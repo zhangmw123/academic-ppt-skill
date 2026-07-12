@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "palettes": {
+    "academic_blue": {
+      "name": "学术深蓝",
+      "recommended_for": ["理工科答辩", "计算机", "通用学术报告"],
+      "colors": {"background": "#F5F7F9", "surface": "#FFFFFF", "primary_dark": "#17324D", "primary": "#2B579A", "primary_soft": "#D8E4F0", "primary_pale": "#EEF3F8", "accent": "#B06A2B", "text": "#20262D", "muted": "#68727D", "line": "#D6DDE4", "positive": "#2E7D5B", "warning": "#B7791F", "negative": "#A33A3A"},
+      "chart": ["#2B579A", "#2E7D5B", "#B06A2B", "#7A5AA6", "#5C7C8A", "#B54A5A"]
+    },
+    "research_green": {
+      "name": "科研青绿",
+      "recommended_for": ["生物", "农业", "环境", "医学"],
+      "colors": {"background": "#F3F7F5", "surface": "#FFFFFF", "primary_dark": "#173F37", "primary": "#26705F", "primary_soft": "#D4E5DF", "primary_pale": "#EDF4F1", "accent": "#A6602A", "text": "#222A28", "muted": "#68736F", "line": "#D5DED9", "positive": "#26705F", "warning": "#B7791F", "negative": "#A33A3A"},
+      "chart": ["#26705F", "#3E7FA6", "#A6602A", "#765A91", "#6D7F47", "#B24D5D"]
+    },
+    "academic_burgundy": {
+      "name": "学术酒红",
+      "recommended_for": ["人文社科", "管理", "正式汇报"],
+      "colors": {"background": "#F7F5F4", "surface": "#FFFFFF", "primary_dark": "#54232D", "primary": "#823B49", "primary_soft": "#E8D9DC", "primary_pale": "#F4ECEE", "accent": "#2F6F73", "text": "#292426", "muted": "#746B6D", "line": "#E0D8DA", "positive": "#39725C", "warning": "#A56B24", "negative": "#9B3344"},
+      "chart": ["#823B49", "#2F6F73", "#A56B24", "#66578A", "#5D7582", "#A65D47"]
+    },
+    "academic_purple": {
+      "name": "深紫灰",
+      "recommended_for": ["人工智能", "数据科学", "交叉学科"],
+      "colors": {"background": "#F8F7FA", "surface": "#FFFFFF", "primary_dark": "#3F315B", "primary": "#665080", "primary_soft": "#DDD5E7", "primary_pale": "#F0ECF4", "accent": "#2F7F78", "text": "#25232A", "muted": "#6F6B76", "line": "#DDD9E2", "positive": "#34735E", "warning": "#A66C27", "negative": "#A43F55"},
+      "chart": ["#665080", "#2F7F78", "#B06A35", "#4778A6", "#8A6D3B", "#B04F68"]
+    },
+    "blue_teal": {
+      "name": "蓝青双色",
+      "recommended_for": ["系统架构", "技术路线", "工程研究"],
+      "colors": {"background": "#F4F7F8", "surface": "#FFFFFF", "primary_dark": "#183B56", "primary": "#286A8A", "primary_soft": "#D4E5EC", "primary_pale": "#EBF3F6", "accent": "#2A8278", "text": "#20282D", "muted": "#66747B", "line": "#D3DEE2", "positive": "#2A8278", "warning": "#AA6C24", "negative": "#A33A45"},
+      "chart": ["#286A8A", "#2A8278", "#9B6B35", "#6D5A8C", "#4F7894", "#A64D5E"]
+    },
+    "neutral_graphite": {
+      "name": "中性黑灰",
+      "recommended_for": ["论文分享", "正式评审", "打印友好"],
+      "colors": {"background": "#F6F6F5", "surface": "#FFFFFF", "primary_dark": "#25282B", "primary": "#4C5359", "primary_soft": "#DFE1E2", "primary_pale": "#F0F1F1", "accent": "#8A4B55", "text": "#202224", "muted": "#6D7174", "line": "#D9DBDC", "positive": "#3F715D", "warning": "#986A2E", "negative": "#93434B"},
+      "chart": ["#4C5359", "#8A4B55", "#3F715D", "#8A6A32", "#4E7180", "#755C86"]
+    },
+    "university_red": {
+      "name": "学校红",
+      "recommended_for": ["校级答辩", "正式仪式", "学校品牌延展"],
+      "colors": {"background": "#F8F6F5", "surface": "#FFFFFF", "primary_dark": "#651D25", "primary": "#963744", "primary_soft": "#EAD7DA", "primary_pale": "#F5EBED", "accent": "#A47A2C", "text": "#292426", "muted": "#746C6E", "line": "#E1D9DA", "positive": "#39705C", "warning": "#A47A2C", "negative": "#963744"},
+      "chart": ["#963744", "#3E7185", "#A47A2C", "#4F765E", "#765A8D", "#B2644D"]
+    },
+    "colorblind_safe": {
+      "name": "色觉友好",
+      "recommended_for": ["多系列实验图表", "无障碍展示", "跨学科报告"],
+      "colors": {"background": "#F7F7F5", "surface": "#FFFFFF", "primary_dark": "#243746", "primary": "#33658A", "primary_soft": "#D8E3EA", "primary_pale": "#EDF2F5", "accent": "#D07A22", "text": "#22272A", "muted": "#697176", "line": "#D8DDE0", "positive": "#2A7F62", "warning": "#D07A22", "negative": "#B34A5A"},
+      "chart": ["#0072B2", "#E69F00", "#009E73", "#CC79A7", "#56B4E9", "#D55E00", "#F0E442", "#000000"]
+    }
+  }
+}

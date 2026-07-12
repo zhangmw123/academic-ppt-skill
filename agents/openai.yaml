@@ -1,0 +1,7 @@
+interface:
+  display_name: "Academic PPT"
+  short_description: "Build scene-aware, template-adaptive academic PPTX decks"
+  default_prompt: "Use $academic-ppt-skill to build a scene-aware academic PPTX that learns my template grammar, grounds claims in evidence, and confirms each phase."
+
+policy:
+  allow_implicit_invocation: true

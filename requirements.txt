@@ -1,0 +1,4 @@
+python-pptx==1.0.2
+PyMuPDF>=1.24,<2
+Pillow>=9.4,<12
+matplotlib>=3.8,<4

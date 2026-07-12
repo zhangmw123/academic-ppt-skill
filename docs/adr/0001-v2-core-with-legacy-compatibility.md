@@ -1,0 +1,3 @@
+# Build a v2 core behind legacy-compatible entry points
+
+The skill will introduce a unified v2 core for workflow state, source evidence, research profiles, template capabilities, layout compilation, visual tasks, QA, and delivery instead of continuing to extend disconnected v1 JSON contracts. Existing useful extraction, rendering, and validation code will be retained behind compatibility adapters for supported commands and artifacts, because an in-place rewrite would break current workflows while unrestricted incremental patching would preserve the architectural gaps that prevent reliable automation.

@@ -1,0 +1,164 @@
+{
+  "schema_version": 2,
+  "aliases": {
+    "开题": "开题答辩",
+    "开题报告": "开题答辩",
+    "中期": "中期考核",
+    "毕业答辩": "毕业答辩",
+    "文献分享": "组会-文献精读",
+    "论文分享": "组会-文献精读",
+    "组会周报": "组会-周报进展",
+    "课题进展": "组会-课题进展",
+    "项目申报": "科研项目申报",
+    "基金申报": "科研项目申报",
+    "科研比赛": "科研项目比赛",
+    "项目验收": "项目中期与结题",
+    "会议报告": "学术会议报告"
+  },
+  "profiles": {
+    "开题答辩": {
+      "family": "degree_review",
+      "objective": "证明选题值得研究、研究空白真实、方案可行、前期基础充分且计划可完成。",
+      "complete_min": 12,
+      "complete_max": 22,
+      "evidence_states": ["planned", "preliminary", "mixed"],
+      "required_tags": ["research_background", "research_significance", "related_work", "research_gap", "objectives", "research_content", "methods", "technical_route", "innovation", "feasibility", "preliminary_work", "schedule", "expected_outputs"],
+      "argument_chain": ["why_it_matters", "what_is_missing", "what_will_be_solved", "how_it_will_be_solved", "why_it_is_feasible", "what_is_new", "when_it_will_be_delivered"],
+      "default_variants": {
+        "standard_6": ["研究背景与意义", "国内外研究现状", "研究目标与内容", "研究方法与技术路线", "创新点与可行性", "进度安排与预期成果"],
+        "problem_driven_6": ["研究背景与现实问题", "现有研究与关键不足", "科学问题与研究目标", "研究思路、内容与方法", "前期基础与创新点", "计划、风险与预期成果"],
+        "compact_5": ["研究背景与意义", "研究现状与研究空白", "研究内容与技术路线", "已完成工作与可行性", "进度安排与预期成果"]
+      },
+      "forbidden": ["把预期结果表述为已验证结论", "用尚未完成的实验制造确定性数字", "把论文目录直接当作答辩论证结构"]
+    },
+    "中期考核": {
+      "family": "degree_review",
+      "objective": "证明研究按计划推进、已形成足够任务量和阶段结果、偏差可控且剩余任务可按期完成。",
+      "complete_min": 12,
+      "complete_max": 22,
+      "evidence_states": ["mixed", "interim"],
+      "required_tags": ["research_overview", "original_plan", "completed_work", "progress_measure", "interim_results", "plan_deviation", "issues", "mitigation", "remaining_work", "next_plan"],
+      "argument_chain": ["what_was_planned", "what_has_been_completed", "what_evidence_exists", "where_the_plan_deviated", "how_risks_are_controlled", "what_remains"],
+      "default_variants": {
+        "progress_5": ["研究任务与原计划", "已完成工作", "阶段性成果", "问题与调整", "下一步计划"],
+        "evidence_6": ["研究概况", "计划与完成度", "已完成任务", "阶段结果与分析", "问题及解决方案", "剩余工作与时间表"]
+      },
+      "forbidden": ["用大量背景和方法介绍挤占进展与结果", "混淆已完成工作和计划工作", "虚构完成比例", "隐藏影响进度的关键问题"]
+    },
+    "毕业答辩": {
+      "family": "degree_review",
+      "objective": "形成问题、方法、实验、结论、贡献和边界完整闭环，证明研究结论可信。",
+      "complete_min": 18,
+      "complete_max": 30,
+      "evidence_states": ["final", "mixed"],
+      "required_tags": ["research_background", "research_problem", "related_work", "research_gap", "objectives", "methods", "data", "experiments", "results", "contributions", "limitations", "future_work"],
+      "argument_chain": ["problem", "gap", "solution", "validation", "interpretation", "contribution", "boundary"],
+      "default_variants": {
+        "classic_5": ["研究背景与问题", "研究内容与方法", "实验与结果", "创新与贡献", "总结与展望"],
+        "method_result_6": ["研究背景", "现状与空白", "研究目标与总体方案", "关键方法", "实验结果与讨论", "贡献、局限与展望"]
+      },
+      "forbidden": ["用代表性样稿冒充完整答辩", "只展示结果不解释实验设计", "省略研究局限和结论边界"]
+    },
+    "组会-文献精读": {
+      "family": "lab_meeting",
+      "objective": "讲清论文解决的问题、证据与方法价值，并转化为对本人课题可执行的启发。",
+      "complete_min": 8,
+      "complete_max": 16,
+      "evidence_states": ["published"],
+      "required_tags": ["paper_metadata", "venue_context", "author_context", "research_problem", "method", "experiments", "innovation", "limitations", "research_inspiration", "next_action"],
+      "argument_chain": ["who_and_where", "what_problem", "why_existing_work_is_insufficient", "how_the_paper_solves_it", "whether_evidence_supports_it", "what_can_be_borrowed", "what_to_do_next"],
+      "default_variants": {
+        "deep_reading_6": ["论文与作者信息", "研究问题与动机", "核心方法", "实验与结果", "创新与局限", "课题启发与下一步"],
+        "replication_6": ["论文概览", "方法原理", "实验配置", "复现结果", "差异与问题", "课题应用计划"]
+      },
+      "quality_gates": [
+        "单张方法图或结果图必须有相邻的读图结论、机制解释或比较口径和证据边界",
+        "多栏版式必须有足够的分栏证据，否则改用紧凑版式或调整原始文本框与面板尺寸",
+        "课题启发必须包含可迁移机制、验证问题、复现或消融设计、评价指标和下一步动作",
+        "导航字体与字号全篇一致，仅当前板块使用深色底"
+      ],
+      "forbidden": ["按论文章节逐页翻译", "把汇报者推断写成作者结论", "只讲论文不落到本人课题", "单图无解读", "用请讨论作为默认结尾"]
+    },
+    "组会-周报进展": {
+      "family": "lab_meeting",
+      "objective": "高效呈现近期任务、原始证据、失败尝试、阻碍和下一步可执行动作。",
+      "complete_min": 5,
+      "complete_max": 12,
+      "evidence_states": ["interim", "mixed", "planned"],
+      "required_tags": ["period_focus", "completed_tasks", "learning_and_reading", "experiment_progress", "evidence", "failed_attempts", "issues", "discussion", "next_actions"],
+      "argument_chain": ["what_was_planned", "what_was_done", "what_was_learned", "what_failed_or_blocked", "what_decision_is_needed", "what_happens_next"],
+      "default_variants": {
+        "weekly_5": ["本周任务", "文献与学习", "实验与结果", "问题与讨论", "下周计划"],
+        "compact_4": ["任务完成情况", "关键证据与发现", "问题及需要的支持", "下一步行动"]
+      },
+      "forbidden": ["重复完整论文背景", "只列完成事项而没有证据和下一步", "隐藏失败尝试和阻碍"]
+    },
+    "组会-课题进展": {
+      "family": "lab_meeting",
+      "objective": "围绕课题或论文当前阶段，展示已完成模块、阶段结论、缺口和下一步研究决策。",
+      "complete_min": 7,
+      "complete_max": 16,
+      "evidence_states": ["interim", "mixed"],
+      "required_tags": ["research_focus", "stage_goal", "completed_modules", "interim_results", "experiment_gap", "writing_progress", "risks", "next_actions"],
+      "argument_chain": ["current_question", "completed_work", "current_evidence", "remaining_gap", "decision_or_support_needed", "next_experiment_or_writing_step"],
+      "default_variants": {
+        "research_5": ["课题目标与当前阶段", "已完成研究内容", "阶段结果", "缺口与问题", "下一步实验与写作"],
+        "paper_5": ["论文主线", "已完成章节与实验", "当前核心结果", "缺失实验与风险", "投稿计划"]
+      },
+      "forbidden": ["把组会做成完整毕业答辩", "只讲方法不讲当前证据", "没有明确需要讨论的决策"]
+    },
+    "科研项目申报": {
+      "family": "project",
+      "objective": "证明项目必要、目标可考核、路线可实施、团队有基础且风险可控制。",
+      "complete_min": 12,
+      "complete_max": 24,
+      "evidence_states": ["planned", "preliminary", "mixed"],
+      "required_tags": ["necessity", "objectives", "indicators", "research_content", "technical_route", "feasibility", "innovation", "team", "schedule", "risk", "outputs"],
+      "argument_chain": ["why_now", "what_will_be_delivered", "how_it_will_be_done", "why_this_team", "what_is_new", "how_risk_is_controlled"],
+      "default_variants": {
+        "application_6": ["立项背景与必要性", "目标与考核指标", "研究内容与技术路线", "创新点", "基础与团队", "计划、风险与产出"]
+      },
+      "forbidden": ["只讲技术不讲任务和指标", "把创新点写成一般性工作", "缺少风险和备选方案"]
+    },
+    "科研项目比赛": {
+      "family": "project",
+      "objective": "在有限时间内证明问题真实、方案有优势、验证充分且具备应用或推广价值。",
+      "complete_min": 8,
+      "complete_max": 18,
+      "evidence_states": ["preliminary", "mixed", "final"],
+      "required_tags": ["problem", "user_or_scenario", "solution", "core_technology", "innovation", "validation", "comparative_advantage", "application_value", "team", "roadmap"],
+      "argument_chain": ["pain", "solution", "why_better", "proof", "value", "execution"],
+      "default_variants": {
+        "competition_6": ["问题与应用场景", "解决方案", "核心技术与创新", "验证结果", "应用价值与优势", "团队与推进计划"]
+      },
+      "forbidden": ["用口号代替验证", "虚构市场或应用数据", "科研汇报中过度商业包装"]
+    },
+    "项目中期与结题": {
+      "family": "project",
+      "objective": "按任务书审计目标、指标、成果和问题，说明项目完成状态与后续处置。",
+      "complete_min": 10,
+      "complete_max": 22,
+      "evidence_states": ["interim", "final", "mixed"],
+      "required_tags": ["contract_objectives", "indicator_status", "completed_tasks", "results", "deliverables", "issues", "risk", "remaining_or_followup"],
+      "argument_chain": ["contract", "completion", "evidence", "gap", "resolution", "delivery"],
+      "default_variants": {
+        "milestone_6": ["任务书与目标", "任务完成情况", "指标与成果证据", "应用或影响", "问题与整改", "后续工作"],
+        "acceptance_5": ["项目目标", "完成情况", "成果与指标对照", "问题与边界", "交付与推广"]
+      },
+      "forbidden": ["只展示亮点不对照任务书", "用过程活动代替成果证据", "隐藏未完成指标"]
+    },
+    "学术会议报告": {
+      "family": "academic_talk",
+      "objective": "在会议时限内让同行快速理解研究问题、核心方法、最强结果和贡献边界。",
+      "complete_min": 8,
+      "complete_max": 18,
+      "evidence_states": ["published", "final", "mixed"],
+      "required_tags": ["motivation", "research_problem", "method", "experiment_setup", "key_results", "contribution", "limitations", "takeaway"],
+      "argument_chain": ["motivation", "problem", "idea", "evidence", "contribution", "takeaway"],
+      "default_variants": {
+        "conference_5": ["研究动机", "问题与核心思路", "方法", "关键结果", "贡献与结论"]
+      },
+      "forbidden": ["塞入完整论文所有细节", "结果页没有比较对象和结论", "超出会议时间预算"]
+    }
+  }
+}

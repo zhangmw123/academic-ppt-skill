@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+ppt_output/
+~$*.pptx
+
+# Local reference and test inputs; bundled templates live under assets/templates/.
+/*.pptx
+/*.pdf
+/*.jpg
+/*.jpeg
+/*.png

@@ -1,0 +1,66 @@
+{
+  "schema_version": 3,
+  "template_mode": "template_native",
+  "confirmed": true,
+  "font_policy": {"zh": "Microsoft YaHei", "latin": "Times New Roman"},
+  "pages": [
+    {
+      "page_id": "P01",
+      "layout": "comparison",
+      "render_mode": "template_native",
+      "source_slide_index": 4,
+      "layout_signature": "three_columns",
+      "clear_unbound_text": true,
+      "text_bindings": [
+        {"shape_id": 164, "content": "三项研究内容共同支撑总体目标"},
+        {"shape_id": 169, "content": "研究内容一"},
+        {"shape_id": 171, "content": "研究内容二"},
+        {"shape_id": 173, "content": "研究内容三"},
+        {"shape_id": 174, "content": "数据与问题定义"},
+        {"shape_id": 175, "content": "方法设计与实现"},
+        {"shape_id": 176, "content": "实验验证与应用"}
+      ]
+    },
+    {
+      "page_id": "P02",
+      "layout": "process",
+      "render_mode": "template_native",
+      "source_slide_index": 5,
+      "layout_signature": "five_columns",
+      "clear_unbound_text": true,
+      "text_bindings": [
+        {"shape_id": 262, "content": "五阶段技术路线保持模板原生结构"},
+        {"shape_id": 269, "content": "STEP 1"},
+        {"shape_id": 270, "content": "问题定义"},
+        {"shape_id": 273, "content": "STEP 2"},
+        {"shape_id": 274, "content": "数据准备"},
+        {"shape_id": 277, "content": "STEP 3"},
+        {"shape_id": 278, "content": "模型设计"},
+        {"shape_id": 281, "content": "STEP 4"},
+        {"shape_id": 282, "content": "实验验证"},
+        {"shape_id": 285, "content": "STEP 5"},
+        {"shape_id": 286, "content": "总结交付"}
+      ]
+    },
+    {
+      "page_id": "P03",
+      "layout": "points",
+      "render_mode": "template_adaptive",
+      "source_slide_index": 6,
+      "layout_signature": "four_columns",
+      "clear_unbound_text": true,
+      "text_bindings": [
+        {"shape_id": 222, "content": "四项创新点直接写入原文本框"},
+        {"shape_id": 227, "content": "创新一"},
+        {"shape_id": 229, "content": "创新二"},
+        {"shape_id": 231, "content": "创新三"},
+        {"shape_id": 233, "content": "创新四"},
+        {"shape_id": 235, "content": "数据层创新"},
+        {"shape_id": 238, "content": "方法层创新"},
+        {"shape_id": 241, "content": "验证层创新"},
+        {"shape_id": 244, "content": "应用层创新"}
+      ],
+      "adjustments": [{"shape_id": 236, "font_size_pt": 13}]
+    }
+  ]
+}

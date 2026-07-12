@@ -1,0 +1,44 @@
+{
+  "schema_version": 3,
+  "scene": "开题答辩",
+  "objective": "证明选题必要、研究方案可行且计划可完成。",
+  "audience": "开题答辩专家组",
+  "duration_minutes": 3,
+  "evidence_state": "mixed",
+  "section_variant": "compact_5",
+  "sections": ["研究背景与意义", "研究现状与研究空白", "研究内容与技术路线", "已完成工作与可行性", "进度安排与预期成果"],
+  "storyline": ["为什么需要研究", "现有工作缺什么", "准备怎样解决", "为什么能够完成"],
+  "template_path": "assets/templates/绿色-科研风格PPT模版.pptx",
+  "template_mode": "template_native",
+  "palette": "academic_purple",
+  "font_policy": "沿用模板字体",
+  "pages": [
+    {
+      "page_id": "P01", "layout": "cover", "section": "研究背景与意义",
+      "page_role": "opening", "title": "研究课题开题答辩",
+      "question_answered": "本次汇报研究什么？", "content_units": ["课题名称", "汇报人和导师"],
+      "visual_strategy": "template_cover", "template_layout_need": {"component_count": 2, "relationship": "hierarchy"},
+      "time_seconds": 20, "next_link": "从研究对象进入现实问题。"
+    },
+    {
+      "page_id": "P02", "layout": "text_figure", "section": "研究背景与意义",
+      "page_role": "situation", "title": "现实需求使该问题具有明确研究价值",
+      "question_answered": "为什么值得研究？", "content_units": ["现实问题", "学术意义", "应用意义"],
+      "evidence_ids": ["E01"], "asset_ids": ["FIG_001"],
+      "visual_strategy": "source_figure", "template_layout_need": {"component_count": 2, "relationship": "text_figure", "preferred_signatures": ["text_figure_right"]},
+      "time_seconds": 75, "next_link": "需求明确后，需要判断现有研究是否已经解决。"
+    },
+    {
+      "page_id": "P03", "layout": "comparison", "section": "研究现状与研究空白",
+      "page_role": "complication", "title": "三类现有方法仍留下共同研究空白",
+      "question_answered": "现有工作还缺什么？", "content_units": ["方法类别一", "方法类别二", "方法类别三"],
+      "evidence_ids": ["E02", "E03"],
+      "visual_strategy": "structured_comparison", "template_layout_need": {"component_count": 3, "relationship": "comparison", "preferred_signatures": ["three_columns"]},
+      "time_seconds": 85, "next_link": "研究空白决定下一步的目标与技术路线。"
+    }
+  ],
+  "missing_information": ["学校规定的答辩时长待确认"],
+  "supplemental_visuals": ["根据材料关系绘制可编辑技术路线图"],
+  "risks": ["前期实验数据较少，需要明确标注为初步结果"],
+  "confirmed": false
+}
