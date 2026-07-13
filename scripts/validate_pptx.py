@@ -125,7 +125,7 @@ def estimate_overflow(shape) -> float:
 
 
 def validate(pptx_path: Path, plan_path: Path | None, render_mode: str, preview_dir: Path,
-             selected_page_ids: set[str] | None = None):
+             selected_page_ids: set[str] | None = None, render_engine: str = "auto"):
     report = {
         "file": str(pptx_path.resolve()),
         "validated_at": datetime.now(timezone.utc).isoformat(),
@@ -205,7 +205,7 @@ def validate(pptx_path: Path, plan_path: Path | None, render_mode: str, preview_
 
     if render_mode != "off":
         try:
-            export_preview(pptx_path, preview_dir, "auto", 1600, 900)
+            export_preview(pptx_path, preview_dir, render_engine, 1600, 900)
         except Exception as exc:
             level = "ERROR" if render_mode == "required" or find_powerpoint() else "WARNING"
             add_check(report, "Real application render succeeds", level, False, str(exc))
@@ -221,6 +221,7 @@ def main():
     parser.add_argument("--layout-plan")
     parser.add_argument("--output", required=True)
     parser.add_argument("--render-check", choices=["off", "auto", "required"], default="auto")
+    parser.add_argument("--render-engine", choices=["auto", "powerpoint", "wps", "libreoffice"], default="auto")
     parser.add_argument("--preview-dir")
     parser.add_argument("--pages", help="Comma-separated page IDs when validating a sample render")
     args = parser.parse_args()
@@ -228,7 +229,7 @@ def main():
     preview_dir = Path(args.preview_dir) if args.preview_dir else output.parent / "rendered-preview"
     selected = {value.strip() for value in args.pages.split(",")} if args.pages else None
     report = validate(Path(args.pptx), Path(args.layout_plan) if args.layout_plan else None,
-                      args.render_check, preview_dir, selected)
+                      args.render_check, preview_dir, selected, args.render_engine)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps({key: report[key] for key in ["passed", "failed_error", "failed_warning"]}, ensure_ascii=False))

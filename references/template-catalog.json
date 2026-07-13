@@ -1,13 +1,13 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "templates": [
-    {"id": "T01", "short_name": "绿色科研", "aliases": ["01", "1", "绿色", "绿色模板", "绿色科研模板"], "path": "assets/templates/绿色-科研风格PPT模版.pptx", "recommended_scenes": ["组会-文献精读", "组会-周报进展", "组会-课题进展", "开题答辩", "学术会议报告"]},
-    {"id": "T02", "short_name": "蓝色科研", "aliases": ["02", "2", "蓝色科研", "蓝色科研模板", "蓝色升级版"], "path": "assets/templates/蓝色-科研学术汇报通用模板_升级版.pptx", "recommended_scenes": ["毕业答辩", "组会-课题进展", "学术会议报告"]},
-    {"id": "T03", "short_name": "蓝色答辩", "aliases": ["03", "3", "蓝色答辩", "蓝色学术答辩"], "path": "assets/templates/蓝色-学术答辩多版式通用模板 (Academic Defense Multi-Layout Template).pptx", "recommended_scenes": ["开题答辩", "中期考核", "毕业答辩"]},
-    {"id": "T04", "short_name": "项目申报", "aliases": ["04", "4", "项目申报模板", "科研项目模板"], "path": "assets/templates/科研项目申报汇报模板.pptx", "recommended_scenes": ["科研项目申报", "科研项目比赛", "项目中期与结题"]},
-    {"id": "T05", "short_name": "红色通用", "aliases": ["05", "5", "红色", "红色模板", "红色通用模板"], "path": "assets/templates/红色-通用模版.pptx", "recommended_scenes": ["开题答辩", "中期考核", "科研项目比赛"]},
-    {"id": "T06", "short_name": "云大紫色", "aliases": ["06", "6", "云大紫", "云大紫色模板"], "path": "assets/templates/云大答辩PPT-紫色款.pptx", "recommended_scenes": ["开题答辩", "中期考核", "毕业答辩"]},
-    {"id": "T07", "short_name": "云大红色", "aliases": ["07", "7", "云大红", "云大红色模板"], "path": "assets/templates/云大答辩PPT-红色款.pptx", "recommended_scenes": ["开题答辩", "中期考核", "毕业答辩"]},
-    {"id": "T08", "short_name": "云大蓝色", "aliases": ["08", "8", "云大蓝", "云大蓝色模板"], "path": "assets/templates/云大答辩PPT-蓝色款.pptx", "recommended_scenes": ["开题答辩", "中期考核", "毕业答辩"]}
+    {"id": "T01", "short_name": "绿色科研", "aliases": ["01", "1", "绿色"], "path": "assets/powerpoint_templates/T01_green_research.pptx", "recommended_scenes": ["组会-文献精读", "组会-周报进展", "组会-课题进展", "开题答辩", "学术会议报告"]},
+    {"id": "T02", "short_name": "蓝色科研", "aliases": ["02", "2", "蓝色科研"], "path": "assets/powerpoint_templates/T02_blue_research.pptx", "recommended_scenes": ["毕业答辩", "组会-课题进展", "学术会议报告"]},
+    {"id": "T03", "short_name": "蓝色答辩", "aliases": ["03", "3", "蓝色答辩"], "path": "assets/powerpoint_templates/T03_blue_defense.pptx", "recommended_scenes": ["开题答辩", "中期考核", "毕业答辩"]},
+    {"id": "T04", "short_name": "项目申报", "aliases": ["04", "4", "项目申报"], "path": "assets/powerpoint_templates/T04_project_application.pptx", "recommended_scenes": ["科研项目申报", "科研项目比赛", "项目中期与结题"]},
+    {"id": "T05", "short_name": "红色通用", "aliases": ["05", "5", "红色"], "path": "assets/powerpoint_templates/T05_red_general.pptx", "recommended_scenes": ["开题答辩", "中期考核", "科研项目比赛"]},
+    {"id": "T06", "short_name": "云大紫色", "aliases": ["06", "6", "云大紫色"], "path": "assets/powerpoint_templates/T06_yunnan_purple.pptx", "recommended_scenes": ["开题答辩", "中期考核", "毕业答辩"]},
+    {"id": "T07", "short_name": "云大红色", "aliases": ["07", "7", "云大红色"], "path": "assets/powerpoint_templates/T07_yunnan_red.pptx", "recommended_scenes": ["开题答辩", "中期考核", "毕业答辩"]},
+    {"id": "T08", "short_name": "云大蓝色", "aliases": ["08", "8", "云大蓝色"], "path": "assets/powerpoint_templates/T08_yunnan_blue.pptx", "recommended_scenes": ["开题答辩", "中期考核", "毕业答辩"]}
   ]
 }

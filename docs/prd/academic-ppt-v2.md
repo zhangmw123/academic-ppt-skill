@@ -6,6 +6,10 @@ issue_tracker_status: local-only
 
 # Academic PPT v2 PRD
 
+> 1.0 的公开发布范围、验收矩阵和完成条件由
+> [Academic PPT Skill 1.0 Release PRD](academic-ppt-skill-1.0.md) 定义。本文件保留
+> 长期 V2 架构、完整需求池和后续演进约束。
+
 ## Problem Statement
 
 工科学生需要把论文、学位论文、项目书、实验记录、调查数据、旧 PPT、图片、表格和公式转化为符合开题、中期、毕业答辩、组会、项目申报及会议报告要求的科研 PPT。现有 Skill 已具备场景规则、证据台账、模板解析、PPTX 克隆渲染和基础 QA，但规范与执行之间存在明显断层：素材解析主要停留在 PDF 内嵌图片，模板组件未形成可执行能力图，页面合同不会自动编译为合理布局，补充图表没有完整生产闭环，页面审核偏重文件结构而无法证明内容、证据、布局和视觉是否合理。
@@ -23,6 +27,8 @@ V2 以科研论证和可读性为最高优先级。模板通过 **Native Reuse**
 系统自动识别一个主要及若干辅助 **Research Method Profile**，第一版支持计算与模型、实验室实验、调查与统计、工程系统、文献与证据综合，并允许同一套 PPT 在页面级组合多个画像。**Presentation Scene** 决定汇报必须证明什么，方法画像决定什么算作证据、应该使用什么视觉载体以及如何审核。
 
 系统采用 **Guided Workflow** 与 **Autonomous Draft** 两种交互方式，并独立选择 Lean、Standard 或 Strict **Rigor Profile**。正式交付必须经过用户确认；自动模式只能生成内部 QA 通过但未获用户批准的草稿。
+
+对于公开的 1.0 **Academic PPT Skill**，Guided Workflow 是默认调用契约：素材与任务、故事线、逐页规划、视觉蓝图和代表页需要用户确认。仅当用户明确请求时才启用 Autonomous Draft，且其输出始终是未确认草稿，不能作为正式交付。
 
 最终系统必须能够证明 PPT 合理，但不在每页显示内部审核或强制参考文献。证明材料通过 **Evidence Provenance**、**Deck Rationale**、QA 报告及真实渲染结果保存在页面外。
 
@@ -136,7 +142,7 @@ V2 以科研论证和可读性为最高优先级。模板通过 **Native Reuse**
 106. 作为现有用户，我希望旧命令和受支持的 v1 产物仍能通过兼容层运行，从而平滑迁移。
 107. 作为维护者，我希望新项目统一进入 V2 Core，从而不继续扩展松散 v1 合同。
 108. 作为维护者，我希望现有渲染、克隆、导出和基础验证能力被复用，从而避免无价值重写。
-109. 作为维护者，我希望 8 个 Core Benchmark Suite 案例作为发布基准，从而防止优化一个场景破坏另一个场景。
+109. 作为维护者，我希望 10 个 Core Benchmark Suite 案例作为发布基准，从而防止优化一个场景破坏另一个场景。
 110. 作为维护者，我希望快速结构测试在每次修改运行，完整端到端与模板压力测试按风险运行，从而平衡反馈速度和覆盖率。
 
 ## Implementation Decisions
@@ -196,7 +202,7 @@ V2 以科研论证和可读性为最高优先级。模板通过 **Native Reuse**
 - Revision Baseline Manager 测试页面新增/删除/换序、手工文本和几何变化检测、未指定页面保护、局部修改和重建披露。
 - Rendering Runtime Adapter 至少在 Windows PowerPoint 完成真实渲染回归；WPS 目标案例必须在 WPS 验证。无权威运行环境时测试必须明确标记未完成视觉验收。
 - Delivery Builder 测试 deliverables/audit/working 隔离、资源自包含、版本哈希一致、未确认草稿隔离和临时文件不泄漏。
-- Core Benchmark Suite 包含八个固定端到端案例：计算模型毕业答辩、实验室实验中期、调查统计开题、工程系统项目申报、文献精读组会、混合方法工程项目、周报进展组会、课题进展组会。
+- Core Benchmark Suite 包含十个固定端到端案例，分别覆盖开题答辩、中期考核、毕业答辩、组会-文献精读、组会-周报进展、组会-课题进展、科研项目申报、科研项目比赛、项目中期与结题和学术会议报告；每个案例选择能检验其方法画像与证据要求的代表性材料。
 - 六份根目录 PPTX 是 Reference Corpus 和压力素材，不作为统一视觉金标准；页面级正例、可借鉴例和反例需分别标注。
 - 八个内置模板进入跨模板回归；模板家族色彩变体允许共享几何，但必须保留可识别身份。
 - 每次修改运行快速结构测试；修改解析、布局、渲染或 QA 时运行相关端到端案例；发布与新增模板时运行完整 Core Benchmark Suite 和模板压力集。
@@ -220,6 +226,6 @@ V2 以科研论证和可读性为最高优先级。模板通过 **Native Reuse**
 ## Further Notes
 
 - 本 PRD 使用项目领域词汇，并遵循“Build a v2 core behind legacy-compatible entry points”架构决策。
-- 推荐实施顺序：建立八个端到端基准与 characterization tests；统一 schema 与 workflow state；构建 Source Ingestion 与 Evidence Graph；构建 Template Capability Graph；实现 Layout Compiler；完成 Visual Task Pipeline；接入四层 QA；实现 Revision Baseline Manager 与 Delivery Builder；最后收敛 Legacy Compatibility Adapter。
+- 推荐实施顺序：建立十个端到端基准与 characterization tests；统一 schema 与 workflow state；构建 Source Ingestion 与 Evidence Graph；构建 Template Capability Graph；实现 Layout Compiler；完成 Visual Task Pipeline；接入四层 QA；实现 Revision Baseline Manager 与 Delivery Builder；最后收敛 Legacy Compatibility Adapter。
 - 采用纵向切片实施，每个里程碑至少完成一个真实场景从输入到可渲染页面的闭环，避免先建设大量孤立 schema 而长期无法验证成品。
 - 当前目录没有项目级 issue tracker 配置，且环境没有 GitHub CLI；本 PRD 因此以 `needs-triage` 状态保存在项目内，尚未发布为 GitHub Issue。

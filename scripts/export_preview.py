@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
@@ -34,22 +35,44 @@ def find_wps() -> bool:
 
 
 def export_with_powerpoint(pptx: Path, output_dir: Path, width: int, height: int) -> None:
-    safe_in = str(pptx.resolve()).replace("'", "''")
-    safe_out = str(output_dir.resolve()).replace("'", "''")
-    command = (
-        "$ErrorActionPreference='Stop'; $ppt=$null; $pres=$null; "
-        "try { "
-        "$ppt=New-Object -ComObject PowerPoint.Application; "
-        f"$pres=$ppt.Presentations.Open('{safe_in}',$true,$true,$false); "
-        f"$pres.Export('{safe_out}','PNG',{width},{height}); "
-        "} finally { "
-        "if($pres){$pres.Close(); [Runtime.InteropServices.Marshal]::ReleaseComObject($pres)|Out-Null}; "
-        "if($ppt){$ppt.Quit(); [Runtime.InteropServices.Marshal]::ReleaseComObject($ppt)|Out-Null} "
-        "}"
-    )
-    encoded = base64.b64encode(command.encode("utf-16-le")).decode("ascii")
-    subprocess.run(["powershell", "-NoProfile", "-EncodedCommand", encoded], check=True,
-                   timeout=120, capture_output=True)
+    # PowerPoint COM can reject otherwise valid PPTX files opened from non-ASCII
+    # workspace paths. Stage both COM paths under an ASCII-only temporary root.
+    with tempfile.TemporaryDirectory(prefix="academic-ppt-powerpoint-") as temp_dir:
+        staging_root = Path(temp_dir)
+        staged_input = staging_root / "deck.pptx"
+        staged_output = staging_root / "png"
+        staged_output.mkdir()
+        shutil.copy2(pptx, staged_input)
+        safe_in = str(staged_input).replace("'", "''")
+        safe_out = str(staged_output).replace("'", "''")
+        command = (
+            "$ErrorActionPreference='Stop'; $ppt=$null; $pres=$null; "
+            "try { "
+            "$ppt=New-Object -ComObject PowerPoint.Application; "
+            f"$pres=$ppt.Presentations.Open('{safe_in}',$true,$true,$false); "
+            f"$pres.Export('{safe_out}','PNG',{width},{height}); "
+            "} finally { "
+            "if($pres){$pres.Close(); [Runtime.InteropServices.Marshal]::ReleaseComObject($pres)|Out-Null}; "
+            "if($ppt){$ppt.Quit(); [Runtime.InteropServices.Marshal]::ReleaseComObject($ppt)|Out-Null} "
+            "}"
+        )
+        encoded = base64.b64encode(command.encode("utf-16-le")).decode("ascii")
+        for attempt in range(2):
+            try:
+                subprocess.run(["powershell", "-NoProfile", "-EncodedCommand", encoded], check=True,
+                               timeout=120, capture_output=True)
+                break
+            except subprocess.CalledProcessError as exc:
+                detail = _process_failure_detail(exc)
+                if attempt == 0 and "rpc server is unavailable" in detail.lower():
+                    time.sleep(1)
+                    continue
+                raise RuntimeError(f"PowerPoint export failed: {detail}") from exc
+        images = [*staged_output.glob("*.PNG"), *staged_output.glob("*.png")]
+        if not images:
+            raise RuntimeError("PowerPoint export completed without PNG files")
+        for image in images:
+            shutil.copy2(image, output_dir / image.name)
 
 
 def export_with_wps(pptx: Path, output_dir: Path, width: int, height: int) -> None:
@@ -67,8 +90,22 @@ def export_with_wps(pptx: Path, output_dir: Path, width: int, height: int) -> No
         "}"
     )
     encoded = base64.b64encode(command.encode("utf-16-le")).decode("ascii")
-    subprocess.run(["powershell", "-NoProfile", "-EncodedCommand", encoded], check=True,
-                   timeout=120, capture_output=True)
+    try:
+        subprocess.run(["powershell", "-NoProfile", "-EncodedCommand", encoded], check=True,
+                       timeout=120, capture_output=True)
+    except subprocess.CalledProcessError as exc:
+        detail = _process_failure_detail(exc)
+        raise RuntimeError(f"WPS export failed: {detail}") from exc
+
+
+def _process_failure_detail(exc: subprocess.CalledProcessError) -> str:
+    values = (exc.stderr, exc.stdout)
+    detail = "\n".join(
+        value.decode(errors="replace") if isinstance(value, bytes) else str(value)
+        for value in values
+        if value
+    ).strip()
+    return detail or f"process exited with code {exc.returncode}"
 
 
 def export_with_libreoffice(pptx: Path, output_dir: Path, width: int, height: int) -> None:

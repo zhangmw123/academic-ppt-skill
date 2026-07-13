@@ -3,9 +3,13 @@ __pycache__/
 ppt_output/
 ~$*.pptx
 
-# Local reference and test inputs; bundled templates live under assets/templates/.
+# Local reference and test inputs; bundled templates live under assets/.
 /*.pptx
 /*.pdf
 /*.jpg
 /*.jpeg
 /*.png
+
+# Office-suite recovery snapshots are machine-local artifacts.
+.wpp_backup/
+*.wppsnapshot.*

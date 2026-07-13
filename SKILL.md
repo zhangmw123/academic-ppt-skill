@@ -1,6 +1,6 @@
 ---
 name: academic-ppt-skill
-description: Create editable academic PPTX presentations from papers, theses, proposals, experiment reports, PDFs, DOCX, figures, and tables. Use for thesis defenses, proposal defenses, mid-term reviews, lab meetings, journal clubs, paper sharing, project applications, and requests such as 论文答辩PPT、开题PPT、组会汇报、论文分享、科研汇报. Learn visual rules from a user or bundled PPTX without forcing its sample page structure, build an evidence-grounded storyline, confirm each phase, generate dynamic navigation and scientific visuals, and verify the final deck through PowerPoint, WPS, or LibreOffice rendering.
+description: Create editable academic PPTX presentations from papers, theses, proposals, experiment reports, PDFs, DOCX, figures, and tables. Use for thesis defenses, proposal defenses, mid-term reviews, lab meetings, journal clubs, paper sharing, project applications, and requests such as 论文答辩PPT、开题PPT、组会汇报、论文分享、科研汇报. Learn visual rules from a user or bundled PPTX without forcing its sample page structure, build an evidence-grounded storyline, confirm each phase, generate dynamic navigation and scientific visuals, and verify formal 1.0 delivery through Windows PowerPoint; WPS or LibreOffice renders provide compatibility evidence only.
 ---
 
 # Academic PPT
@@ -83,24 +83,50 @@ and decorative pictures.
 
 ## First response
 
-Discover obvious workspace files before asking the user to repeat paths. Obtain or
-confirm:
+Discover obvious workspace files before asking the user to repeat paths. Infer the
+primary source, Presentation Scene, Method Profiles, a compatible bundled template,
+duration, language, scene sections, palette, font policy, cover fields, logo,
+speaker-note preference, and Guided Workflow mode whenever the material or request
+makes a choice non-blocking.
 
-- one primary source;
-- scene: `开题报告`, `中期考核`, `毕业答辩`, `组会汇报`, `论文分享`,
-  `项目申报`, or `自定义`;
-- template path or a stable bundled ID from `T01` to `T08`; show the user both
-  ID and short name, such as `T01 绿色科研` and `T02 蓝色科研`, and accept aliases
-  such as `01`, `绿色模板`, or `蓝色科研` through `resolve_template.py`;
-- duration or target page range;
-- language;
-- scene section variant and any user replacements, merges, or custom sections;
-- template palette: preserve, academic preset, or custom primary color;
-- font policy: preserve, academic default, or explicit Chinese/Latin fonts;
-- presenter/supervisor/institution/date for a formal cover;
-- optional logo path;
-- speaker notes preference;
-- interaction mode: gated by default, full automation only on explicit request.
+Present one concise task summary of the inferred choices and request confirmation or
+correction. Ask a direct follow-up only when a required source, scene, template,
+formal-cover detail, delivery choice, or user decision remains missing or materially
+ambiguous. Do not present an upfront internal configuration questionnaire.
+
+Infer output language from the request and materials. Formally support Simplified
+Chinese, English, and mixed Chinese-English decks; disclose that other languages are
+best-effort unless their typography and render coverage has been added.
+
+When no user template is supplied, select one compatible bundled template from T01
+to T08 and state its ID and short name in the summary. Show alternatives or previews
+only when confidence is low, the request materially conflicts with the selection, or
+the user asks to compare styles.
+
+## Portable V2 CLI
+
+Run the V2 Core through this skill's own script path, not through a relative
+`python -m academic_ppt` command. The user's current directory is normally their
+project, while the installed skill lives elsewhere.
+
+Use the absolute path of this skill directory when invoking:
+
+```powershell
+python "<skill-root>/scripts/academic_ppt_cli.py" analyze "<source>" ["<source>" ...]
+python "<skill-root>/scripts/academic_ppt_cli.py" init "<project>" --scene "毕业答辩" --rigor standard
+python "<skill-root>/scripts/academic_ppt_cli.py" status "<project>"
+python "<skill-root>/scripts/academic_ppt_cli.py" prepare "<project>" "<source>" ["<source>" ...] --scene "毕业答辩"
+python "<skill-root>/scripts/academic_ppt_cli.py" confirm-brief "<project>" --note "User confirmed the task summary"
+```
+
+`analyze` is local and read-only. It normalizes sources, recommends Research
+Method Profiles, emits traceable Evidence IDs, and reports material metric
+conflicts. Use it to establish the evidence basis; it does not replace the
+Phase 0 confirmation gate or claim that a PPTX has been produced.
+
+`prepare` is the preferred internal entry point for a Guided Workflow. It creates
+the task summary and leaves Phase 0 awaiting confirmation. Use `confirm-brief`
+only after the user has explicitly approved that summary.
 
 ## Phase protocol
 
@@ -293,6 +319,10 @@ Prefer transparent subject images for plants and organisms; use background image
 only when it does not compete with evidence. Add attribution in notes or an asset
 manifest when required by the license.
 
+Use external retrieval only for a necessary missing public visual. Do not transmit
+user-supplied documents, raw data, screenshots, or unpublished material to the
+external source without explicit authorization.
+
 Normalize every downloaded or generated bitmap before insertion to remove EXIF,
 alpha-channel, color-profile, and codec incompatibilities:
 
@@ -309,6 +339,11 @@ python scripts/validate_visual_tasks.py ppt_output/visual_tasks.json --evidence 
 
 Never invent chart values. A page that needs a diagram must not silently degrade
 to five bullets because drawing is inconvenient.
+
+Apply only auditable Presentation Transforms by default. Request explicit user
+authorization before any Derived Analysis such as a new statistical test, regression,
+model evaluation, or scientific inference; record and label authorized results as
+system-computed rather than source-reported evidence.
 
 Stop after showing the blueprint, navigation hierarchy, drawing task list, and
 representative layouts.
@@ -341,9 +376,10 @@ Deliver only when all ERROR checks pass and rendered previews have been visually
 reviewed. Provide:
 
 - timestamped editable PPTX;
-- full contact sheet and individual slide PNGs;
-- `render_report.json`;
-- evidence ledger, selected storyline, content lock, and dynamic plan.
+- separate DOCX speaker script and Concise Speaker Notes in the PPTX;
+- full contact sheet, individual slide PNGs, `render_report.json`, evidence ledger,
+  selected storyline, content lock, and dynamic plan as retained supporting artifacts,
+  not normal-user visible deliverables by default.
 
 ## Rendering modes
 
@@ -367,6 +403,19 @@ python scripts/check_templates.py --grammar-check
 python scripts/check_templates.py --render-check --style-learning-check --grammar-check
 ```
 
+For release or scene-contract changes, run the fixed ten-scene suite through the
+same V2 service used by normal Skill invocations. A structural run is a fast
+regression check; only the formal command satisfies the Authoritative Runtime gate:
+
+```powershell
+python "<skill-root>/scripts/run_scene_benchmarks.py"
+python "<skill-root>/scripts/run_scene_benchmarks.py" --formal --runtime powerpoint
+```
+
+Do not fork per-scene application logic. Update
+[scene-benchmarks.json](references/scene-benchmarks.json) when a fixed case changes,
+and keep its expected coverage synchronized with the canonical scene profiles.
+
 For cross-template regression, render the same content with two templates and run:
 
 ```powershell
@@ -388,6 +437,7 @@ python scripts/validate_template_usage.py ppt_output/dynamic_plan.json ppt_outpu
 - Workflow and visual task schemas: [workflow-schema.md](references/workflow-schema.md)
 - Scenes: [scene-templates.md](references/scene-templates.md)
 - Machine-checkable scene profiles: [scene-profiles.json](references/scene-profiles.json)
+- Fixed ten-scene release benchmarks: [scene-benchmarks.json](references/scene-benchmarks.json)
 - Template choices: [template-catalog.md](references/template-catalog.md)
 - Visual learning/navigation/layout: [visual-learning.md](references/visual-learning.md)
 - Academic typography/density: [academic-standards.md](references/academic-standards.md)

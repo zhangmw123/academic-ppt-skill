@@ -1,0 +1,3 @@
+# Guarantee bundled templates and conditionally admit user templates
+
+The Academic PPT Skill will guarantee formal 1.0 support for bundled templates T01 through T08. A user-supplied PPTX becomes conditionally supported only after grammar extraction, editable-component checks, and authoritative real-render validation succeed for that project; otherwise the skill rejects it with an explanation rather than silently substituting a generic theme or uncontrolled freeform layout. This preserves useful user-template support without making an untestable guarantee about arbitrary third-party PPTX files.

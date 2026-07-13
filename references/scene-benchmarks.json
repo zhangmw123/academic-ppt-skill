@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "case_id": "proposal-defense-modeling",
+      "scene": "开题答辩",
+      "method_profile": "computational_modeling",
+      "evidence_state": "preliminary",
+      "section_variant": "standard_6",
+      "target_pages": 12,
+      "duration_minutes": 12,
+      "template_id": "T01",
+      "source_claims": [
+        "拟研究模型、算法、训练数据集、基线与消融设计，当前已有初步验证结果。",
+        "现有方法在跨区域数据上的泛化能力不足，因此需要新的技术路线。",
+        "前期工作已经完成数据清洗与基线复现，后续将按计划完成对比实验。"
+      ],
+      "required_tags": ["research_background", "research_significance", "related_work", "research_gap", "objectives", "research_content", "methods", "technical_route", "innovation", "feasibility", "preliminary_work", "schedule", "expected_outputs"],
+      "argument_units": ["why_it_matters", "what_is_missing", "what_will_be_solved", "how_it_will_be_solved", "why_it_is_feasible", "what_is_new", "when_it_will_be_delivered"]
+    },
+    {
+      "case_id": "midterm-laboratory",
+      "scene": "中期考核",
+      "method_profile": "laboratory_experiment",
+      "evidence_state": "interim",
+      "section_variant": "progress_5",
+      "target_pages": 12,
+      "duration_minutes": 12,
+      "template_id": "T03",
+      "source_claims": [
+        "已完成对照、重复、实验条件和试剂筛选，并形成显微观察记录。",
+        "原计划中的两项任务按期完成，一项因样品批次差异调整了时间表。",
+        "阶段结果支持继续推进，剩余风险将通过增加生物学重复进行控制。"
+      ],
+      "required_tags": ["research_overview", "original_plan", "completed_work", "progress_measure", "interim_results", "plan_deviation", "issues", "mitigation", "remaining_work", "next_plan"],
+      "argument_units": ["what_was_planned", "what_has_been_completed", "what_evidence_exists", "where_the_plan_deviated", "how_risks_are_controlled", "what_remains"]
+    },
+    {
+      "case_id": "graduation-survey",
+      "scene": "毕业答辩",
+      "method_profile": "survey_empirical_analysis",
+      "evidence_state": "final",
+      "section_variant": "classic_5",
+      "target_pages": 18,
+      "duration_minutes": 18,
+      "template_id": "T02",
+      "source_claims": [
+        "研究采用问卷、样本量估计、量表信度与效度检验，并完成回归分析。",
+        "实证结果回答了核心研究问题，同时结论仅适用于当前抽样范围。",
+        "研究贡献在于解释关键影响路径，未来工作需要扩展样本与纵向观察。"
+      ],
+      "required_tags": ["research_background", "research_problem", "related_work", "research_gap", "objectives", "methods", "data", "experiments", "results", "contributions", "limitations", "future_work"],
+      "argument_units": ["problem", "gap", "solution", "validation", "interpretation", "contribution", "boundary"]
+    },
+    {
+      "case_id": "lab-paper-deep-reading",
+      "scene": "组会-文献精读",
+      "method_profile": "literature_synthesis",
+      "evidence_state": "published",
+      "section_variant": "deep_reading_6",
+      "target_pages": 8,
+      "duration_minutes": 8,
+      "template_id": "T01",
+      "source_claims": [
+        "本次文献精读基于检索、引文追踪和系统评价框架梳理论文证据。",
+        "论文提出的核心方法解决了既有研究的证据缺口，但实验边界需要明确。",
+        "可迁移机制将通过复现、消融和评价指标对照转化为下一步实验。"
+      ],
+      "required_tags": ["paper_metadata", "venue_context", "author_context", "research_problem", "method", "experiments", "innovation", "limitations", "research_inspiration", "next_action"],
+      "argument_units": ["who_and_where", "what_problem", "why_existing_work_is_insufficient", "how_the_paper_solves_it", "whether_evidence_supports_it", "what_can_be_borrowed", "what_to_do_next"]
+    },
+    {
+      "case_id": "lab-weekly-progress",
+      "scene": "组会-周报进展",
+      "method_profile": "laboratory_experiment",
+      "evidence_state": "interim",
+      "section_variant": "weekly_5",
+      "target_pages": 5,
+      "duration_minutes": 5,
+      "template_id": "T01",
+      "source_claims": [
+        "本周完成对照、重复和实验条件检查，并补充试剂记录。",
+        "一次失败尝试暴露了温度控制问题，需要导师确认新的验证顺序。",
+        "下周将完成显微观察、整理原始证据并执行预定复现实验。"
+      ],
+      "required_tags": ["period_focus", "completed_tasks", "learning_and_reading", "experiment_progress", "evidence", "failed_attempts", "issues", "discussion", "next_actions"],
+      "argument_units": ["what_was_planned", "what_was_done", "what_was_learned", "what_failed_or_blocked", "what_decision_is_needed", "what_happens_next"]
+    },
+    {
+      "case_id": "lab-research-progress",
+      "scene": "组会-课题进展",
+      "method_profile": "computational_modeling",
+      "evidence_state": "interim",
+      "section_variant": "research_5",
+      "target_pages": 7,
+      "duration_minutes": 7,
+      "template_id": "T01",
+      "source_claims": [
+        "课题已完成模型、算法、训练数据集和基线实现，并得到阶段性准确率结果。",
+        "消融实验显示当前模块仍存在泛化缺口，写作中的方法章节已经形成初稿。",
+        "下一阶段将补充对比实验并决定是否调整特征融合方案。"
+      ],
+      "required_tags": ["research_focus", "stage_goal", "completed_modules", "interim_results", "experiment_gap", "writing_progress", "risks", "next_actions"],
+      "argument_units": ["current_question", "completed_work", "current_evidence", "remaining_gap", "decision_or_support_needed", "next_experiment_or_writing_step"]
+    },
+    {
+      "case_id": "project-application-engineering",
+      "scene": "科研项目申报",
+      "method_profile": "engineering_system_validation",
+      "evidence_state": "preliminary",
+      "section_variant": "application_6",
+      "target_pages": 12,
+      "duration_minutes": 12,
+      "template_id": "T04",
+      "source_claims": [
+        "项目拟建设可部署的系统架构与 API，并以延迟、吞吐量和可靠性作为考核指标。",
+        "前期原型已在测试环境完成负载验证，团队具备实施基础。",
+        "技术路线、创新点、风险控制和阶段产出均已映射到项目计划。"
+      ],
+      "required_tags": ["necessity", "objectives", "indicators", "research_content", "technical_route", "feasibility", "innovation", "team", "schedule", "risk", "outputs"],
+      "argument_units": ["why_now", "what_will_be_delivered", "how_it_will_be_done", "why_this_team", "what_is_new", "how_risk_is_controlled"]
+    },
+    {
+      "case_id": "project-competition-engineering",
+      "scene": "科研项目比赛",
+      "method_profile": "engineering_system_validation",
+      "evidence_state": "preliminary",
+      "section_variant": "competition_6",
+      "target_pages": 8,
+      "duration_minutes": 8,
+      "template_id": "T04",
+      "source_claims": [
+        "方案通过系统架构、部署环境和 API 串联用户场景，并以低延迟验证核心优势。",
+        "原型负载测试表明吞吐量与可靠性满足当前演示目标。",
+        "应用价值、竞争优势、团队分工和推进路线均有明确证据支撑。"
+      ],
+      "required_tags": ["problem", "user_or_scenario", "solution", "core_technology", "innovation", "validation", "comparative_advantage", "application_value", "team", "roadmap"],
+      "argument_units": ["pain", "solution", "why_better", "proof", "value", "execution"]
+    },
+    {
+      "case_id": "project-closeout-engineering",
+      "scene": "项目中期与结题",
+      "method_profile": "engineering_system_validation",
+      "evidence_state": "final",
+      "section_variant": "milestone_6",
+      "target_pages": 10,
+      "duration_minutes": 10,
+      "template_id": "T04",
+      "source_claims": [
+        "项目已按任务书完成系统架构、部署和 API 交付，并通过负载与可靠性检查。",
+        "延迟和吞吐量指标达到约定目标，未完成事项已形成整改计划。",
+        "成果证据、应用影响、交付清单和后续维护边界均已记录。"
+      ],
+      "required_tags": ["contract_objectives", "indicator_status", "completed_tasks", "results", "deliverables", "issues", "risk", "remaining_or_followup"],
+      "argument_units": ["contract", "completion", "evidence", "gap", "resolution", "delivery"]
+    },
+    {
+      "case_id": "conference-modeling-talk",
+      "scene": "学术会议报告",
+      "method_profile": "computational_modeling",
+      "evidence_state": "final",
+      "section_variant": "conference_5",
+      "target_pages": 8,
+      "duration_minutes": 8,
+      "template_id": "T01",
+      "source_claims": [
+        "研究提出新的模型与算法，在公开数据集上完成基线、准确率和消融比较。",
+        "核心思路改善了泛化表现，最强结果支持主要贡献但仍受数据范围限制。",
+        "会议报告将聚焦研究动机、方法、关键证据和可带走的结论。"
+      ],
+      "required_tags": ["motivation", "research_problem", "method", "experiment_setup", "key_results", "contribution", "limitations", "takeaway"],
+      "argument_units": ["motivation", "problem", "idea", "evidence", "contribution", "takeaway"]
+    }
+  ]
+}

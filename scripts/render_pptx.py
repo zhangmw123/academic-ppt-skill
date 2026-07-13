@@ -126,6 +126,10 @@ def place_picture_binding(slide, image_path: Path, binding: dict, errors: list[s
         return
     picture = add_fitted_picture(slide, image_path, box, binding.get("fit", "contain"))
     if target is not None and parent is not None and target_index is not None:
+        # Preserve the original component identity for later V2 bindings and edits.
+        for non_visual_properties in picture._element.iterdescendants(qn("p:cNvPr")):
+            non_visual_properties.set("id", str(target.shape_id))
+            break
         parent.remove(target._element)
         picture_parent = picture._element.getparent()
         picture_parent.remove(picture._element)

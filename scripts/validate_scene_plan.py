@@ -4,26 +4,28 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
+
+
+SKILL_ROOT = Path(__file__).resolve().parents[1]
+if str(SKILL_ROOT) not in sys.path:
+    sys.path.insert(0, str(SKILL_ROOT))
+
+from academic_ppt.scenes import SceneCatalog, ScenePlanContract
 
 
 def validate_plan(plan, profiles):
     scene_raw = plan.get("scene")
-    scene = profiles.get("aliases", {}).get(scene_raw, scene_raw)
-    profile = profiles.get("profiles", {}).get(scene)
     errors, warnings = [], []
-    if not profile:
+    try:
+        profile = SceneCatalog.from_payload(profiles).resolve(scene_raw or "")
+    except ValueError:
+        profile = None
+    scene = profile.name if profile else scene_raw
+    if profile is None:
         errors.append(f"unknown scene profile: {scene_raw}")
     else:
-        scope = plan.get("deck_scope", "complete")
-        page_count = len(plan.get("pages", []))
-        if scope == "complete" and not (profile["complete_min"] <= page_count <= profile["complete_max"]):
-            errors.append(f"{scene} complete deck requires {profile['complete_min']}-{profile['complete_max']} pages; got {page_count}")
-        elif scope == "sample" and page_count > 7:
-            warnings.append(f"sample deck has {page_count} pages; consider short_version or complete")
-        evidence_state = plan.get("evidence_state")
-        if evidence_state not in profile["evidence_states"]:
-            errors.append(f"{scene} does not allow evidence_state={evidence_state}; expected {profile['evidence_states']}")
         tags = set(plan.get("coverage_tags", []))
         argument_units = set(plan.get("argument_units", []))
         total_seconds = 0
@@ -84,34 +86,23 @@ def validate_plan(plan, profiles):
             forbidden_labels = ("读图结论", "如何读图", "讲述重点")
             if any(label in visible_text for label in forbidden_labels):
                 errors.append(f"{page.get('page_id')} exposes an internal planning label on-slide")
-        missing = sorted(set(profile["required_tags"]) - tags)
-        if missing:
-            errors.append(f"{scene} missing coverage tags: {missing}")
-        missing_arguments = sorted(set(profile.get("argument_chain", [])) - argument_units)
-        if missing_arguments:
-            errors.append(f"{scene} missing argument units: {missing_arguments}")
-
-        variant = plan.get("section_variant")
-        variants = profile.get("default_variants", {})
-        if variant and variant != "custom" and variant not in variants:
-            errors.append(f"{scene} unknown section_variant={variant}; expected one of {sorted(variants)} or custom")
-        sections = plan.get("sections", [])
-        if not sections:
-            errors.append(f"{scene} requires user-visible sections")
-        if variant in variants and sections != variants[variant]:
-            warnings.append(
-                f"{scene} sections differ from variant {variant}; set section_variant=custom if this is intentional"
-            )
-
-        duration_minutes = plan.get("duration_minutes")
-        if duration_minutes:
-            expected = int(float(duration_minutes) * 60)
-            if total_seconds == 0:
-                errors.append(f"{scene} pages require time_seconds for a {duration_minutes}-minute talk")
-            elif abs(total_seconds - expected) > max(60, expected * 0.12):
-                warnings.append(
-                    f"planned speaking time is {total_seconds}s, expected about {expected}s"
-                )
+        shared_contract = ScenePlanContract(
+            deck_scope=plan.get("deck_scope", "complete"),
+            evidence_state=plan.get("evidence_state"),
+            coverage_tags=tuple(tags),
+            argument_units=tuple(argument_units),
+            section_variant=plan.get("section_variant"),
+            duration_minutes=plan.get("duration_minutes"),
+        )
+        shared_result = SceneCatalog.from_payload(profiles).validate_plan(
+            scene,
+            shared_contract,
+            sections=plan.get("sections", []),
+            page_count=len(plan.get("pages", [])),
+            total_seconds=total_seconds,
+        )
+        errors.extend(shared_result.errors)
+        warnings.extend(shared_result.warnings)
 
         if scene == "组会-文献精读":
             transfer_pages = [page for page in plan.get("pages", []) if page.get("page_role") == "transfer"]

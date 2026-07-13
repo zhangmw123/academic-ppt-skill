@@ -18,7 +18,7 @@ from validate_pptx import package_integrity
 
 
 def check_template(path: Path, work_dir: Path, render_check: bool, style_learning_check: bool,
-                   grammar_check: bool) -> dict:
+                   grammar_check: bool, render_engine: str = "auto") -> dict:
     result = {
         "template": path.name,
         "path": str(path.resolve()),
@@ -47,7 +47,7 @@ def check_template(path: Path, work_dir: Path, render_check: bool, style_learnin
         result["errors"].extend(package_integrity(output))
         preview_dir = work_dir / f"{path.stem}_preview"
         if not result["errors"] and render_check:
-            export_preview(output, preview_dir, "auto", 1280, 720)
+            export_preview(output, preview_dir, render_engine, 1280, 720)
         if not result["errors"] and style_learning_check:
             if not render_check:
                 raise ValueError("--style-learning-check requires --render-check")
@@ -86,7 +86,7 @@ def check_template(path: Path, work_dir: Path, render_check: bool, style_learnin
             if dynamic_errors:
                 result["errors"].extend(dynamic_errors)
             else:
-                export_preview(dynamic_output, work_dir / f"{path.stem}_dynamic_preview", "auto", 1280, 720)
+                export_preview(dynamic_output, work_dir / f"{path.stem}_dynamic_preview", render_engine, 1280, 720)
                 result["style_learning_passed"] = True
         if not result["errors"] and grammar_check:
             grammar_path = work_dir / f"{path.stem}_grammar.json"
@@ -103,8 +103,9 @@ def check_template(path: Path, work_dir: Path, render_check: bool, style_learnin
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--template-dir", default=str(Path(__file__).resolve().parents[1] / "assets" / "templates"))
+    parser.add_argument("--template-dir", default=str(Path(__file__).resolve().parents[1] / "assets" / "powerpoint_templates"))
     parser.add_argument("--render-check", action="store_true", help="Open every sample in PowerPoint or LibreOffice")
+    parser.add_argument("--render-engine", choices=["auto", "powerpoint", "wps", "libreoffice"], default="auto")
     parser.add_argument("--style-learning-check", action="store_true", help="Also learn style and render a dynamic three-page deck")
     parser.add_argument("--grammar-check", action="store_true", help="Extract template grammar and identity tokens")
     parser.add_argument("--output", help="Optional JSON report path")
@@ -114,11 +115,16 @@ def main():
     if not templates:
         raise SystemExit("No PPTX templates found")
     with tempfile.TemporaryDirectory(prefix="academic-ppt-template-check-") as temp:
-        results = [check_template(path, Path(temp), args.render_check, args.style_learning_check, args.grammar_check) for path in templates]
+        results = [
+            check_template(path, Path(temp), args.render_check, args.style_learning_check,
+                           args.grammar_check, args.render_engine)
+            for path in templates
+        ]
     report = {
         "template_count": len(results),
         "passed_count": sum(1 for result in results if result["passed"]),
         "render_check": args.render_check,
+        "render_engine": args.render_engine,
         "results": results,
     }
     if args.output:
