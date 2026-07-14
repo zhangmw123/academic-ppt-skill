@@ -58,8 +58,8 @@
       "method_profile": "literature_synthesis",
       "evidence_state": "published",
       "section_variant": "deep_reading_6",
-      "target_pages": 8,
-      "duration_minutes": 8,
+      "target_pages": 10,
+      "duration_minutes": 10,
       "template_id": "T01",
       "source_claims": [
         "本次文献精读基于检索、引文追踪和系统评价框架梳理论文证据。",
@@ -75,8 +75,8 @@
       "method_profile": "laboratory_experiment",
       "evidence_state": "interim",
       "section_variant": "weekly_5",
-      "target_pages": 5,
-      "duration_minutes": 5,
+      "target_pages": 8,
+      "duration_minutes": 8,
       "template_id": "T01",
       "source_claims": [
         "本周完成对照、重复和实验条件检查，并补充试剂记录。",
@@ -92,8 +92,8 @@
       "method_profile": "computational_modeling",
       "evidence_state": "interim",
       "section_variant": "research_5",
-      "target_pages": 7,
-      "duration_minutes": 7,
+      "target_pages": 8,
+      "duration_minutes": 8,
       "template_id": "T01",
       "source_claims": [
         "课题已完成模型、算法、训练数据集和基线实现，并得到阶段性准确率结果。",

@@ -10,7 +10,7 @@ status: accepted
 Academic PPT Skill is an installable Codex and Claude Code Skill, not a separately
 deployed application. After host-native configuration, a user invokes it with natural
 language or `$academic-ppt-skill` and supplies research materials, a Presentation
-Scene, and optionally a template. The skill owns the internal V2 Core workflow and
+Scene, and optionally a template. The skill owns its bundled scripts and references and
 returns an editable, evidence-grounded academic PPTX plus its Delivery Bundle.
 
 The user must not need to create or understand an internal project model, invoke
@@ -47,8 +47,8 @@ local working artifacts as part of Local-First Processing.
   unit conversion, ordering, percentage calculation, and chart reconstruction. Any
   Derived Analysis requires explicit user authorization, reproducible records, and
   visible identification as system-computed rather than source-reported evidence.
-- Expose one user-facing skill invocation. Internal V2 CLI commands remain an
-  implementation adapter and are not required user knowledge.
+- Expose one user-facing skill invocation. Task scripts remain bundled implementation
+  details and are not required user knowledge.
 - Ship one canonical skill directory for Codex and Claude Code. Host-specific
   discovery metadata may be added only as a thin adapter and must not fork behavior,
   resources, validation, or output contracts.
@@ -92,6 +92,36 @@ For every supported scene, the skill must complete this path:
    disclosing any replacement before rebuilding. Complex two-way semantic sync and
    three-way object merges are outside 1.0.
 
+## Template Standardization And Dense Composition
+
+- Compile every bundled template into both a standard editable PPTX and a
+  machine-readable semantic specification. Standardize T01 and T03 first, then
+  T02 and T04-T08, without collapsing their distinct visual identities.
+- Model composition as `page -> semantic module -> child slot`. A module may own a
+  heading, explanation, image, chart, icon, caption, or metric; a three-card page
+  may therefore contain one evidence visual inside each card rather than only one
+  page-level picture area.
+- Distinguish page-level media layouts from module-level media. Support 1, 2, 3, 4,
+  and 6-image pages, primary-plus-supporting compositions, and verified multi-panel
+  source figures. Every used visual requires a semantic role, source binding, and
+  caption where needed; an unavailable visual removes or reflows its slot.
+- Use mutually exclusive render modes for each semantic region: reuse its complete
+  native editable component, or remove that component and fully reconstruct the
+  region. Never cover old frames with new panels, masks, or overlapping objects.
+- Delete an unused component as a complete ownership group, including its frame,
+  sample text, icon, caption, connector, and child placeholder. Orphan or duplicate
+  objects are release-blocking defects.
+- Use bounded typography instead of arbitrary shrinking. Default ranges are cover
+  28-32 pt, page title 20-24 pt, module heading 13-16 pt, body 11-13 pt, and caption
+  8.5-10 pt; normal content text should not fall below 10.5 pt. Split, shorten, or
+  reflow content when a module cannot fit within those bounds.
+- For literature sharing, plan a source-grounded bibliographic context module that
+  may include field, journal, publication identity, and verified current indexing
+  or quartile information. Time-sensitive metadata must come from a reliable current
+  source and must never be inferred from the paper text alone.
+- Extend formal QA with object-level duplicate, overlap, orphan, and empty-slot
+  checks, plus template-identity comparison and Windows PowerPoint rendering.
+
 ## Release Matrix
 
 - Complete one formal-delivery benchmark for each of the ten Presentation Scenes.
@@ -122,7 +152,7 @@ For every supported scene, the skill must complete this path:
    user workspace without relying on the repository checkout as the current directory.
 3. All ten scene benchmarks and eight bundled-template regressions pass the Release
    Matrix and Hard Release Gates.
-4. The V2 Core exposes the complete user workflow through the skill and preserves
-   supported legacy commands through adapters.
+4. The canonical Skill exposes the complete workflow without a separately deployed
+   application, server, or user-managed project lifecycle.
 5. Tests, representative rendered artifacts, and release documentation identify the
    supported surface and all conditional limitations precisely.

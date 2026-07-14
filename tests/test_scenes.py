@@ -75,10 +75,10 @@ class SceneCatalogTests(unittest.TestCase):
             "argument_units": list(profile.argument_chain),
             "section_variant": "weekly_5",
             "sections": list(profile.default_variants["weekly_5"]),
-            "duration_minutes": 5,
+            "duration_minutes": 8,
             "pages": [
                 {"page_id": f"P{index + 1:03d}", "page_role": "section", "time_seconds": 60}
-                for index in range(5)
+                for index in range(8)
             ],
         }
 

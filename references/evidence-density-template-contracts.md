@@ -77,6 +77,9 @@ Store the rules, not the six sample PPTX files or their page content, in the ski
 - combine roughly 3-5 meaningful modules on a normal evidence page when the
   source supports them, rather than repeating one generic card layout;
 - use claim + mechanism/evidence + interpretation as the common reading path;
+- render each evidence module as a source-specific heading plus an explanatory
+  line; never show internal slot names such as `核心判断`, `证据依据`, `机制解释`,
+  `边界与行动`, `读图重点`, or `证据、读图与边界`;
 - use contribution columns, architecture-with-annotations, formula-with-steps,
   comparison tables, metric cards, multi-panel evidence, and summary connections
   according to the argument, not as decoration;
@@ -130,14 +133,57 @@ Recognize these cases:
 4. Outer panel plus independent inner placeholder: replace or remove the inner
    child; keep the outer panel unless the page plan removes the whole component.
 5. Placeholder frame baked into a raster scaffold: create and cache a clean raster
-   variant for that source asset, then reuse it. Do not cover the frame with an
-   arbitrary new white rectangle unless an explicit temporary mask is approved.
+   variant only for non-semantic decoration. Recover the geometry of semantic
+   panels and rebuild every frame, heading, body, image slot, node, and connector
+   as a separately editable PowerPoint object. Do not leave an information-bearing
+   multi-frame raster as the editable layer.
 6. Sample icon, image, caption, or metric card: treat the related shapes as one
    component so removal does not leave orphan labels or frames.
 
 The renderer must not create a new textbox, panel, or picture frame when a
 compatible editable component already exists. `freeform` additions require both a
 missing native component and a recorded `fallback_reason`.
+
+### Nested module schema
+
+Compile each bundled template into a standard editable PPTX plus a machine-readable
+specification. Describe content with three ownership levels:
+
+```json
+{
+  "page_archetype": "three_evidence_modules",
+  "media_scope": "module",
+  "modules": [
+    {
+      "module_id": "M01",
+      "role": "result_evidence",
+      "child_slots": [
+        {"role": "heading", "required": true},
+        {"role": "explanation", "required": true},
+        {"role": "image_or_chart", "required": false},
+        {"role": "caption", "required_when": "image_or_chart"}
+      ],
+      "removal_policy": "remove_complete_ownership_group"
+    }
+  ]
+}
+```
+
+Do not confuse a page-level gallery with visuals owned by individual modules.
+Page-level media may use 1, 2, 3, 4, or 6 images, a primary image with supporting
+details, or verified multi-panel extraction. Module-level media places a relevant
+figure, chart, icon, or metric inside its owning card or panel. Every visual must
+have a source-bound role; remove or reflow a slot when no valid asset exists.
+
+For each semantic region, `native_reuse` and `full_reconstruction` are mutually
+exclusive. Before reconstruction, remove the complete native ownership group,
+including its frame, sample text, icon, caption, connector, and child placeholder.
+Never use a white mask or a new panel to cover retained sample objects.
+
+Use bounded typography: cover 28-32 pt, page title 20-24 pt, module heading 13-16
+pt, body 11-13 pt, caption 8.5-10 pt, and normal content at least 10.5 pt. When text
+does not fit, enrich or shorten the explanation according to evidence, split the
+module, or select another archetype; do not apply unlimited shrinking.
 
 ## 5. Navigation contract
 

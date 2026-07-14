@@ -6,10 +6,11 @@ description: Create editable academic PPTX presentations from papers, theses, pr
 # Academic PPT
 
 Build a real, editable `.pptx`. Treat the source as evidence, the confirmed scene
-contract as the argument, and each selected template page as the native editable
-canvas. When a user or bundled template is selected, clone its original pages and
-write into its existing text and image slots. Do not reduce a template to colors
-and decorative pictures.
+contract as the argument, and the selected template as a visual system plus a set
+of layout archetypes. Bind every content page to a compatible template archetype,
+then rebuild the evidence layer with editable text, shapes, charts, diagrams, and
+necessary local visual assets. Preserve template identity without carrying over
+sample frames whose capacity does not match the page.
 
 ## Hard rules
 
@@ -20,13 +21,13 @@ and decorative pictures.
    results, citations, figure meanings, logos, or institutional details.
 3. Build an evidence ledger and compare 2-3 storylines before producing the final
    outline. Do not map paper chapters directly to slides without narrative review.
-4. Use `template_native` by default. Clone a compatible source slide, clear sample
-   content, bind claims to its existing shape IDs, replace sample pictures in place,
-   and preserve layers, groups, spacing, columns, and decorative objects.
-5. Use `template_adaptive` for small capacity changes that can be solved by moving,
-   resizing, hiding, or reflowing original slots. Use `freeform` only when no source
-   slide can express the required relationships; record `fallback_reason` and keep
-   freeform pages below 20% of a complete deck unless the user approves otherwise.
+4. Use `template_hybrid_editable` by default. Learn the template's fonts, type
+   scale, navigation, title geometry, grid, panel language, colors, and archetypes.
+   Rebuild each page on the closest archetype with editable information objects;
+   retain only identity decorations that do not contain sample content.
+5. Use `template_native` only when an original slide's editable components and
+   capacity exactly match the page contract. Use `template_adaptive` for a small
+   documented reflow. Do not clone a large sample frame merely because it exists.
 6. Derive navigation from the confirmed story sections. Three sections produce
    three equal tabs; unused template tabs are removed. Highlight the current
    section on each page. Cover and ending pages need no navigation.
@@ -73,13 +74,47 @@ and decorative pictures.
     character quota. A normal content page should carry one claim, 2-4 supporting
     evidence units, 1-2 evidence carriers, an interpretation or boundary, and a
     transition, unless the page role justifies another composition.
-21. Never draw a new textbox, panel, or image frame over a compatible editable
-    template component. Edit text inside textboxes, AutoShapes, and grouped child
-    shapes directly. Remove or replace independent nested placeholders as complete
-    components; use a clean cached raster variant for baked-in placeholder frames.
+21. In native mode, never draw over a compatible editable template component.
+    In hybrid mode, rebuild the complete content region from the selected archetype
+    geometry; do not mix new content with leftover sample frames or labels.
 22. Treat navigation as a protected stateful component. Detect who owns each label,
     preserve one global font family and size, reset every tab state after cloning,
     and highlight exactly the current section with the template's active treatment.
+23. Apply dual hard gates to every content page: the core information layer must
+    remain editable, and the template's visual identity and page semantics must
+    remain recognizable. Neither gate can compensate for failure of the other.
+24. Generate `slide_manifest.json` from the actual PPTX. Every content page must
+    record its template archetype, visible module count, density, editable text
+    count, native-object count, picture count, and page-level errors.
+25. Never expose internal composition labels such as `核心判断`, `证据依据`,
+    `机制解释`, `边界与行动`, `读图重点`, or `证据、读图与边界`. Use a
+    source-specific key-point heading followed by smaller explanatory text.
+26. Treat a key point as a heading/explanation pair. A method name, dataset scale,
+    metric, limitation, or contribution belongs in the heading; its mechanism,
+    advantage, numerical support, or implication belongs in the explanation.
+27. When several template frames are baked into one raster or group, recover their
+    geometry and rebuild every semantic panel, title, body, image slot, node, and
+    connector as a separately editable PowerPoint object. Retain a combined raster
+    only for non-semantic decoration.
+28. Bind a selected PDF figure by verified source page and caption, not merely by
+    nearest-page proximity. Record the PDF page in the visible caption or asset
+    manifest and reject a figure whose semantic role does not match the page claim.
+29. Model every content composition as `page -> semantic module -> child slot`.
+    A repeated card may own its own heading, explanation, image or chart, icon, and
+    caption. Do not treat all visuals as page-level attachments.
+30. Distinguish page-level multi-image evidence from module-level media. Support
+    1, 2, 3, 4, and 6-image layouts plus primary-and-supporting compositions; bind
+    every visual to evidence and remove or reflow any slot that has no valid asset.
+31. For each semantic region, choose exactly one mode: reuse the complete native
+    editable component, or remove it and fully reconstruct the region. Never hide
+    old frames with masks or stack new panels over retained sample components.
+32. Remove unused components by ownership group, including frames, sample text,
+    icons, captions, connectors, and child placeholders. Treat duplicate, orphaned,
+    overlapping, or visibly empty components as blocking QA failures.
+33. Use these default typography ranges unless the confirmed template requires a
+    compatible alternative: cover 28-32 pt, page title 20-24 pt, module heading
+    13-16 pt, body 11-13 pt, caption 8.5-10 pt, with normal content no smaller than
+    10.5 pt. Shorten, split, or reflow before shrinking below the range.
 
 ## First response
 
@@ -103,30 +138,31 @@ to T08 and state its ID and short name in the summary. Show alternatives or prev
 only when confidence is low, the request materially conflicts with the selection, or
 the user asks to compare styles.
 
-## Portable V2 CLI
+When the user names one of the cataloged source templates under `assets/templates`,
+resolve it to the matching repaired catalog copy and disclose the source path,
+catalog ID, and package-recompile reason in the task summary. T01 and T03 retain the
+complete 10/11-slide source structure, geometry, fonts, sizes, positions, and layout
+archetypes; their media packages are normalized for compatibility. Do not replace
+either with a merely color-similar five-page template. Admit any other user PPTX only after
+editable-component, grammar-extraction, clone/save, and Authoritative Runtime checks pass.
 
-Run the V2 Core through this skill's own script path, not through a relative
-`python -m academic_ppt` command. The user's current directory is normally their
-project, while the installed skill lives elsewhere.
+## Portable Skill scripts
 
-Use the absolute path of this skill directory when invoking:
+Invoke scripts through this Skill's absolute installed path. Do not ask the user to
+create an internal project, run phase commands, hand-author JSON, or change into the
+Skill repository.
+
+For an explicitly requested autonomous candidate, use the single task entry point:
 
 ```powershell
-python "<skill-root>/scripts/academic_ppt_cli.py" analyze "<source>" ["<source>" ...]
-python "<skill-root>/scripts/academic_ppt_cli.py" init "<project>" --scene "毕业答辩" --rigor standard
-python "<skill-root>/scripts/academic_ppt_cli.py" status "<project>"
-python "<skill-root>/scripts/academic_ppt_cli.py" prepare "<project>" "<source>" ["<source>" ...] --scene "毕业答辩"
-python "<skill-root>/scripts/academic_ppt_cli.py" confirm-brief "<project>" --note "User confirmed the task summary"
+python "<skill-root>/scripts/build_complete_deck.py" "<source.pdf>" --scene "毕业答辩" --template "<template.pptx>" --output "<output-dir>"
 ```
 
-`analyze` is local and read-only. It normalizes sources, recommends Research
-Method Profiles, emits traceable Evidence IDs, and reports material metric
-conflicts. Use it to establish the evidence basis; it does not replace the
-Phase 0 confirmation gate or claim that a PPTX has been produced.
-
-`prepare` is the preferred internal entry point for a Guided Workflow. It creates
-the task summary and leaves Phase 0 awaiting confirmation. Use `confirm-brief`
-only after the user has explicitly approved that summary.
+The script self-locates bundled modules and assets from any working directory. Its
+default output is an unconfirmed candidate under `working/candidate`. Pass
+`--confirmed` only after explicit user approval of the complete plan and sample;
+formal publication additionally requires a PowerPoint render and per-slide visual
+review report.
 
 ## Phase protocol
 
@@ -220,6 +256,10 @@ Show the PRD summary in the conversation and provide the full artifact. Stop for
 section replacement, reorder, merge, split, page-title, page-content, time, visual,
 and template-layout confirmation. Only then create `slide_content_lock.json`.
 
+```powershell
+python scripts/build_content_lock.py --plan ppt_output/dynamic_plan.json --evidence ppt_output/evidence_ledger.json --output ppt_output/slide_content_lock.json
+```
+
 Validate scene completeness before visual planning:
 
 ```powershell
@@ -262,12 +302,11 @@ binding pages, then inspect it:
 python scripts/apply_template_palette.py "<template.pptx>" ppt_output/template_variant.pptx --palette academic_purple --report ppt_output/palette_report.json
 ```
 
-Create `ppt_output/layout_plan.json` by selecting an actual compatible source slide
-for each page and binding content to its original shape IDs. Record `render_mode`,
-`source_slide_index`, `layout_signature`, `text_bindings`, `image_bindings`,
-`logo_binding`, `component_bindings`, `adjustments`, `preserve_shape_ids`,
-`remove_shape_ids`, `remove_component_ids`, and any `additions` with a
-`fallback_reason`.
+Create `ppt_output/layout_plan.json` by selecting an actual compatible source
+archetype for each page. Record `render_mode`, `source_slide_index`,
+`layout_signature`, editable component inventory, complex visual assets, density
+target, template identity tokens, and any documented adjustments. Native pages
+also record explicit shape bindings and complete component removals.
 Three-, four-, and five-component content must prefer corresponding native template
 pages when they exist.
 
@@ -353,12 +392,11 @@ representative layouts.
 Render 3-5 representative pages first: cover, method/diagram, results/chart,
 dense text page, and ending when relevant.
 
-Default template-native renderer:
+Default template-guided editable renderer:
 
 ```powershell
-python scripts/validate_template_native.py ppt_output/layout_plan.json "<template-or-variant.pptx>" --output ppt_output/sample/template_native_report.json
-python scripts/render_pptx.py --layout-plan ppt_output/layout_plan.json --template "<template-or-variant.pptx>" --output ppt_output/sample/sample.pptx --allow-unconfirmed
-python scripts/validate_pptx.py ppt_output/sample/sample.pptx --layout-plan ppt_output/layout_plan.json --render-check required --output ppt_output/sample/report.json
+python scripts/build_complete_deck.py "<source>" --scene "<scene>" --template "<template>" --content-plan ppt_output/authored_content.json --output ppt_output/candidate
+python scripts/validate_pptx.py ppt_output/candidate/working/sample.pptx --layout-plan ppt_output/candidate/audit/sample_layout_plan.json --render-check required --output ppt_output/candidate/audit/sample_report.json
 ```
 
 For high-risk or highly designed decks, render and approve one page at a time.
@@ -383,12 +421,16 @@ reviewed. Provide:
 
 ## Rendering modes
 
-- `template_native` (default): clone the complete source page and replace text or
-  pictures through existing shape IDs.
+- `template_hybrid_editable` (default): bind the page to a template archetype and
+  rebuild its information layer with editable objects while retaining template
+  fonts, navigation, title geometry, grid, panel language, and identity details.
+- `template_native`: clone a source page only when its complete editable component
+  structure and capacity exactly fit the content.
 - `template_adaptive`: same as native, with recorded movement, resize, reflow, or
   hidden original slots.
-- `freeform` (exception): use `render_dynamic.py` only with a disclosed reason and
-  no compatible native page. It is not a shortcut around template analysis.
+- `freeform` (exception): use content-driven geometry with a disclosed reason only
+  when no template archetype can express the page. It is not a shortcut around
+  template analysis or identity checks.
 
 ## Portability
 
@@ -403,9 +445,9 @@ python scripts/check_templates.py --grammar-check
 python scripts/check_templates.py --render-check --style-learning-check --grammar-check
 ```
 
-For release or scene-contract changes, run the fixed ten-scene suite through the
-same V2 service used by normal Skill invocations. A structural run is a fast
-regression check; only the formal command satisfies the Authoritative Runtime gate:
+For release or scene-contract changes, validate the fixed ten-scene contract
+matrix. Synthetic cases never satisfy product acceptance; a product benchmark must
+bind real representative sources and pass the complete Skill entry point:
 
 ```powershell
 python "<skill-root>/scripts/run_scene_benchmarks.py"
@@ -432,6 +474,7 @@ python scripts/validate_template_usage.py ppt_output/dynamic_plan.json ppt_outpu
 
 ## Resources
 
+- Portable capability boundary: [capability-contract.md](references/capability-contract.md)
 - Evidence/storyline: [content-and-storyline.md](references/content-and-storyline.md)
 - Evidence density and template contracts: [evidence-density-template-contracts.md](references/evidence-density-template-contracts.md)
 - Workflow and visual task schemas: [workflow-schema.md](references/workflow-schema.md)

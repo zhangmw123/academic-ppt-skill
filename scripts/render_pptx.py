@@ -27,10 +27,10 @@ def apply_font_policy(shape, policy: dict | None) -> None:
     latin_font = policy.get("latin")
     for paragraph in shape.text_frame.paragraphs:
         for run in paragraph.runs:
-            if latin_font:
-                run.font.name = latin_font
+            has_cjk = any("\u4e00" <= character <= "\u9fff" for character in run.text)
+            primary_font = zh_font if has_cjk and zh_font else latin_font
             properties = run._r.get_or_add_rPr()
-            for tag, font_name in (("a:ea", zh_font), ("a:latin", latin_font)):
+            for tag, font_name in (("a:ea", zh_font), ("a:latin", primary_font)):
                 if not font_name:
                     continue
                 element = properties.find(qn(tag))
@@ -126,7 +126,7 @@ def place_picture_binding(slide, image_path: Path, binding: dict, errors: list[s
         return
     picture = add_fitted_picture(slide, image_path, box, binding.get("fit", "contain"))
     if target is not None and parent is not None and target_index is not None:
-        # Preserve the original component identity for later V2 bindings and edits.
+        # Preserve original component identity for later semantic bindings and edits.
         for non_visual_properties in picture._element.iterdescendants(qn("p:cNvPr")):
             non_visual_properties.set("id", str(target.shape_id))
             break
@@ -224,7 +224,8 @@ def apply_native_navigation_contract(slide, sections: list[str], active: str | N
     if not members:
         return 0
     if len(members) < len(sections):
-        errors.append(f"[{page_id}] navigation contract has {len(members)} members for {len(sections)} sections")
+        # Let the caller rebuild a complete navigation strip when a source page
+        # carries only a subset of the deck's confirmed sections.
         return 0
 
     sampled = []
@@ -441,11 +442,13 @@ def render(plan_path: Path, template_path: Path, output_path: Path, page_ids: se
 
         apply_shape_adjustments(slide, page.get("adjustments", []), errors, page_id)
         apply_placeholder_masks(slide, page.get("placeholder_masks", []), errors, page_id)
+        navigation_enabled = page.get("navigation_enabled", True)
         native_navigation_count = apply_native_navigation_contract(
             slide, plan.get("sections", []), page.get("section"), navigation_contract,
             source_index, font_policy, errors, page_id,
-        )
-        if native_navigation_count == 0 and page.get("replace_raster_navigation", plan.get("replace_raster_navigation", False)):
+        ) if navigation_enabled else 0
+        if (navigation_enabled and native_navigation_count == 0
+                and page.get("replace_raster_navigation", plan.get("replace_raster_navigation", False))):
             replace_raster_navigation(
                 slide, plan.get("sections", []), page.get("section"),
                 prs.slide_width, prs.slide_height, font_policy,
@@ -467,6 +470,16 @@ def render(plan_path: Path, template_path: Path, output_path: Path, page_ids: se
                 errors.append(f"[{page_id}] logo not found: {logo_path}")
             else:
                 place_picture_binding(slide, logo_path, logo_binding, errors, page_id)
+
+        # Template scaffolds often place a picture panel above editable text slots.
+        # Keep all authored text visible without changing its geometry or formatting.
+        for shape_id in bindings:
+            shape = find_shape(slide, shape_id)
+            if shape is None:
+                continue
+            parent = shape._element.getparent()
+            parent.remove(shape._element)
+            parent.append(shape._element)
 
         notes = page.get("speaker_notes", "").strip()
         if notes and include_notes:

@@ -40,9 +40,23 @@ class LayoutCompiler:
     def __init__(self, template_graph: TemplateCapabilityGraph):
         self.template_graph = template_graph
 
-    def compile(self, contract: ScientificPageContract) -> LayoutDecision:
+    def compile(
+        self,
+        contract: ScientificPageContract,
+        *,
+        preferred_slide_index: int | None = None,
+        candidate_offset: int = 0,
+        allowed_slide_indices: set[int] | None = None,
+    ) -> LayoutDecision:
         contract.validate()
-        candidates = self.template_graph.find_compatible_slides(contract.component_requirements)
+        candidates = tuple(
+            slide for slide in self.template_graph.find_compatible_slides(contract.component_requirements)
+            if allowed_slide_indices is None or slide.slide_index in allowed_slide_indices
+            if all(
+                len(self._select_components(slide, kind, required)) == required
+                for kind, required in contract.component_requirements.items()
+            )
+        )
         if not candidates:
             return LayoutDecision(
                 page_id=contract.page_id,
@@ -50,13 +64,16 @@ class LayoutCompiler:
                 source_slide_index=None,
                 fallback_reason="no compatible native template slide",
             )
-        selected = min(candidates, key=lambda slide: self._excess_capacity(slide, contract))
+        ordered = sorted(candidates, key=lambda slide: self._candidate_rank(slide, contract))
+        selected = next(
+            (slide for slide in ordered if slide.slide_index == preferred_slide_index),
+            ordered[candidate_offset % len(ordered)],
+        )
         bindings = {
             kind: tuple(
                 component.shape_id
-                for component in selected.components
-                if component.kind == kind
-            )[:required]
+                for component in self._select_components(selected, kind, required)
+            )
             for kind, required in contract.component_requirements.items()
         }
         return LayoutDecision(
@@ -74,3 +91,50 @@ class LayoutCompiler:
         counts = slide.component_counts
         excess = sum(counts.get(kind, 0) - required for kind, required in contract.component_requirements.items())
         return excess, slide.slide_index
+
+    @classmethod
+    def _candidate_rank(
+        cls,
+        slide: TemplateSlideCapability,
+        contract: ScientificPageContract,
+    ) -> tuple[float, int, int]:
+        useful_area = 0
+        for kind, required in contract.component_requirements.items():
+            components = cls._select_components(slide, kind, required)
+            useful_area += sum(cls._component_capacity(component) for component in components)
+        excess, _ = cls._excess_capacity(slide, contract)
+        return -useful_area, excess, slide.slide_index
+
+    @staticmethod
+    def _component_capacity(component) -> int:
+        return int(component.geometry["width"]) * int(component.geometry["height"])
+
+    @classmethod
+    def _select_components(cls, slide, kind: str, required: int):
+        ordered = sorted(
+            (component for component in slide.components if component.kind == kind),
+            key=cls._component_capacity,
+            reverse=True,
+        )
+        if kind != "text":
+            return ordered[:required]
+        selected = []
+        for component in ordered:
+            if any(cls._overlap_ratio(component.geometry, existing.geometry) > 0.1 for existing in selected):
+                continue
+            selected.append(component)
+            if len(selected) == required:
+                break
+        return selected
+
+    @staticmethod
+    def _overlap_ratio(first: dict[str, int], second: dict[str, int]) -> float:
+        left = max(first["left"], second["left"])
+        top = max(first["top"], second["top"])
+        right = min(first["left"] + first["width"], second["left"] + second["width"])
+        bottom = min(first["top"] + first["height"], second["top"] + second["height"])
+        if right <= left or bottom <= top:
+            return 0.0
+        overlap = (right - left) * (bottom - top)
+        smaller = min(first["width"] * first["height"], second["width"] * second["height"])
+        return overlap / max(smaller, 1)

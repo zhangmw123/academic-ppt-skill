@@ -1,4 +1,4 @@
-"""Shared serializable contracts for the Academic PPT v2 core."""
+"""Shared serializable contracts for the reusable Academic PPT Skill core."""
 
 from __future__ import annotations
 

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "name": "real_complete_deck_acceptance",
+  "hard_gates": [
+    {"id": "real_source_material", "evidence": "source hashes and locators", "rejects": "synthetic claims presented as product evidence"},
+    {"id": "user_confirmation", "evidence": "explicit approval of complete plan and representative render", "rejects": "internal validation presented as user approval"},
+    {"id": "complete_scene_budget", "evidence": "complete PagePlan", "rejects": "3-7 page representative samples presented as complete decks"},
+    {"id": "complete_scene_contract", "evidence": "coverage tags and argument units", "rejects": "page count without scene completeness"},
+    {"id": "non_repeating_page_arguments", "evidence": "unique claim and evidence bindings", "rejects": "cyclic evidence reuse"},
+    {"id": "sample_final_separation", "evidence": "different paths and SHA-256 values", "rejects": "sample.pptx published as final"},
+    {"id": "final_layout_is_complete", "evidence": "full final layout plan", "rejects": "sample-only rendering"},
+    {"id": "full_preview_exported", "evidence": "one image per final slide and contact sheet", "rejects": "package-only validation"},
+    {"id": "structural_qa", "evidence": "render report", "rejects": "corrupt packages, overflow, overlap, residue"},
+    {"id": "scientific_semantic_qa", "evidence": "Source to Evidence to Claim to Page trace", "rejects": "unsupported claims"},
+    {"id": "visual_task_qa", "evidence": "accepted visual task ledger", "rejects": "fixed text_only or auto-accepted visuals"},
+    {"id": "powerpoint_real_render", "evidence": "Windows PowerPoint export", "rejects": "file-open or fallback-render acceptance"},
+    {"id": "human_visual_review", "evidence": "per-slide review decisions", "rejects": "automatically approved screenshots"}
+  ],
+  "result_rule": "product_accepted is true only when every hard gate passes",
+  "non_product_suites": ["unit", "contract", "structural", "synthetic_scene_fixture"]
+}

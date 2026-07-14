@@ -58,7 +58,9 @@ class RenderQualityGateTests(unittest.TestCase):
             with patch("academic_ppt.qa.subprocess.run", side_effect=write_unavailable_report):
                 result = RenderQualityGate().inspect(pptx, root / "audit", require_runtime=True)
 
-            self.assertEqual(commands[0][-2:], ["--render-engine", "powerpoint"])
+            self.assertIn("--render-engine", commands[0])
+            self.assertEqual(commands[0][commands[0].index("--render-engine") + 1], "powerpoint")
+            self.assertIn("--preview-dir", commands[0])
             self.assertFalse(result.real_render_passed)
             self.assertFalse(result.formal_accepted)
             self.assertEqual(result.runtime_status, "unavailable")

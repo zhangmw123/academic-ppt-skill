@@ -4,32 +4,28 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 
-def normalize(value: str) -> str:
-    return "".join(value.strip().lower().split())
+SKILL_ROOT = Path(__file__).resolve().parents[1]
+if str(SKILL_ROOT) not in sys.path:
+    sys.path.insert(0, str(SKILL_ROOT))
+
+from academic_ppt.templates import TemplateCatalog
 
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("selection")
-    parser.add_argument("--catalog", default=str(Path(__file__).resolve().parents[1] / "references" / "template-catalog.json"))
+    parser.add_argument("--catalog", default=str(SKILL_ROOT / "references" / "template-catalog.json"))
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
-    catalog_path = Path(args.catalog)
-    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
-    wanted = normalize(args.selection)
-    matches = []
-    for item in catalog["templates"]:
-        names = [item["id"], item["short_name"], *item.get("aliases", [])]
-        if wanted in {normalize(name) for name in names}:
-            matches.append(item)
-    if len(matches) != 1:
-        choices = ", ".join(f"{item['id']} {item['short_name']}" for item in catalog["templates"])
-        raise SystemExit(f"template selection must match exactly one entry; choices: {choices}")
-    result = dict(matches[0])
-    result["absolute_path"] = str((catalog_path.resolve().parents[1] / result["path"]).resolve())
+    selection = TemplateCatalog.load(args.catalog).select("", args.selection)
+    result = selection.to_dict()
+    result["absolute_path"] = selection.path
     print(json.dumps(result, ensure_ascii=False, indent=2) if args.json else result["absolute_path"])
 
 

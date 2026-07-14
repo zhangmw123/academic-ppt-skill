@@ -14,6 +14,7 @@ from typing import Iterable
 class DeliveryResult:
     visible_files: tuple[Path, ...]
     audit_files: tuple[Path, ...]
+    candidate_files: tuple[Path, ...] = ()
 
 
 class DeliveryBundle:
@@ -39,14 +40,21 @@ class DeliveryBundle:
         *,
         audit_artifacts: Iterable[Path | str] = (),
         quality_summary: dict | None = None,
+        approved: bool = True,
     ) -> DeliveryResult:
         pptx = self._require_file(pptx_path, ".pptx")
         speaker_script = self._require_file(speaker_script_path, ".docx")
         stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%SZ")
-        visible_files = (
-            self._copy(pptx, self.deliverables_dir / f"{pptx.stem}_{stamp}.pptx"),
-            self._copy(speaker_script, self.deliverables_dir / f"{speaker_script.stem}_{stamp}.docx"),
+        if "sample" in pptx.name.casefold():
+            raise ValueError("representative sample PPTX cannot be published")
+        target_dir = self.deliverables_dir if approved else self.working_dir / "candidate"
+        target_dir.mkdir(parents=True, exist_ok=True)
+        published = (
+            self._copy(pptx, target_dir / f"{pptx.stem}_{stamp}.pptx"),
+            self._copy(speaker_script, target_dir / f"{speaker_script.stem}_{stamp}.docx"),
         )
+        visible_files = published if approved else ()
+        candidate_files = () if approved else published
         audit_files = tuple(
             self._copy(self._require_file(value), self.audit_dir / Path(value).name)
             for value in audit_artifacts
@@ -55,7 +63,11 @@ class DeliveryBundle:
             summary_path = self.audit_dir / "quality_summary.json"
             summary_path.write_text(json.dumps(quality_summary, ensure_ascii=False, indent=2), encoding="utf-8")
             audit_files += (summary_path,)
-        return DeliveryResult(visible_files=visible_files, audit_files=audit_files)
+        return DeliveryResult(
+            visible_files=visible_files,
+            audit_files=audit_files,
+            candidate_files=candidate_files,
+        )
 
     @staticmethod
     def _require_file(value: Path | str, expected_suffix: str | None = None) -> Path:

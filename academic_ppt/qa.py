@@ -1,4 +1,4 @@
-"""Adapt existing PPTX validation into explicit V2 acceptance status."""
+"""Adapt PPTX validation into explicit reusable-Skill acceptance status."""
 
 from __future__ import annotations
 
@@ -30,6 +30,8 @@ class RenderQualityGate:
         *,
         require_runtime: bool,
         runtime: str = "powerpoint",
+        layout_plan: Path | str | None = None,
+        preview_dir: Path | str | None = None,
     ) -> RenderQualityResult:
         if runtime not in {"powerpoint", "wps", "portable"}:
             raise ValueError(f"unsupported runtime: {runtime}")
@@ -37,13 +39,19 @@ class RenderQualityGate:
         audit = Path(audit_dir)
         audit.mkdir(parents=True, exist_ok=True)
         report_path = audit / "render_report.json"
+        resolved_preview = Path(preview_dir) if preview_dir else audit / "rendered-preview"
         render_engine = "auto" if runtime == "portable" else runtime
         command = [
             sys.executable, str(skill_root / "scripts" / "validate_pptx.py"), str(Path(pptx_path).resolve()),
             "--output", str(report_path), "--render-check", "required" if require_runtime else "off",
-            "--render-engine", render_engine,
+            "--render-engine", render_engine, "--preview-dir", str(resolved_preview),
         ]
-        subprocess.run(command, cwd=skill_root, check=False, capture_output=True, text=True, encoding="utf-8")
+        if layout_plan is not None:
+            command.extend(("--layout-plan", str(Path(layout_plan).resolve())))
+        subprocess.run(
+            command, cwd=skill_root, check=False, capture_output=True,
+            text=True, encoding="utf-8", errors="replace",
+        )
         report = json.loads(report_path.read_text(encoding="utf-8"))
         real = next((check for check in report["checks"] if check["name"] == "Real application render succeeds"), None)
         real_render_passed = bool(real and real["passed"])

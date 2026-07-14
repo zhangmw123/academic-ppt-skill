@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "reviewed": true,
+  "deck": "liujinping_defense",
+  "pages": [
+    {"page_id":"P001","passed":true,"note":"论文题名、答辩人和答辩场景清楚。"},
+    {"page_id":"P002","passed":true,"note":"五类障碍按原生流程组件展开，信息密度均衡。"},
+    {"page_id":"P003","passed":true,"note":"三个研究任务使用三栏版式，无空置图框。"},
+    {"page_id":"P004","passed":true,"note":"自然语言到图查询链路与论文图对应，无模板样例图。"},
+    {"page_id":"P005","passed":true,"note":"数据、算法、应用三层内容分区明确。"},
+    {"page_id":"P006","passed":true,"note":"Transformer 图完整，左侧解读未遮挡图片。"},
+    {"page_id":"P007","passed":true,"note":"实体识别模型结构图与三类模块说明一致。"},
+    {"page_id":"P008","passed":true,"note":"五环节技术路线完整，步骤顺序可扫描。"},
+    {"page_id":"P009","passed":true,"note":"BIOES 到三元组图清晰，抽取解释可读。"},
+    {"page_id":"P010","passed":true,"note":"问答链路五步内容完整，无文本重叠。"},
+    {"page_id":"P011","passed":true,"note":"实验协议、指标与对比截图同时呈现。"},
+    {"page_id":"P012","passed":true,"note":"意图模型改进与系统结构图对应。"},
+    {"page_id":"P013","passed":true,"note":"三项指标提升使用原生比较组件，结论明确。"},
+    {"page_id":"P014","passed":true,"note":"实体识别收益与系统截图组合，无模板残留。"},
+    {"page_id":"P015","passed":true,"note":"移动端问答截图可辨，端到端解释完整。"},
+    {"page_id":"P016","passed":true,"note":"图谱、模型和系统三类成果清楚。"},
+    {"page_id":"P017","passed":true,"note":"数据、模型、应用三类局限分栏呈现。"},
+    {"page_id":"P018","passed":true,"note":"结论与致谢层级清楚，适合作为答辩结束页。"}
+  ]
+}

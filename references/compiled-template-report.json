@@ -1,0 +1,1917 @@
+{
+  "schema_version": 1,
+  "templates": [
+    {
+      "source": "D:\\毕业论文\\paperwriting\\academic-ppt-skill\\assets\\templates\\绿色-科研风格PPT模版.pptx",
+      "output": "D:\\毕业论文\\paperwriting\\academic-ppt-skill\\assets\\powerpoint_templates\\T01_green_research.pptx",
+      "source_accent": "358960",
+      "target_accent": "358960",
+      "editable_color_replacements": 0,
+      "normalized_png_count": 51,
+      "recolored_png_count": 0,
+      "structure_identity": {
+        "first": "D:\\毕业论文\\paperwriting\\academic-ppt-skill\\assets\\templates\\绿色-科研风格PPT模版.pptx",
+        "second": "D:\\毕业论文\\paperwriting\\academic-ppt-skill\\assets\\powerpoint_templates\\T01_green_research.pptx",
+        "first_fingerprint": "81009971ed4dd9c2f35c4626313779bd0bf4ca00793276073f791ff762613c5d",
+        "second_fingerprint": "81009971ed4dd9c2f35c4626313779bd0bf4ca00793276073f791ff762613c5d",
+        "passed": true,
+        "first_media": [
+          {
+            "name": "ppt/media/image1.png",
+            "dimensions": [
+              1280,
+              720,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image10.png",
+            "dimensions": [
+              35,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image11.png",
+            "dimensions": [
+              31,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image12.png",
+            "dimensions": [
+              159,
+              50,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image13.png",
+            "dimensions": [
+              377,
+              513,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image14.png",
+            "dimensions": [
+              378,
+              513,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image15.png",
+            "dimensions": [
+              377,
+              513,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image16.png",
+            "dimensions": [
+              27,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image17.png",
+            "dimensions": [
+              39,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image18.png",
+            "dimensions": [
+              39,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image19.png",
+            "dimensions": [
+              159,
+              50,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image2.png",
+            "dimensions": [
+              200,
+              60,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image20.png",
+            "dimensions": [
+              205,
+              161,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image21.png",
+            "dimensions": [
+              206,
+              161,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image22.png",
+            "dimensions": [
+              206,
+              161,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image23.png",
+            "dimensions": [
+              206,
+              161,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image24.png",
+            "dimensions": [
+              205,
+              161,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image25.png",
+            "dimensions": [
+              34,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image26.png",
+            "dimensions": [
+              20,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image27.png",
+            "dimensions": [
+              20,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image28.png",
+            "dimensions": [
+              160,
+              50,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image29.png",
+            "dimensions": [
+              280,
+              513,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image3.png",
+            "dimensions": [
+              159,
+              50,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image30.png",
+            "dimensions": [
+              280,
+              513,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image31.png",
+            "dimensions": [
+              280,
+              513,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image32.png",
+            "dimensions": [
+              280,
+              513,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image33.png",
+            "dimensions": [
+              240,
+              40,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image34.png",
+            "dimensions": [
+              240,
+              40,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image35.png",
+            "dimensions": [
+              240,
+              40,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image36.png",
+            "dimensions": [
+              240,
+              40,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image37.png",
+            "dimensions": [
+              380,
+              247,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image38.png",
+            "dimensions": [
+              380,
+              247,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image39.png",
+            "dimensions": [
+              380,
+              247,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image4.png",
+            "dimensions": [
+              150,
+              46,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image40.png",
+            "dimensions": [
+              380,
+              247,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image41.png",
+            "dimensions": [
+              302,
+              201,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image42.png",
+            "dimensions": [
+              302,
+              201,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image43.png",
+            "dimensions": [
+              30,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image44.png",
+            "dimensions": [
+              38,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image45.png",
+            "dimensions": [
+              1180,
+              82,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image46.png",
+            "dimensions": [
+              1180,
+              513,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image47.png",
+            "dimensions": [
+              159,
+              50,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image48.png",
+            "dimensions": [
+              159,
+              50,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image49.png",
+            "dimensions": [
+              159,
+              50,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image5.png",
+            "dimensions": [
+              1180,
+              513,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image50.png",
+            "dimensions": [
+              160,
+              50,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image51.png",
+            "dimensions": [
+              159,
+              50,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image6.png",
+            "dimensions": [
+              14,
+              18,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image7.png",
+            "dimensions": [
+              31,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image8.png",
+            "dimensions": [
+              575,
+              513,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image9.png",
+            "dimensions": [
+              575,
+              513,
+              "PNG"
+            ]
+          }
+        ],
+        "second_media": [
+          {
+            "name": "ppt/media/image1.png",
+            "dimensions": [
+              1280,
+              720,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image10.png",
+            "dimensions": [
+              35,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image11.png",
+            "dimensions": [
+              31,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image12.png",
+            "dimensions": [
+              159,
+              50,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image13.png",
+            "dimensions": [
+              377,
+              513,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image14.png",
+            "dimensions": [
+              378,
+              513,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image15.png",
+            "dimensions": [
+              377,
+              513,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image16.png",
+            "dimensions": [
+              27,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image17.png",
+            "dimensions": [
+              39,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image18.png",
+            "dimensions": [
+              39,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image19.png",
+            "dimensions": [
+              159,
+              50,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image2.png",
+            "dimensions": [
+              200,
+              60,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image20.png",
+            "dimensions": [
+              205,
+              161,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image21.png",
+            "dimensions": [
+              206,
+              161,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image22.png",
+            "dimensions": [
+              206,
+              161,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image23.png",
+            "dimensions": [
+              206,
+              161,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image24.png",
+            "dimensions": [
+              205,
+              161,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image25.png",
+            "dimensions": [
+              34,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image26.png",
+            "dimensions": [
+              20,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image27.png",
+            "dimensions": [
+              20,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image28.png",
+            "dimensions": [
+              160,
+              50,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image29.png",
+            "dimensions": [
+              280,
+              513,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image3.png",
+            "dimensions": [
+              159,
+              50,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image30.png",
+            "dimensions": [
+              280,
+              513,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image31.png",
+            "dimensions": [
+              280,
+              513,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image32.png",
+            "dimensions": [
+              280,
+              513,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image33.png",
+            "dimensions": [
+              240,
+              40,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image34.png",
+            "dimensions": [
+              240,
+              40,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image35.png",
+            "dimensions": [
+              240,
+              40,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image36.png",
+            "dimensions": [
+              240,
+              40,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image37.png",
+            "dimensions": [
+              380,
+              247,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image38.png",
+            "dimensions": [
+              380,
+              247,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image39.png",
+            "dimensions": [
+              380,
+              247,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image4.png",
+            "dimensions": [
+              150,
+              46,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image40.png",
+            "dimensions": [
+              380,
+              247,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image41.png",
+            "dimensions": [
+              302,
+              201,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image42.png",
+            "dimensions": [
+              302,
+              201,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image43.png",
+            "dimensions": [
+              30,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image44.png",
+            "dimensions": [
+              38,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image45.png",
+            "dimensions": [
+              1180,
+              82,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image46.png",
+            "dimensions": [
+              1180,
+              513,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image47.png",
+            "dimensions": [
+              159,
+              50,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image48.png",
+            "dimensions": [
+              159,
+              50,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image49.png",
+            "dimensions": [
+              159,
+              50,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image5.png",
+            "dimensions": [
+              1180,
+              513,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image50.png",
+            "dimensions": [
+              160,
+              50,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image51.png",
+            "dimensions": [
+              159,
+              50,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image6.png",
+            "dimensions": [
+              14,
+              18,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image7.png",
+            "dimensions": [
+              31,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image8.png",
+            "dimensions": [
+              575,
+              513,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image9.png",
+            "dimensions": [
+              575,
+              513,
+              "PNG"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "source": "D:\\毕业论文\\paperwriting\\academic-ppt-skill\\assets\\templates\\蓝色-学术答辩多版式通用模板 (Academic Defense Multi-Layout Template).pptx",
+      "output": "D:\\毕业论文\\paperwriting\\academic-ppt-skill\\assets\\powerpoint_templates\\T03_blue_defense.pptx",
+      "source_accent": "16365C",
+      "target_accent": "16365C",
+      "editable_color_replacements": 0,
+      "normalized_png_count": 66,
+      "recolored_png_count": 0,
+      "structure_identity": {
+        "first": "D:\\毕业论文\\paperwriting\\academic-ppt-skill\\assets\\templates\\蓝色-学术答辩多版式通用模板 (Academic Defense Multi-Layout Template).pptx",
+        "second": "D:\\毕业论文\\paperwriting\\academic-ppt-skill\\assets\\powerpoint_templates\\T03_blue_defense.pptx",
+        "first_fingerprint": "7bfaaa0842588caf47fabd9fa61ec00f8714d9a3f77595dd24c842f68f1a9b85",
+        "second_fingerprint": "7bfaaa0842588caf47fabd9fa61ec00f8714d9a3f77595dd24c842f68f1a9b85",
+        "passed": true,
+        "first_media": [
+          {
+            "name": "ppt/media/image1.png",
+            "dimensions": [
+              1280,
+              720,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image10.png",
+            "dimensions": [
+              72,
+              59,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image11.png",
+            "dimensions": [
+              72,
+              59,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image12.png",
+            "dimensions": [
+              72,
+              59,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image13.png",
+            "dimensions": [
+              1180,
+              519,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image14.png",
+            "dimensions": [
+              540,
+              360,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image15.png",
+            "dimensions": [
+              520,
+              294,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image16.png",
+            "dimensions": [
+              1180,
+              519,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image17.png",
+            "dimensions": [
+              1120,
+              144,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image18.png",
+            "dimensions": [
+              514,
+              201,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image19.png",
+            "dimensions": [
+              514,
+              201,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image2.png",
+            "dimensions": [
+              802,
+              223,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image20.png",
+            "dimensions": [
+              354,
+              459,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image21.png",
+            "dimensions": [
+              354,
+              459,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image22.png",
+            "dimensions": [
+              354,
+              459,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image23.png",
+            "dimensions": [
+              20,
+              22,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image24.png",
+            "dimensions": [
+              29,
+              22,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image25.png",
+            "dimensions": [
+              23,
+              22,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image26.png",
+            "dimensions": [
+              530,
+              235,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image27.png",
+            "dimensions": [
+              530,
+              235,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image28.png",
+            "dimensions": [
+              530,
+              235,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image29.png",
+            "dimensions": [
+              530,
+              235,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image3.png",
+            "dimensions": [
+              160,
+              45,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image30.png",
+            "dimensions": [
+              212,
+              349,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image31.png",
+            "dimensions": [
+              212,
+              349,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image32.png",
+            "dimensions": [
+              212,
+              349,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image33.png",
+            "dimensions": [
+              212,
+              349,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image34.png",
+            "dimensions": [
+              212,
+              349,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image35.png",
+            "dimensions": [
+              34,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image36.png",
+            "dimensions": [
+              26,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image37.png",
+            "dimensions": [
+              30,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image38.png",
+            "dimensions": [
+              38,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image39.png",
+            "dimensions": [
+              34,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image4.png",
+            "dimensions": [
+              19,
+              19,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image40.png",
+            "dimensions": [
+              76,
+              75,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image41.png",
+            "dimensions": [
+              76,
+              75,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image42.png",
+            "dimensions": [
+              21,
+              26,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image43.png",
+            "dimensions": [
+              56,
+              37,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image44.png",
+            "dimensions": [
+              40,
+              42,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image45.png",
+            "dimensions": [
+              42,
+              37,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image46.png",
+            "dimensions": [
+              51,
+              41,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image47.png",
+            "dimensions": [
+              42,
+              46,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image48.png",
+            "dimensions": [
+              1180,
+              519,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image49.png",
+            "dimensions": [
+              340,
+              141,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image5.png",
+            "dimensions": [
+              33,
+              27,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image50.png",
+            "dimensions": [
+              340,
+              141,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image51.png",
+            "dimensions": [
+              340,
+              141,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image52.png",
+            "dimensions": [
+              340,
+              141,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image53.png",
+            "dimensions": [
+              340,
+              141,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image54.png",
+            "dimensions": [
+              340,
+              141,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image55.png",
+            "dimensions": [
+              1180,
+              544,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image56.png",
+            "dimensions": [
+              432,
+              480,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image57.png",
+            "dimensions": [
+              648,
+              221,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image58.png",
+            "dimensions": [
+              17,
+              22,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image59.png",
+            "dimensions": [
+              268,
+              201,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image6.png",
+            "dimensions": [
+              448,
+              720,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image60.png",
+            "dimensions": [
+              18,
+              22,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image61.png",
+            "dimensions": [
+              14,
+              18,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image62.png",
+            "dimensions": [
+              18,
+              18,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image63.png",
+            "dimensions": [
+              23,
+              18,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image64.png",
+            "dimensions": [
+              160,
+              45,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image65.png",
+            "dimensions": [
+              19,
+              19,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image66.png",
+            "dimensions": [
+              21,
+              21,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image7.png",
+            "dimensions": [
+              832,
+              720,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image8.png",
+            "dimensions": [
+              72,
+              59,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image9.png",
+            "dimensions": [
+              72,
+              59,
+              "PNG"
+            ]
+          }
+        ],
+        "second_media": [
+          {
+            "name": "ppt/media/image1.png",
+            "dimensions": [
+              1280,
+              720,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image10.png",
+            "dimensions": [
+              72,
+              59,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image11.png",
+            "dimensions": [
+              72,
+              59,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image12.png",
+            "dimensions": [
+              72,
+              59,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image13.png",
+            "dimensions": [
+              1180,
+              519,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image14.png",
+            "dimensions": [
+              540,
+              360,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image15.png",
+            "dimensions": [
+              520,
+              294,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image16.png",
+            "dimensions": [
+              1180,
+              519,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image17.png",
+            "dimensions": [
+              1120,
+              144,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image18.png",
+            "dimensions": [
+              514,
+              201,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image19.png",
+            "dimensions": [
+              514,
+              201,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image2.png",
+            "dimensions": [
+              802,
+              223,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image20.png",
+            "dimensions": [
+              354,
+              459,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image21.png",
+            "dimensions": [
+              354,
+              459,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image22.png",
+            "dimensions": [
+              354,
+              459,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image23.png",
+            "dimensions": [
+              20,
+              22,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image24.png",
+            "dimensions": [
+              29,
+              22,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image25.png",
+            "dimensions": [
+              23,
+              22,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image26.png",
+            "dimensions": [
+              530,
+              235,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image27.png",
+            "dimensions": [
+              530,
+              235,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image28.png",
+            "dimensions": [
+              530,
+              235,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image29.png",
+            "dimensions": [
+              530,
+              235,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image3.png",
+            "dimensions": [
+              160,
+              45,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image30.png",
+            "dimensions": [
+              212,
+              349,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image31.png",
+            "dimensions": [
+              212,
+              349,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image32.png",
+            "dimensions": [
+              212,
+              349,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image33.png",
+            "dimensions": [
+              212,
+              349,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image34.png",
+            "dimensions": [
+              212,
+              349,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image35.png",
+            "dimensions": [
+              34,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image36.png",
+            "dimensions": [
+              26,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image37.png",
+            "dimensions": [
+              30,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image38.png",
+            "dimensions": [
+              38,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image39.png",
+            "dimensions": [
+              34,
+              31,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image4.png",
+            "dimensions": [
+              19,
+              19,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image40.png",
+            "dimensions": [
+              76,
+              75,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image41.png",
+            "dimensions": [
+              76,
+              75,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image42.png",
+            "dimensions": [
+              21,
+              26,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image43.png",
+            "dimensions": [
+              56,
+              37,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image44.png",
+            "dimensions": [
+              40,
+              42,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image45.png",
+            "dimensions": [
+              42,
+              37,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image46.png",
+            "dimensions": [
+              51,
+              41,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image47.png",
+            "dimensions": [
+              42,
+              46,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image48.png",
+            "dimensions": [
+              1180,
+              519,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image49.png",
+            "dimensions": [
+              340,
+              141,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image5.png",
+            "dimensions": [
+              33,
+              27,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image50.png",
+            "dimensions": [
+              340,
+              141,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image51.png",
+            "dimensions": [
+              340,
+              141,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image52.png",
+            "dimensions": [
+              340,
+              141,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image53.png",
+            "dimensions": [
+              340,
+              141,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image54.png",
+            "dimensions": [
+              340,
+              141,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image55.png",
+            "dimensions": [
+              1180,
+              544,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image56.png",
+            "dimensions": [
+              432,
+              480,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image57.png",
+            "dimensions": [
+              648,
+              221,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image58.png",
+            "dimensions": [
+              17,
+              22,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image59.png",
+            "dimensions": [
+              268,
+              201,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image6.png",
+            "dimensions": [
+              448,
+              720,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image60.png",
+            "dimensions": [
+              18,
+              22,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image61.png",
+            "dimensions": [
+              14,
+              18,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image62.png",
+            "dimensions": [
+              18,
+              18,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image63.png",
+            "dimensions": [
+              23,
+              18,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image64.png",
+            "dimensions": [
+              160,
+              45,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image65.png",
+            "dimensions": [
+              19,
+              19,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image66.png",
+            "dimensions": [
+              21,
+              21,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image7.png",
+            "dimensions": [
+              832,
+              720,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image8.png",
+            "dimensions": [
+              72,
+              59,
+              "PNG"
+            ]
+          },
+          {
+            "name": "ppt/media/image9.png",
+            "dimensions": [
+              72,
+              59,
+              "PNG"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

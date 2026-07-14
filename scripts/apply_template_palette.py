@@ -7,11 +7,15 @@ import colorsys
 import io
 import json
 import re
+import sys
 import zipfile
 from collections import Counter
 from pathlib import Path
 
 from PIL import Image
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from academic_ppt.template_identity import compare_structure
 
 
 SRGB = re.compile(rb'(<a:srgbClr\b[^>]*\bval=")([0-9A-Fa-f]{6})(")')
@@ -146,6 +150,9 @@ def main():
         "recolored_flat_png_count": recolored_media,
         "raster_warning": "Only flat PNG accents are hue-mapped; inspect photographs and complex colored sample images separately."
     }
+    report["structure_identity"] = compare_structure(Path(args.input), Path(args.output))
+    if not report["structure_identity"]["passed"]:
+        raise SystemExit("palette application changed non-color template structure")
     if args.report:
         output = Path(args.report)
         output.parent.mkdir(parents=True, exist_ok=True)

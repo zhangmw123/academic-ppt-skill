@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "reviewed": true,
+  "deck": "test_file_lab_share",
+  "pages": [
+    {"page_id":"P001","passed":true,"note":"封面题名、场景和层级清楚，无样例残留。"},
+    {"page_id":"P002","passed":true,"note":"左文右图分区清楚，文档切分图完整可辨。"},
+    {"page_id":"P003","passed":true,"note":"图社区对比图与页面论点一致，边界说明可读。"},
+    {"page_id":"P004","passed":true,"note":"五步路线使用模板原生多栏组件，步骤完整且不重叠。"},
+    {"page_id":"P005","passed":true,"note":"LLM-as-Judge 对比截图清晰，解释与局限均呈现。"},
+    {"page_id":"P006","passed":true,"note":"消融图完整保留坐标、图例和比较关系。"},
+    {"page_id":"P007","passed":true,"note":"实体与关系分布图可读，数据边界说明明确。"},
+    {"page_id":"P008","passed":true,"note":"结论页收束论文贡献与讨论方向，结束状态明确。"}
+  ]
+}

@@ -7,10 +7,65 @@ from pptx import Presentation
 from pptx.util import Inches
 
 from academic_ppt.layout import LayoutCompiler, ScientificPageContract
-from academic_ppt.templates import TemplateCapabilityGraph
+from academic_ppt.templates import TemplateAdmissionGate, TemplateCapabilityGraph, TemplateCatalog
 
 
 class TemplateCapabilityGraphTests(unittest.TestCase):
+    def test_resolves_original_bundled_names_to_disclosed_powerpoint_safe_templates(self):
+        catalog = TemplateCatalog.load()
+
+        green = catalog.select("组会-文献精读", "绿色-科研风格PPT模版.pptx")
+        blue_defense = catalog.select(
+            "毕业答辩",
+            "蓝色-学术答辩多版式通用模板 (Academic Defense Multi-Layout Template).pptx",
+        )
+
+        self.assertEqual(green.template_id, "T01")
+        self.assertEqual(blue_defense.template_id, "T03")
+        self.assertTrue(Path(green.path).is_file())
+        self.assertTrue(Path(blue_defense.path).is_file())
+        self.assertEqual(green.support_level, "bundled_recompiled_source")
+        self.assertIn("complete slide structure", green.substitution_reason)
+        self.assertTrue(green.source_path.endswith("绿色-科研风格PPT模版.pptx"))
+        self.assertEqual(green.source_fidelity, "complete_structure_recompile")
+        self.assertIn("all 10 source slides", green.source_limitations)
+        self.assertIn("all 11 source slides", blue_defense.source_limitations)
+
+    def test_accepts_an_existing_unregistered_template_as_conditional(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            template_path = Path(temp_dir) / "custom.pptx"
+            presentation = Presentation()
+            presentation.slides.add_slide(presentation.slide_layouts[6])
+            presentation.save(template_path)
+
+            selection = TemplateCatalog.load().select("毕业答辩", template_path)
+
+            self.assertIsNone(selection.template_id)
+            self.assertEqual(selection.support_level, "conditional_user")
+            self.assertEqual(Path(selection.path), template_path.resolve())
+
+    def test_user_template_admission_requires_editable_components_and_grammar(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            valid_path = root / "valid.pptx"
+            valid = Presentation()
+            valid_slide = valid.slides.add_slide(valid.slide_layouts[6])
+            valid_slide.shapes.add_textbox(Inches(1), Inches(1), Inches(4), Inches(1)).text = "Editable"
+            valid.save(valid_path)
+            invalid_path = root / "invalid.pptx"
+            invalid = Presentation()
+            invalid.slides.add_slide(invalid.slide_layouts[6])
+            invalid.save(invalid_path)
+
+            accepted = TemplateAdmissionGate().inspect(valid_path, require_runtime=False)
+            rejected = TemplateAdmissionGate().inspect(invalid_path, require_runtime=False)
+
+            self.assertTrue(accepted.passed)
+            self.assertTrue(accepted.grammar_extracted)
+            self.assertGreater(accepted.editable_component_count, 0)
+            self.assertFalse(rejected.passed)
+            self.assertTrue(any("editable" in error for error in rejected.errors))
+
     def test_selects_a_native_slide_with_required_editable_component_capacity(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)

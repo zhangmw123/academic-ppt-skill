@@ -1,4 +1,4 @@
-"""Run one or all fixed scene benchmarks through the V2 service workflow."""
+"""Run fixed scene-contract benchmarks through the reusable Skill core."""
 
 from __future__ import annotations
 
@@ -23,8 +23,14 @@ def main() -> None:
     parser.add_argument("--output-dir", type=Path)
     parser.add_argument("--formal", action="store_true", help="Require an authoritative runtime render")
     parser.add_argument("--runtime", choices=("powerpoint", "wps", "portable"), default="powerpoint")
+    parser.add_argument("--template", help="Override the template for one focused case")
+    parser.add_argument("--source", action="append", dest="sources", help="Use an external source for one focused case")
     parser.add_argument("--fail-fast", action="store_true")
     args = parser.parse_args()
+    if args.template and (not args.case_ids or len(args.case_ids) != 1):
+        parser.error("--template requires exactly one --case")
+    if args.sources and (not args.case_ids or len(args.case_ids) != 1):
+        parser.error("--source requires exactly one --case")
 
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%SZ")
     output_dir = args.output_dir or Path.cwd() / "ppt_output" / "benchmarks" / stamp
@@ -35,14 +41,23 @@ def main() -> None:
         require_runtime=args.formal,
         runtime=args.runtime,
         keep_going=not args.fail_fast,
+        template_selection=args.template,
+        source_paths=args.sources,
     )
+    effective_passed = report["passed"] if args.sources else report["contract_matrix_passed"]
     print(json.dumps({
         "output_dir": str(output_dir.resolve()),
-        "passed": report["passed"],
+        "passed": effective_passed,
+        "contract_matrix_passed": report["contract_matrix_passed"],
+        "product_suite_passed": report["product_suite_passed"],
+        "product_acceptance_claimed": report["product_suite_passed"],
         "case_count": len(report["cases"]),
-        "failed_cases": [item["case_id"] for item in report["cases"] if not item["passed"]],
+        "failed_cases": [
+            item["case_id"] for item in report["cases"]
+            if not (item["passed"] if args.sources else item["contract_passed"])
+        ],
     }, ensure_ascii=False, indent=2))
-    if not report["passed"]:
+    if not effective_passed:
         raise SystemExit(1)
 
 

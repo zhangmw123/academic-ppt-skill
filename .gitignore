@@ -1,6 +1,7 @@
 __pycache__/
 *.py[cod]
 ppt_output/
+real_product_outputs/
 ~$*.pptx
 
 # Local reference and test inputs; bundled templates live under assets/.
@@ -13,3 +14,6 @@ ppt_output/
 # Office-suite recovery snapshots are machine-local artifacts.
 .wpp_backup/
 *.wppsnapshot.*
+
+# Internal development handoffs are not part of the distributable skill.
+docs/handoff/

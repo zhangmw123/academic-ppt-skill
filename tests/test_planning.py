@@ -49,11 +49,12 @@ class PagePlannerTests(unittest.TestCase):
             graph = EvidenceGraph.from_sources([SourceIngestor().ingest(source_path)])
             evidence = graph.all()[0]
             pages = []
-            for index in range(5):
+            sections = ("本周任务", "文献与学习", "实验与结果", "问题与讨论", "下周计划")
+            for index in range(8):
                 claim = graph.add_claim(f"进展证据 {index + 1}", [evidence.evidence_id])
                 pages.append(PageDraft(
                     page_id=f"P{index + 1:03d}",
-                    section=("本周任务", "文献与学习", "实验与结果", "问题与讨论", "下周计划")[index],
+                    section=sections[index % len(sections)],
                     title=f"进展证据 {index + 1}",
                     question_answered="本周工作形成了什么证据？",
                     claim_id=claim.claim_id,
@@ -75,12 +76,12 @@ class PagePlannerTests(unittest.TestCase):
                 deck_scope="complete",
                 evidence_state="interim",
                 section_variant="weekly_5",
-                duration_minutes=5,
+                duration_minutes=8,
             )
 
             plan = PagePlanner().build(
                 "组会-周报进展",
-                ["本周任务", "文献与学习", "实验与结果", "问题与讨论", "下周计划"],
+                list(sections),
                 pages,
                 graph,
                 scene_contract=contract,

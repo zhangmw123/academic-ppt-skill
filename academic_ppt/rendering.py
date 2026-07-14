@@ -1,4 +1,4 @@
-"""Adapt V2 page and layout contracts to the native PPTX renderer."""
+"""Adapt page and layout contracts to the native PPTX renderer."""
 
 from __future__ import annotations
 
@@ -9,6 +9,7 @@ from pathlib import Path
 
 from .layout import LayoutDecision
 from .planning import PagePlan
+from .templates import TemplateCapabilityGraph
 
 
 class NativeRenderAdapter:
@@ -23,10 +24,18 @@ class NativeRenderAdapter:
         *,
         confirmed: bool,
         image_content: dict[str, list[Path | str]] | None = None,
+        page_ids: set[str] | None = None,
+        template_grammar: Path | str | None = None,
+        template_graph: TemplateCapabilityGraph | None = None,
+        remove_shape_ids: dict[str, list[int]] | None = None,
+        font_policy: dict[str, str] | None = None,
     ) -> Path:
         image_content = image_content or {}
+        remove_shape_ids = remove_shape_ids or {}
         pages = []
-        for page in page_plan.pages:
+        for page_index, page in enumerate(page_plan.pages):
+            if page_ids is not None and page.page_id not in page_ids:
+                continue
             try:
                 decision = decisions[page.page_id]
             except KeyError as exc:
@@ -51,24 +60,45 @@ class NativeRenderAdapter:
                     "replace_shape_id": shape_id,
                     "fit": "contain",
                 })
+            text_bindings = []
+            adjustments = []
+            geometry_by_id = {
+                component.shape_id: component.geometry
+                for slide in (template_graph.slides if template_graph else ())
+                if slide.slide_index == decision.source_slide_index
+                for component in slide.components
+            }
+            for value_index, (shape_id, content) in enumerate(zip(text_shape_ids, values)):
+                resolved_content = str(content)
+                geometry = geometry_by_id.get(shape_id)
+                if geometry:
+                    resolved_content, font_size = self._fit_text(resolved_content, geometry, value_index == 0)
+                    adjustments.append({"shape_id": shape_id, "font_size_pt": font_size})
+                text_bindings.append({"shape_id": shape_id, "content": resolved_content})
             pages.append({
                 "page_id": page.page_id,
                 "section": page.section,
                 "render_mode": decision.render_mode,
                 "source_slide_index": decision.source_slide_index,
-                "text_bindings": [
-                    {"shape_id": shape_id, "content": content}
-                    for shape_id, content in zip(text_shape_ids, values)
-                ],
+                "text_bindings": text_bindings,
                 "image_bindings": image_bindings,
+                "adjustments": adjustments,
+                "remove_shape_ids": remove_shape_ids.get(page.page_id, []),
                 "speaker_notes": self._speaker_notes(page),
+                "navigation_enabled": page_index not in {0, len(page_plan.pages) - 1},
             })
         payload = {
             "confirmed": confirmed,
             "template_mode": "template_native",
+            "deck_scope": "sample" if page_ids is not None else page_plan.deck_scope,
             "sections": list(page_plan.sections),
+            "replace_raster_navigation": True,
             "pages": pages,
         }
+        if font_policy:
+            payload["font_policy"] = dict(font_policy)
+        if template_grammar is not None:
+            payload["template_grammar"] = str(Path(template_grammar).resolve())
         output = Path(output_path)
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -93,6 +123,7 @@ class NativeRenderAdapter:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            errors="replace",
         )
         if not output.is_file():
             raise RuntimeError(f"native renderer did not create output: {output}")
@@ -105,3 +136,25 @@ class NativeRenderAdapter:
             f"转场：{page.next_link}",
             f"建议时长：{page.time_seconds} 秒",
         ))
+
+    @staticmethod
+    def _fit_text(content: str, geometry: dict[str, int], is_title: bool) -> tuple[str, float]:
+        width_pt = geometry["width"] / 12700
+        height_pt = geometry["height"] / 12700
+        minimum = 14.0 if is_title else 11.5
+        maximum = 24.0 if is_title else 16.0
+        units = max(1.0, sum(1.0 if "\u4e00" <= char <= "\u9fff" else 0.55 for char in content))
+        estimated = ((width_pt * height_pt) / max(units * 0.96, 1)) ** 0.5
+        font_size = max(minimum, min(maximum, estimated))
+        capacity = max(4.0, (width_pt / (font_size * 0.9)) * (height_pt / (font_size * 1.2)))
+        if units > capacity:
+            retained = []
+            used = 0.0
+            for char in content:
+                cost = 1.0 if "\u4e00" <= char <= "\u9fff" else 0.55
+                if used + cost > max(1.0, capacity - 1.0):
+                    break
+                retained.append(char)
+                used += cost
+            content = "".join(retained).rstrip() + "…"
+        return content, round(font_size, 1)

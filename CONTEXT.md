@@ -132,10 +132,6 @@ _Avoid_: One maximum-rigor workflow for every task
 A user-edited generated PPTX adopted as the visual source of truth for subsequent localized revisions, protecting untouched pages and manual objects from full regeneration.
 _Avoid_: Rebuilding from an outdated layout plan
 
-**V2 Core**:
-The internal workflow, schema, and module architecture used by the **Academic PPT Skill** for evidence, templates, layout, visuals, QA, and delivery, exposed through skill and legacy command adapters rather than as a separate user-facing project.
-_Avoid_: Unbounded patching of v1 JSON contracts
-
 **Academic PPT Skill**:
 The installable, user-facing Codex capability that turns research materials into scene-aware, evidence-grounded, editable academic PPTX deliverables.
 _Avoid_: A separate project users must deploy or operate
@@ -180,6 +176,38 @@ _Avoid_: An upfront internal configuration questionnaire
 The selection of one compatible bundled template for a request without a user-supplied template, subject to user confirmation in the inferred task summary.
 _Avoid_: Mandatory template picking, silent generic-theme fallback
 
+**Standard Template Specification**:
+The machine-readable companion to a standardized editable PPTX, recording page archetypes, semantic modules, child slots, ownership groups, capacity, render modes, and removal policies.
+_Avoid_: Screenshot-only template analysis, palette summary
+
+**Semantic Module**:
+A bounded argument unit inside a page, such as a contribution card, result panel, method step, or evidence group, that owns its heading, explanation, and optional visual children.
+_Avoid_: Decorative box, arbitrary text chunk
+
+**Module Child Slot**:
+An owned position inside a Semantic Module for a heading, explanation, image, chart, icon, metric, or caption, including the rules for replacement, omission, and reflow.
+_Avoid_: Unowned placeholder, page-wide image slot
+
+**Page-Level Media Layout**:
+A composition in which several visuals form the page's primary evidence carrier, including 1, 2, 3, 4, or 6-image galleries and primary-plus-supporting arrangements.
+_Avoid_: Any picture anywhere on a slide
+
+**Module-Level Media**:
+A visual child owned by one Semantic Module, such as one figure inside each of three contribution cards.
+_Avoid_: Page gallery, decorative thumbnail
+
+**Complete Component Removal**:
+Deleting an unused component together with every owned frame, label, icon, caption, connector, and placeholder so no sample residue or orphan object remains.
+_Avoid_: Emptying text only, covering with a white mask
+
+**Exclusive Region Render Mode**:
+The requirement that one semantic region uses either complete native reuse or complete reconstruction, never overlapping old and new implementations.
+_Avoid_: Drawing a new panel over a retained sample frame
+
+**Typography Capacity Policy**:
+The bounded type scale and reflow rule that protects readability by shortening, splitting, or changing composition before shrinking content below its accepted range.
+_Avoid_: Fit by unlimited font shrinking
+
 ## Relationships
 
 - A **Scientific Page Contract** selects one of **Native Reuse**, **Reconstructive Reuse**, or **Scientific Freeform**.
@@ -213,7 +241,6 @@ _Avoid_: Mandatory template picking, silent generic-theme fallback
 - A **Delivery Bundle** exposes the editable PPTX and separate speaker script by default; rendered previews, Deck Rationale, quality summaries, audit, and working artifacts remain available without becoming normal-user handoff clutter.
 - The **Rigor Profile** controls which gates and audit artifacts are materialized, while interaction remains independently selectable as **Guided Workflow** or **Autonomous Draft**.
 - An **Authoritative Edit Baseline** is revised only on explicitly targeted pages; detected manual edits are protected, and any required rebuild discloses what would be replaced before proceeding.
-- The **V2 Core** is the source of truth for new projects; legacy commands and supported v1 artifacts are translated through compatibility adapters and remain covered by regression tests.
 - The **1.0 Release Gate** requires the Core Benchmark Suite, template regressions, and formal delivery quality gates to pass for the declared supported surface.
 - The **1.0 Release Matrix** verifies every supported scene and template without requiring every possible scene-template pair to receive complete manual review.
 - The **1.0 Supported Surface** consists of 开题答辩、中期考核、毕业答辩、组会-文献精读、组会-周报进展、组会-课题进展、科研项目申报、科研项目比赛、项目中期与结题、学术会议报告, plus T01 through T08.
@@ -224,6 +251,10 @@ _Avoid_: Mandatory template picking, silent generic-theme fallback
 - **One-Time Skill Configuration** prepares the supported host and local runtime once; a normal skill invocation performs only lightweight checks and never exposes internal dependency management to the user.
 - **Progressive Input Discovery** makes an inferred task summary the default initial interaction; explicit questions are reserved for missing or materially ambiguous scene, source, template, formal-cover, or delivery choices.
 - **Template Autoselection** chooses one T01-T08 candidate by default; alternatives and previews are shown only for low confidence, material conflict, or an explicit user comparison request.
+- A **Standard Template Specification** describes each page as **Semantic Modules** with owned **Module Child Slots** and is compiled alongside the standard editable PPTX.
+- **Page-Level Media Layout** and **Module-Level Media** are separate composition choices; both require evidence binding and must remove unavailable slots rather than leave empty frames.
+- **Exclusive Region Render Mode** requires **Complete Component Removal** before reconstruction and forbids masks or stacked native and rebuilt components.
+- The **Typography Capacity Policy** governs every Semantic Module and triggers shortening, splitting, or reflow before unreadable shrinking.
 
 ## Example dialogue
 
