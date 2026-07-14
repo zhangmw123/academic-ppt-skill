@@ -136,6 +136,10 @@ _Avoid_: Rebuilding from an outdated layout plan
 The installable, user-facing Codex capability that turns research materials into scene-aware, evidence-grounded, editable academic PPTX deliverables.
 _Avoid_: A separate project users must deploy or operate
 
+**Self-Contained Skill Boundary**:
+The rule that Academic PPT Skill owns the complete presentation workflow and may use low-level host tools or libraries without delegating its core work to another presentation Skill or becoming a user-managed project.
+_Avoid_: Nature-paper2ppt delegation, required companion Skill, internal application presented as the product
+
 **1.0 Release Gate**:
 The public-release condition requiring every declared supported Presentation Scene to meet formal delivery quality rather than treating a single representative workflow as sufficient.
 _Avoid_: MVP-only acceptance, preview release
@@ -247,11 +251,13 @@ _Avoid_: Fit by unlimited font shrinking
 - T01 through T08 are unconditionally supported within the **1.0 Supported Surface**; a **Conditionally Supported Template** is rejected early when its required validation does not pass and must never silently fall back to a generic theme.
 - The **1.0 Invocation Contract** uses Guided Workflow by default; an **Autonomous Draft** cannot satisfy the **1.0 Release Gate** for a formal deliverable without later user confirmation.
 - The canonical **Academic PPT Skill** directory is shared by both **Supported Skill Hosts**; optional host metadata may improve discovery but cannot change the workflow or output contract.
+- The **Self-Contained Skill Boundary** makes the Academic PPT Skill the sole owner of source analysis, storyline, template interpretation, composition, rendering, and acceptance; another presentation Skill cannot replace any stage.
 - The **1.0 Formal Runtime** is required for formal delivery; WPS is an optional separately verified target, while macOS and Linux output remains an unaccepted draft unless an Authoritative Runtime render is available.
 - **One-Time Skill Configuration** prepares the supported host and local runtime once; a normal skill invocation performs only lightweight checks and never exposes internal dependency management to the user.
 - **Progressive Input Discovery** makes an inferred task summary the default initial interaction; explicit questions are reserved for missing or materially ambiguous scene, source, template, formal-cover, or delivery choices.
 - **Template Autoselection** chooses one T01-T08 candidate by default; alternatives and previews are shown only for low confidence, material conflict, or an explicit user comparison request.
 - A **Standard Template Specification** describes each page as **Semantic Modules** with owned **Module Child Slots** and is compiled alongside the standard editable PPTX.
+- T01 through T08 must each receive a **Standard Template Specification** and pass the complete release gates; implementation order does not create a partially supported release.
 - **Page-Level Media Layout** and **Module-Level Media** are separate composition choices; both require evidence binding and must remove unavailable slots rather than leave empty frames.
 - **Exclusive Region Render Mode** requires **Complete Component Removal** before reconstruction and forbids masks or stacked native and rebuilt components.
 - The **Typography Capacity Policy** governs every Semantic Module and triggers shortening, splitting, or reflow before unreadable shrinking.

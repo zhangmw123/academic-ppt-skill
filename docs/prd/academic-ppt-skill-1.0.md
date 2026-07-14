@@ -13,6 +13,11 @@ language or `$academic-ppt-skill` and supplies research materials, a Presentatio
 Scene, and optionally a template. The skill owns its bundled scripts and references and
 returns an editable, evidence-grounded academic PPTX plus its Delivery Bundle.
 
+This Skill is the sole presentation-workflow owner. Its core path must not create a
+user-managed project or delegate planning, composition, rendering, or acceptance to
+another presentation Skill. Host tools and libraries may be implementation details,
+but another Skill must never be a required dependency or a silent substitute.
+
 The user must not need to create or understand an internal project model, invoke
 individual Python modules, assemble JSON contracts, choose an internal renderer, or
 manage Python dependencies after One-Time Skill Configuration. The skill may create
@@ -94,9 +99,10 @@ For every supported scene, the skill must complete this path:
 
 ## Template Standardization And Dense Composition
 
-- Compile every bundled template into both a standard editable PPTX and a
-  machine-readable semantic specification. Standardize T01 and T03 first, then
-  T02 and T04-T08, without collapsing their distinct visual identities.
+- Compile all eight bundled templates T01-T08 into both a standard editable PPTX
+  and a machine-readable semantic specification without collapsing their distinct
+  visual identities. T01 and T03 may be the first implementation batch only; that
+  ordering grants no partial-support or release claim.
 - Model composition as `page -> semantic module -> child slot`. A module may own a
   heading, explanation, image, chart, icon, caption, or metric; a three-card page
   may therefore contain one evidence visual inside each card rather than only one
@@ -127,6 +133,9 @@ For every supported scene, the skill must complete this path:
 - Complete one formal-delivery benchmark for each of the ten Presentation Scenes.
 - Run grammar, clone/save, dynamic-render, Template Identity, and relevant visual
   regression checks for each bundled template T01-T08.
+- Require every T01-T08 template to pass package parsing, semantic specification
+  compilation, editable component binding, representative dense and multi-image
+  rendering, object-level QA, and Windows PowerPoint visual acceptance.
 - Run selected high-risk scene-template combinations. Do not require exhaustive
   manual review of the 10 x 8 Cartesian product.
 - Verify a complete deck through the selected Authoritative Runtime for every scene
@@ -142,6 +151,8 @@ For every supported scene, the skill must complete this path:
 - No violation of Scientific Color Semantics or unexplained loss of Template Identity.
 - No formal delivery from an unconfirmed Autonomous Draft.
 - No release without a passing Authoritative Runtime render for every scene benchmark.
+- No partial template release: failure or incomplete standardization of any one of
+  T01-T08 blocks the 1.0 release for the bundled-template supported surface.
 - No macOS/Linux or unverified-WPS output is labeled as a formally accepted delivery.
 
 ## Completion Criteria

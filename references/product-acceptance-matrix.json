@@ -13,6 +13,7 @@
     {"id": "structural_qa", "evidence": "render report", "rejects": "corrupt packages, overflow, overlap, residue"},
     {"id": "scientific_semantic_qa", "evidence": "Source to Evidence to Claim to Page trace", "rejects": "unsupported claims"},
     {"id": "visual_task_qa", "evidence": "accepted visual task ledger", "rejects": "fixed text_only or auto-accepted visuals"},
+    {"id": "all_bundled_templates_accepted", "evidence": "T01-T08 semantic compile, editable binding, dense and multi-image render, object QA, and PowerPoint review reports", "rejects": "partial template support or T01/T03-only acceptance"},
     {"id": "powerpoint_real_render", "evidence": "Windows PowerPoint export", "rejects": "file-open or fallback-render acceptance"},
     {"id": "human_visual_review", "evidence": "per-slide review decisions", "rejects": "automatically approved screenshots"}
   ],

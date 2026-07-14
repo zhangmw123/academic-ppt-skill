@@ -19,8 +19,8 @@ They must not be removed as "application" or "platform" code during cleanup.
 - Build editable native PowerPoint diagrams, charts, tables, comparisons, and
   process or architecture views when the relationship is better expressed visually.
 - Render evidence-bound quantitative charts with matplotlib; never invent values.
-- Route complex illustrations to an available plotting, diagram, or image-generation
-  skill while rebuilding factual labels and numbers as editable PowerPoint objects.
+- Build complex illustrations through bundled scripts or host-provided low-level
+  tools while rebuilding factual labels and numbers as editable PowerPoint objects.
 - Search the web only for a necessary missing public visual, record provenance and
   license, and never upload private source material without explicit permission.
 
@@ -44,6 +44,19 @@ They must not be removed as "application" or "platform" code during cleanup.
   limits. Validate duplicate objects, overlaps, orphan companions, and empty slots.
 - Support T01-T08 and user templates that pass package, grammar, clone/save, and
   authoritative-runtime admission checks.
+- Treat T01-T08 as one indivisible release surface. Each template must pass parsing,
+  semantic compilation, editable binding, dense and multi-image rendering,
+  object-level QA, and authoritative PowerPoint visual acceptance.
+
+## Required Skill boundary
+
+- Keep Academic PPT Skill as the single user-facing and workflow-owning capability.
+- Do not create a separately operated project, application, service, or internal
+  product that the user must manage.
+- Do not invoke or depend on another presentation-generation Skill for source
+  analysis, storyline, template interpretation, composition, rendering, or QA.
+- Use host tools and libraries only as low-level implementation aids under this
+  Skill's own contracts, scripts, provenance, and acceptance gates.
 
 ## Required delivery workflow
 

@@ -11,6 +11,21 @@ from academic_ppt.templates import TemplateAdmissionGate, TemplateCapabilityGrap
 
 
 class TemplateCapabilityGraphTests(unittest.TestCase):
+    def test_all_eight_bundled_templates_exist_and_parse_into_editable_components(self):
+        catalog = TemplateCatalog.load()
+
+        self.assertEqual({item["id"] for item in catalog.templates}, {f"T{i:02d}" for i in range(1, 9)})
+        for item in catalog.templates:
+            template_path = catalog.root / item["path"]
+            self.assertTrue(template_path.is_file(), item["id"])
+            graph = TemplateCapabilityGraph.from_presentation(template_path)
+            self.assertGreater(len(graph.slides), 0, item["id"])
+            self.assertTrue(
+                any(component.kind in {"text", "picture", "table", "chart"}
+                    for slide in graph.slides for component in slide.components),
+                item["id"],
+            )
+
     def test_resolves_original_bundled_names_to_disclosed_powerpoint_safe_templates(self):
         catalog = TemplateCatalog.load()
 

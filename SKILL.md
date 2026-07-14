@@ -12,6 +12,9 @@ then rebuild the evidence layer with editable text, shapes, charts, diagrams, an
 necessary local visual assets. Preserve template identity without carrying over
 sample frames whose capacity does not match the page.
 
+Own this workflow end to end. Do not invoke another presentation-generation Skill,
+create a user-managed project, or replace this Skill's contracts with another system.
+
 ## Hard rules
 
 1. Complete at most one gated phase per assistant turn. Stop for explicit user
@@ -115,6 +118,9 @@ sample frames whose capacity does not match the page.
     compatible alternative: cover 28-32 pt, page title 20-24 pt, module heading
     13-16 pt, body 11-13 pt, caption 8.5-10 pt, with normal content no smaller than
     10.5 pt. Shorten, split, or reflow before shrinking below the range.
+34. Treat T01-T08 as one release surface. Every template must pass parsing, semantic
+    compilation, editable binding, dense and multi-image rendering, object-level QA,
+    and PowerPoint visual acceptance; T01/T03-first is sequencing, not partial support.
 
 ## First response
 
@@ -341,13 +347,13 @@ Prefer in order:
    timelines, taxonomies, and causal chains;
 3. a native or matplotlib chart reconstructed from source data;
 4. a traceable web image for a missing real-world subject or restrained background;
-5. an available image-generation or diagram skill for a new explanatory visual,
+5. a bundled or host-provided low-level image-generation tool for an explanatory visual,
    with all factual text and numbers rebuilt as editable PowerPoint elements.
 
 Route quantitative axes to `matplotlib`; route boxes-and-arrows structures to an
 editable native PowerPoint diagram, using Graphviz only as an optional coordinate
-solver; route complex conceptual illustrations to an available plotting or image
-generation skill. Use generated imagery only as a visual base, never as the source
+solver; use a low-level plotting or image-generation tool for complex conceptual
+illustrations. Use generated imagery only as a visual base, never as the source
 of scientific numbers, labels, or relationships.
 
 For web images, use the environment's image or web search tool. Record query,
