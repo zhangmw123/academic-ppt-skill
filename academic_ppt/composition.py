@@ -278,9 +278,14 @@ class DynamicCompositionCompiler:
             else:
                 value -= 100
             module_count = int(prototype.get("content_module_count", 1))
-            value += max(-35, 30 - abs(module_count - max(desired_modules, 1)) * 12)
+            value += max(-40, 50 - abs(module_count - max(desired_modules, 1)) * 20)
             scope = media.get("scope", "none")
-            value += 32 if scope == desired_scope else -18
+            if scope == desired_scope:
+                value += 32
+            elif desired_scope == "none" and scope == "module":
+                value += 26
+            else:
+                value -= 18
             slot_count = int(media.get("slot_count", 0))
             if desired_media:
                 value += 28 if slot_count == desired_media else -abs(slot_count - desired_media) * 8
@@ -363,9 +368,12 @@ class DynamicCompositionCompiler:
         layout = page.media_layout if page.media_layout not in {"", "none"} else {
             2: "two_image", 3: "three_image", 4: "four_image", 6: "six_image",
         }[count]
+        summary = _headline_detail(page.claim_text, fallback="多面板证据")
         return {
             "layout": "media_gallery",
             "title": page.title,
+            "lead": summary["title"],
+            "explanation": summary["body"] or page.interpretation,
             "media_scope": "page",
             "media_layout": layout,
             "media_items": media_items,
@@ -579,6 +587,8 @@ class CompositionQualityGate:
                 items = page.get("media_items", ())
                 if len(items) not in {2, 3, 4, 6}:
                     errors.append(f"{page_id}: media gallery requires 2, 3, 4, or 6 images")
+                if not _clean(page.get("lead", "")) or not _clean(page.get("explanation", "")):
+                    errors.append(f"{page_id}: media gallery requires a heading and explanation")
                 for media_index, item in enumerate(items, 1):
                     if not item.get("path") or not self._media_source_complete(item.get("source", {})):
                         errors.append(f"{page_id}: gallery image {media_index} lacks a real source binding")
@@ -645,9 +655,9 @@ class CompositionQualityGate:
                 for node in column.get("nodes", ())
             ] + [page.get("page_conclusion", "")]
         if layout == "media_gallery":
-            return [
+            return [page.get("lead", ""), page.get("explanation", ""), *[
                 item.get("caption", "") for item in page.get("media_items", ())
-            ] + [page.get("page_conclusion", "")]
+            ], page.get("page_conclusion", "")]
         if layout == "module_media":
             return [
                 f"{item.get('title', '')} {item.get('body', '')} {item.get('caption', '')}"

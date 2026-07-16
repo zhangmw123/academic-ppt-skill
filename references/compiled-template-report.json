@@ -15,7 +15,7 @@
       "semantic_specification": "assets/template_specs/T01_green_research.semantic.json",
       "slide_count": 10,
       "semantic_module_count": 31,
-      "child_slot_count": 78,
+      "child_slot_count": 88,
       "media_archetypes": [
         {
           "page_id": "T01_P03",
@@ -76,7 +76,7 @@
       "semantic_specification": "assets/template_specs/T03_blue_defense.semantic.json",
       "slide_count": 11,
       "semantic_module_count": 32,
-      "child_slot_count": 86,
+      "child_slot_count": 101,
       "media_archetypes": [
         {
           "page_id": "T03_P04",

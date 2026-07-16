@@ -154,6 +154,9 @@ class ObjectLevelQualityGate:
         manifest_pages = {
             int(page["slide_number"]): page for page in manifest.get("pages", ())
         } if manifest else {}
+        if manifest:
+            for error in manifest.get("errors", ()):
+                categories["orphan_components"].append(f"binding manifest: {error}")
 
         if manifest:
             selected = []
@@ -235,6 +238,37 @@ class ObjectLevelQualityGate:
                         f"slide {slide_number}: blank reconstruction binds only {len(feature_bindings)} "
                         f"template identity features; require {required_features}"
                     )
+                for binding in feature_bindings:
+                    missing = sorted(
+                        int(value) for value in binding.get("shape_ids", ())
+                        if int(value) not in shape_by_id
+                    )
+                    if missing:
+                        categories["template_identity"].append(
+                            f"slide {slide_number}: identity feature {binding.get('feature')!r} "
+                            f"references missing shapes {missing}"
+                        )
+                if page.get("page_role") not in {"cover", "ending", "section"}:
+                    for shape_id in identity_shape_ids:
+                        shape = shape_by_id.get(shape_id)
+                        if not shape or shape.shape_type != MSO_SHAPE_TYPE.PICTURE:
+                            continue
+                        area_ratio = (shape.width * shape.height) / max(
+                            presentation.slide_width * presentation.slide_height, 1
+                        )
+                        center_y = (shape.top + shape.height / 2) / presentation.slide_height
+                        if area_ratio > 0.12 and center_y > 0.16:
+                            categories["template_residue"].append(
+                                f"slide {slide_number}: content-sized identity picture {shape_id} "
+                                f"occupies {area_ratio:.0%} of the slide"
+                            )
+            self._check_frame_layers(
+                slide_number,
+                shapes,
+                module_map,
+                identity_shape_ids,
+                categories,
+            )
             self._check_overlaps(
                 slide_number,
                 shapes,
@@ -389,6 +423,24 @@ class ObjectLevelQualityGate:
             for binding in region.get("slot_bindings", ()):
                 for shape_id in binding.get("shape_ids", ()):
                     module_map[int(shape_id)] = module_id
+            for shape_id in region.get("owned_shape_ids", ()):
+                shape_id = int(shape_id)
+                previous = module_map.get(shape_id)
+                if previous and previous != module_id:
+                    categories["duplicate_objects"].append(
+                        f"slide {slide_number}: shape {shape_id} is owned by {previous} and {module_id}"
+                    )
+                module_map[shape_id] = module_id
+            declared_removed = {
+                int(value) for value in region.get("removed_native_shape_ids", ())
+            }
+            if mode == "full_reconstruction" and declared_removed != native_shapes:
+                missing_removed = sorted(native_shapes - declared_removed)
+                extra_removed = sorted(declared_removed - native_shapes)
+                categories["template_residue"].append(
+                    f"slide {slide_number}: {module_id} incomplete native removal; "
+                    f"missing={missing_removed} extra={extra_removed}"
+                )
 
     @staticmethod
     def _check_internal_labels(slide_number, shapes, categories):
@@ -412,11 +464,15 @@ class ObjectLevelQualityGate:
                 binding = bindings.get(slot_id)
                 if slot.get("role") == "image_or_chart":
                     if binding is None:
-                        if slot.get("required") or slot_id not in explicitly_reflowed:
+                        if slot_id not in explicitly_reflowed:
                             categories["empty_media_slots"].append(
                                 f"slide {slide_number}: media slot {slot_id} is empty and was not reflowed"
                             )
                         continue
+                elif binding is None and slot.get("required") and slot_id not in explicitly_reflowed:
+                    categories["orphan_components"].append(
+                        f"slide {slide_number}: required text slot {slot_id} has no binding"
+                    )
                 if binding is None:
                     continue
                 bound_shapes = [shape_by_id.get(int(value)) for value in binding.get("shape_ids", ())]
@@ -525,6 +581,7 @@ class ObjectLevelQualityGate:
             region = regions.get(module["module_id"], {})
             if region.get("render_mode") == "native_reuse":
                 declared.update(int(value) for value in module.get("ownership_group", {}).get("shape_ids", ()))
+            declared.update(int(value) for value in region.get("owned_shape_ids", ()))
             for binding in region.get("slot_bindings", ()):
                 declared.update(int(value) for value in binding.get("shape_ids", ()))
         orphaned = [
@@ -535,6 +592,39 @@ class ObjectLevelQualityGate:
             categories["orphan_components"].append(
                 f"slide {slide_number}: content-bearing shapes are outside semantic ownership {sorted(orphaned)}"
             )
+
+    @staticmethod
+    def _check_frame_layers(slide_number, shapes, module_map, identity_shape_ids, categories):
+        minimum = 0.55 * 914400
+        frames = [
+            shape for shape in shapes
+            if int(shape.shape_id) not in identity_shape_ids
+            and int(shape.shape_id) in module_map
+            and shape.shape_type == MSO_SHAPE_TYPE.AUTO_SHAPE
+            and not _normalized_text(shape)
+            and shape.width >= minimum
+            and shape.height >= minimum
+        ]
+        for index, outer in enumerate(frames):
+            for inner in frames[index + 1:]:
+                if module_map[int(outer.shape_id)] != module_map[int(inner.shape_id)]:
+                    continue
+                first, second = (
+                    (outer, inner)
+                    if outer.width * outer.height >= inner.width * inner.height
+                    else (inner, outer)
+                )
+                contains = (
+                    first.left <= second.left
+                    and first.top <= second.top
+                    and first.left + first.width >= second.left + second.width
+                    and first.top + first.height >= second.top + second.height
+                )
+                if contains and first.width * first.height > second.width * second.height * 1.1:
+                    categories["duplicate_objects"].append(
+                        f"slide {slide_number}: nested frame shapes {first.shape_id}/{second.shape_id} "
+                        f"remain in {module_map[int(first.shape_id)]}"
+                    )
 
 
 class TemplateIdentityDifferenceGate:

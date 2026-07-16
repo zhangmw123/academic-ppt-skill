@@ -2,6 +2,19 @@
 
 This context defines how source evidence, presentation arguments, template identity, and slide composition interact when producing research presentations.
 
+## Development Handoff (2026-07-16)
+
+- The product remains an installable, self-contained Skill. It is not released and must not be described as complete.
+- The standard semantic template compiler now models page -> semantic module -> child slot, including capacity, typography, media scope, ownership, complete removal, and template identity.
+- T01 and T03 compile successfully: T01 has 10 pages, 31 modules, and 88 child slots; T03 has 11 pages, 32 modules, and 101 child slots.
+- Dynamic reconstruction now uses semantic module geometry, excludes retained content-sized scaffold rasters, suppresses duplicate frames and conclusions, and does not overlay legacy process circles on semantic module headers.
+- Rendered object-binding manifests and object-level QA cover duplicate objects, cross-module overlap, orphan components, empty media slots, template residue, font bounds, identity, provenance, and exclusive render modes.
+- The complete automated suite passes with `82 passed`.
+- Real-content regression candidates are retained under `real_product_outputs/test_file_lab_share_v9` and `real_product_outputs/liujinping_defense_v9`; v7 and v8 remain preserved as requested. Their curated PPTX files each pass 16/16 static, semantic, and object checks.
+- Windows PowerPoint successfully exported the v9 candidates once (10 and 18 slides), and those preview directories remain available. Later in the same session, PowerPoint COM regressed and returned `0x80070570` even for the previously successful candidate and minimal image decks. Therefore formal PowerPoint acceptance remains blocked by an unstable local runtime; do not report it as continuously passing.
+- The tracked compilation report intentionally records the current PowerPoint failure. T02, T04, T05, T06, T07, and T08 still require full semantic compilation and real-content regression. All eight templates remain mandatory for release.
+- Next work should first re-establish a repeatable PowerPoint image-render control, rerun T01/T03 formal review, and only then continue with T02 followed by T04-T08. Do not rebuild the deleted V2 project or delegate core work to another PPT Skill.
+
 ## Language
 
 **Scientific Page Contract**:

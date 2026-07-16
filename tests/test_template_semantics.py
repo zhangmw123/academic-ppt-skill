@@ -6,6 +6,7 @@ import sys
 
 from PIL import Image
 from pptx import Presentation
+from pptx.enum.shapes import MSO_SHAPE
 from pptx.util import Inches, Pt
 
 from academic_ppt.object_qa import ObjectLevelQualityGate, TemplateIdentityDifferenceGate
@@ -97,6 +98,39 @@ def test_semantic_specs_enforce_exclusive_regions_complete_removal_and_font_boun
                 ownership = module["ownership_group"]
                 assert ownership["shape_ids"] == ownership["complete_delete_shape_ids"]
                 assert ownership["removal_policy"] == "remove_complete_ownership_group"
+
+
+def test_semantic_specs_keep_content_modules_out_of_navigation_with_usable_geometry():
+    for specification in (_load("T01"), _load("T03")):
+        for page in specification["pages"]:
+            modules = [
+                module for module in page["semantic_modules"]
+                if module["semantic_region"] == "content"
+            ]
+            if page["page_role"] not in {"cover", "ending", "section"}:
+                for module in modules:
+                    box = module["box"]
+                    assert box["top"] >= 0.20, (page["page_id"], module["module_id"], box)
+                    assert box["width"] >= 0.12, (page["page_id"], module["module_id"], box)
+                    assert box["height"] >= 0.12, (page["page_id"], module["module_id"], box)
+                    assert box["left"] >= 0
+                    assert box["left"] + box["width"] <= 1.001
+                    assert box["top"] + box["height"] <= 1.001
+                for index, first in enumerate(modules):
+                    for second in modules[index + 1:]:
+                        left = max(first["box"]["left"], second["box"]["left"])
+                        top = max(first["box"]["top"], second["box"]["top"])
+                        right = min(
+                            first["box"]["left"] + first["box"]["width"],
+                            second["box"]["left"] + second["box"]["width"],
+                        )
+                        bottom = min(
+                            first["box"]["top"] + first["box"]["height"],
+                            second["box"]["top"] + second["box"]["height"],
+                        )
+                        assert right <= left or bottom <= top, (
+                            page["page_id"], first["module_id"], second["module_id"]
+                        )
 
 
 def test_t01_t03_standard_pptx_objects_match_semantic_ownership():
@@ -257,6 +291,69 @@ def test_object_gate_rejects_picture_that_does_not_match_declared_asset(tmp_path
 
     assert not result.passed
     assert any("does not match" in value for value in result.categories["media_provenance"])
+
+
+def test_object_gate_rejects_nested_frames_and_incomplete_native_removal(tmp_path: Path):
+    presentation = Presentation()
+    slide = presentation.slides.add_slide(presentation.slide_layouts[6])
+    outer = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE, Inches(1), Inches(1), Inches(8), Inches(4.5)
+    )
+    inner = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE, Inches(1.3), Inches(1.3), Inches(7.4), Inches(3.9)
+    )
+    pptx = tmp_path / "nested-frames.pptx"
+    presentation.save(pptx)
+    module_id = "T01_P01_M01"
+    specification = {
+        "template_identity": {"minimum_preserved_features": 4},
+        "pages": [{
+            "page_id": "T01_P01",
+            "page_role": "content",
+            "semantic_modules": [{
+                "module_id": module_id,
+                "ownership_group": {
+                    "shape_ids": [outer.shape_id, inner.shape_id],
+                    "complete_delete_shape_ids": [outer.shape_id, inner.shape_id],
+                },
+                "render_contract": {"allowed_modes": ["full_reconstruction"]},
+                "child_slots": [],
+            }],
+            "identity_regions": [],
+        }],
+    }
+    manifest = {
+        "pages": [{
+            "slide_number": 1,
+            "template_page_id": "T01_P01",
+            "base_mode": "blank_reconstruction",
+            "source_components_present": False,
+            "additional_identity_shape_ids": [],
+            "identity_feature_bindings": [
+                {"feature": f"feature-{index}", "shape_ids": [outer.shape_id]}
+                for index in range(4)
+            ],
+            "regions": [{
+                "module_id": module_id,
+                "render_mode": "full_reconstruction",
+                "owned_shape_ids": [outer.shape_id, inner.shape_id],
+                "removed_native_shape_ids": [outer.shape_id],
+                "slot_bindings": [],
+                "reflowed_or_removed_slots": [],
+            }],
+        }],
+    }
+
+    result = ObjectLevelQualityGate().inspect(
+        pptx,
+        specification,
+        render_manifest=manifest,
+        asset_root=tmp_path,
+    )
+
+    assert not result.passed
+    assert any("nested frame" in value for value in result.categories["duplicate_objects"])
+    assert any("incomplete native removal" in value for value in result.categories["template_residue"])
 
 
 def test_catalog_discloses_semantic_compile_status_without_claiming_all_templates_complete():

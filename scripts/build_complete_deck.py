@@ -25,6 +25,7 @@ from academic_ppt.evidence import EvidenceGraph
 from academic_ppt.ingest import SourceIngestor
 from academic_ppt.layout import LayoutCompiler
 from academic_ppt.manifest import SlideManifestBuilder
+from academic_ppt.object_qa import ObjectLevelQualityGate
 from academic_ppt.planning import PageDraft, PagePlanner
 from academic_ppt.profiles import ResearchMethodProfileResolver
 from academic_ppt.qa import QualitySummaryBuilder, RenderQualityGate, ScientificSemanticGate, VisualCompositionGate
@@ -219,15 +220,19 @@ def _render_dynamic_candidate(
     sample_layout = _write_json(audit / "sample_layout_plan.json", sample_plan)
     sample_pptx = working / "sample.pptx"
     final_pptx = working / "final" / "complete_deck.pptx"
+    object_manifest_path = audit / "object_bindings.json"
     for layout_path, output_path in ((sample_layout, sample_pptx), (final_layout, final_pptx)):
+        command = [
+            sys.executable,
+            str(SKILL_ROOT / "scripts" / "render_dynamic.py"),
+            "--plan", str(layout_path),
+            "--visual-system", str(visual_system_path),
+            "--output", str(output_path),
+        ]
+        if output_path == final_pptx and selected_template.get("semantic_spec_path"):
+            command.extend(["--object-manifest", str(object_manifest_path)])
         subprocess.run(
-            [
-                sys.executable,
-                str(SKILL_ROOT / "scripts" / "render_dynamic.py"),
-                "--plan", str(layout_path),
-                "--visual-system", str(visual_system_path),
-                "--output", str(output_path),
-            ],
+            command,
             cwd=SKILL_ROOT,
             check=True,
             capture_output=True,
@@ -249,6 +254,15 @@ def _render_dynamic_candidate(
         template=selected_template,
     )
     _write_json(audit / "slide_manifest.json", manifest)
+    object_quality = None
+    if selected_template.get("semantic_spec_path"):
+        object_quality = ObjectLevelQualityGate().inspect(
+            final_pptx,
+            selected_template["semantic_spec_path"],
+            render_manifest=object_manifest_path,
+            asset_root=root,
+        )
+        _write_json(audit / "object_qa.json", object_quality.to_dict())
 
     page_layouts = {page["page_id"]: page["layout"] for page in dynamic_plan["pages"]}
     tasks = [
@@ -300,6 +314,10 @@ def _render_dynamic_candidate(
     quality["manifest_errors"] = list(manifest["errors"])
     quality["composition_errors"] = list(composition_quality.errors)
     quality["composition_observations"] = list(composition_quality.observations)
+    quality["object_qa"] = bool(object_quality and object_quality.passed)
+    quality["object_qa_errors"] = list(object_quality.errors) if object_quality else [
+        "selected template has no semantic specification"
+    ]
     quality["confirmation_status"] = "confirmed" if args.confirmed else "autonomous_candidate"
     script_path = SpeakerScriptWriter().write(plan, working / "speaker_script.docx")
     acceptance = ProductAcceptanceEvaluator().evaluate(

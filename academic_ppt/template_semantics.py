@@ -17,6 +17,7 @@ MEDIA_PROVENANCE_FIELDS = ("source_id", "source_path", "pdf_page", "semantic_use
 
 TYPOGRAPHY_POLICY = {
     "cover_title": {"min_pt": 28.0, "max_pt": 32.0, "target_pt": 30.0},
+    "cover_subtitle": {"min_pt": 14.0, "max_pt": 18.0, "target_pt": 16.0},
     "page_title": {"min_pt": 20.0, "max_pt": 24.0, "target_pt": 22.0},
     "module_heading": {"min_pt": 13.0, "max_pt": 16.0, "target_pt": 14.0},
     "body": {"min_pt": 11.0, "max_pt": 13.0, "target_pt": 12.0},
@@ -286,9 +287,28 @@ class StandardTemplateCompiler:
             if int(item["shape_id"]) not in identity_shape_ids | title_shape_ids
             and item.get("role") not in {"navigation_or_footer", "page_number_or_footer"}
         ]
-        content_region = grammar.get("geometry", {}).get(
+        source_content_region = grammar.get("geometry", {}).get(
             "content_region", {"left": 0.05, "top": 0.19, "width": 0.9, "height": 0.7}
         )
+        title_bottom = max(
+            (
+                float(item["box"]["top"]) + float(item["box"]["height"])
+                for item in page_title_slots
+            ),
+            default=0.19,
+        )
+        content_top = max(0.22, title_bottom + 0.02, float(source_content_region.get("top", 0.19)))
+        content_bottom = min(
+            0.90,
+            float(source_content_region.get("top", 0.19))
+            + float(source_content_region.get("height", 0.7)),
+        )
+        content_region = {
+            "left": max(0.04, float(source_content_region.get("left", 0.05))),
+            "top": round(content_top, 4),
+            "width": min(0.92, float(source_content_region.get("width", 0.9))),
+            "height": round(max(0.48, content_bottom - content_top), 4),
+        }
         expected_count = int(override.get("expected_module_count", 1))
         media_scope = override.get("media_scope", "none")
         page_media_count = int(override.get("page_media_count", 0))
@@ -306,16 +326,24 @@ class StandardTemplateCompiler:
         ]
         semantic_records.extend(picture_records)
 
-        if media_scope == "page" or override.get("page_role") in {"cover", "ending", "agenda", "section"}:
+        page_role = override.get("page_role")
+        if page_role in {"cover", "ending", "section"}:
             groups = [semantic_records]
+            group_boxes = [
+                _union((item["box"] for item in semantic_records), content_region)
+            ]
         else:
-            clustering_records = [item for item in semantic_records if item["kind"] == "text"] or semantic_records
-            groups = _cluster_records(clustering_records, expected_count, content_region)
-
-        group_boxes = [
-            _union((item["box"] for item in group), self._grid_box(content_region, index, len(groups)))
-            for index, group in enumerate(groups)
-        ]
+            group_boxes = [
+                self._grid_box(content_region, index, expected_count)
+                for index in range(expected_count)
+            ]
+            groups = [[] for _ in group_boxes]
+            for record in semantic_records:
+                target = min(
+                    range(len(group_boxes)),
+                    key=lambda index: _box_distance(record["box"], group_boxes[index]),
+                )
+                groups[target].append(record)
         assignment = self._assign_components(
             components,
             group_boxes,
@@ -508,7 +536,10 @@ class StandardTemplateCompiler:
         prefix = f"{template_id}_P{slide_index:02d}_M{module_index:02d}"
         heading, captions, explanations = self._partition_text_slots(text_slots)
         children = []
-        heading_role = "cover_title" if role == "cover_identity" else "module_heading"
+        heading_role = {
+            "cover_identity": "cover_title",
+            "ending_summary": "page_title",
+        }.get(role, "module_heading")
         if heading:
             children.append(self._text_child(f"{prefix}_HEADING", heading_role, heading, True))
         else:
@@ -516,7 +547,16 @@ class StandardTemplateCompiler:
                 f"{prefix}_HEADING", "module_heading", _synthetic_box(box, top_ratio=0.04, height_ratio=0.16), True
             ))
         if explanations:
-            children.append(self._text_child(f"{prefix}_EXPLANATION", "explanation", explanations, True))
+            explanation = self._text_child(
+                f"{prefix}_EXPLANATION", "explanation", explanations, True
+            )
+            if role == "cover_identity":
+                explanation["typography"] = {
+                    **explanation["typography"],
+                    "policy_role": "cover_subtitle",
+                    **TYPOGRAPHY_POLICY["cover_subtitle"],
+                }
+            children.append(explanation)
         elif role not in {"cover_identity", "ending_summary"}:
             children.append(self._synthetic_text_child(
                 f"{prefix}_EXPLANATION", "explanation", _synthetic_box(box, top_ratio=0.23, height_ratio=0.34), True
@@ -539,6 +579,13 @@ class StandardTemplateCompiler:
                         f"{prefix}_CAPTION_{media_index:02d}", "caption", [nearest_caption], True
                     ))
                     captions.remove(nearest_caption)
+                else:
+                    children.append(self._synthetic_text_child(
+                        f"{prefix}_CAPTION_{media_index:02d}",
+                        "caption",
+                        _synthetic_box(media["box"], top_ratio=0.88, height_ratio=0.1),
+                        True,
+                    ))
         elif module_media_supported:
             children.append(self._media_child(
                 slot_id=f"{prefix}_MEDIA",
@@ -548,6 +595,12 @@ class StandardTemplateCompiler:
                 required=False,
                 native_reuse=False,
                 scope="module",
+            ))
+            children.append(self._synthetic_text_child(
+                f"{prefix}_CAPTION",
+                "caption",
+                _synthetic_box(box, top_ratio=0.91, height_ratio=0.07),
+                True,
             ))
         for caption_index, caption in enumerate(captions, 1):
             children.append(self._text_child(
@@ -624,7 +677,12 @@ class StandardTemplateCompiler:
 
     @staticmethod
     def _synthetic_text_child(slot_id: str, role: str, box: dict, required: bool) -> dict:
-        policy_role = "module_heading" if role == "module_heading" else "body"
+        policy_role = {
+            "module_heading": "module_heading",
+            "page_title": "page_title",
+            "cover_title": "cover_title",
+            "caption": "caption",
+        }.get(role, "body")
         return {
             "slot_id": slot_id,
             "role": role,
@@ -867,8 +925,39 @@ class StandardTemplateSpecValidator:
                 ]
                 if len(media_slots) != int(media.get("slot_count", -1)):
                     errors.append(f"{page_id}: page media slot count does not match the prototype")
+            content_modules = [
+                module for module in modules if module.get("semantic_region") == "content"
+            ]
+            if page.get("page_role") not in {"cover", "ending", "section"}:
+                for module in content_modules:
+                    box = module.get("box", {})
+                    if (
+                        float(box.get("top", 0)) < 0.20
+                        or float(box.get("width", 0)) < 0.12
+                        or float(box.get("height", 0)) < 0.12
+                        or float(box.get("left", 0)) < 0
+                        or float(box.get("left", 0)) + float(box.get("width", 0)) > 1.001
+                        or float(box.get("top", 0)) + float(box.get("height", 0)) > 1.001
+                    ):
+                        errors.append(f"{module.get('module_id')}: content module geometry is unusable")
+                for index, first in enumerate(content_modules):
+                    for second in content_modules[index + 1:]:
+                        first_box, second_box = first.get("box", {}), second.get("box", {})
+                        left = max(float(first_box.get("left", 0)), float(second_box.get("left", 0)))
+                        top = max(float(first_box.get("top", 0)), float(second_box.get("top", 0)))
+                        right = min(
+                            float(first_box.get("left", 0)) + float(first_box.get("width", 0)),
+                            float(second_box.get("left", 0)) + float(second_box.get("width", 0)),
+                        )
+                        bottom = min(
+                            float(first_box.get("top", 0)) + float(first_box.get("height", 0)),
+                            float(second_box.get("top", 0)) + float(second_box.get("height", 0)),
+                        )
+                        if right > left and bottom > top:
+                            errors.append(
+                                f"{page_id}: content modules {first.get('module_id')}/{second.get('module_id')} overlap"
+                            )
             if page.get("page_role") not in {"cover", "ending", "agenda", "section"}:
-                content_modules = [module for module in modules if module.get("semantic_region") == "content"]
                 if not content_modules:
                     errors.append(f"{page_id}: content page has no content modules")
         if not pages:

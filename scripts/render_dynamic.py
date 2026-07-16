@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
+import sys
 from pathlib import Path
 
 from PIL import Image
@@ -14,6 +16,14 @@ from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.oxml.ns import qn
 from pptx.oxml.xmlchemy import OxmlElement
 from pptx.util import Inches, Pt
+
+
+SKILL_ROOT = Path(__file__).resolve().parents[1]
+if str(SKILL_ROOT) not in sys.path:
+    sys.path.insert(0, str(SKILL_ROOT))
+
+from academic_ppt.manifest import RenderedObjectBindingManifestBuilder
+from academic_ppt.composition import DynamicCompositionCompiler
 
 
 def rgb(value: str) -> RGBColor:
@@ -114,8 +124,76 @@ def add_panel(slide, x, y, w, h, style, *, fill=None):
     )
 
 
-def template_panel_boxes(scaffold, expected):
+def semantic_panel_boxes(page, expected):
+    semantic_page = page.get("_semantic_page") or {}
+    modules = [
+        module for module in semantic_page.get("semantic_modules", ())
+        if module.get("semantic_region") == "content"
+        and module.get("role") != "page_header"
+    ]
+    if len(modules) != expected:
+        return []
+    return [
+        {
+            "x": float(module["box"]["left"]) * 13.333,
+            "y": float(module["box"]["top"]) * 7.5,
+            "w": float(module["box"]["width"]) * 13.333,
+            "h": float(module["box"]["height"]) * 7.5,
+        }
+        for module in modules
+    ]
+
+
+def semantic_content_geometry(page, fallback):
+    boxes = semantic_panel_boxes(
+        page,
+        len([
+            module for module in (page.get("_semantic_page") or {}).get("semantic_modules", ())
+            if module.get("semantic_region") == "content"
+            and module.get("role") != "page_header"
+        ]),
+    )
+    if not boxes:
+        return fallback
+    left = min(box["x"] for box in boxes)
+    top = min(box["y"] for box in boxes)
+    right = max(box["x"] + box["w"] for box in boxes)
+    bottom = max(box["y"] + box["h"] for box in boxes)
+    return left, top, right - left, bottom
+
+
+def compact_semantic_module_boxes(page, boxes, text_blocks):
+    """Fit short reconstructed cards inside their semantic ownership regions."""
+    if not page.get("_semantic_page") or not boxes:
+        return boxes
+
+    required_heights = []
+    for box, text in zip(boxes, text_blocks):
+        visual_units = sum(1.0 if ord(char) > 127 else 0.55 for char in str(text))
+        units_per_line = max(8.0, (box["w"] - 0.3) * 6.0)
+        estimated_lines = max(1, math.ceil(visual_units / units_per_line))
+        required_heights.append(min(3.2, max(2.2, 1.15 + estimated_lines * 0.24)))
+
+    target_height = max(required_heights, default=2.2)
+    compacted = []
+    for box in boxes:
+        height = min(box["h"], target_height)
+        if box["h"] - height < 0.35:
+            compacted.append(box)
+            continue
+        compacted.append({
+            **box,
+            "y": box["y"] + (box["h"] - height) / 2,
+            "h": height,
+        })
+    return compacted
+
+
+def template_panel_boxes(scaffold, expected, page=None):
     """Rebuild combined template frames as separately editable panel geometry."""
+    semantic_boxes = semantic_panel_boxes(page or {}, expected)
+    if semantic_boxes:
+        return semantic_boxes
     if not scaffold or expected <= 0:
         return []
     candidates = []
@@ -474,6 +552,7 @@ def render_text_figure(slide, page, style, base_dir, scaffold=None):
     g = style.get("_runtime", {})
     x0, y0, total_w = g.get("content_x", 0.65), g.get("content_y", 1.68), g.get("content_w", 12.03)
     bottom = g.get("content_bottom", 6.18)
+    x0, y0, total_w, bottom = semantic_content_geometry(page, (x0, y0, total_w, bottom))
     h = bottom - y0
     gap = 0.24
     image_box = template_figure_box(scaffold)
@@ -489,13 +568,6 @@ def render_text_figure(slide, page, style, base_dir, scaffold=None):
         text_x, text_y, text_w, text_h = x0, y0, total_w * 0.42, h
         image_x = x0 + text_w + gap
         image_y, image_w, image_h = y0, total_w - text_w - gap, h
-    if template_mode(style) == "image_scaffold":
-        frame_x = min(text_x, image_x) - 0.12
-        frame_y = min(text_y, image_y) - 0.12
-        frame_right = max(text_x + text_w, image_x + image_w) + 0.12
-        frame_bottom = max(text_y + text_h, image_y + image_h) + 0.12
-        add_outline(slide, frame_x, frame_y, frame_right - frame_x, frame_bottom - frame_y,
-                    colors["primary_soft"], dashed=True, radius=True)
     add_panel(slide, text_x, text_y, text_w, text_h, style)
     add_text(slide, page.get("lead", "核心要点"), text_x + 0.27, text_y + 0.24, text_w - 0.54, 0.36, 15,
              colors["primary"], style["fonts"]["title"], bold=True)
@@ -511,7 +583,11 @@ def render_text_figure(slide, page, style, base_dir, scaffold=None):
         add_text(slide, page["caption"], image_x + 0.22, image_y + image_h - 0.34,
                  image_w - 0.44, 0.25, style["typography"]["caption"],
                  colors["muted"], style["fonts"]["body"], align=PP_ALIGN.CENTER)
-    if template_mode(style) != "image_scaffold" and not image_box:
+    if (
+        template_mode(style) != "image_scaffold"
+        and not image_box
+        and not page.get("_semantic_page")
+    ):
         add_page_conclusion(slide, page_conclusion(page), style, y=min(6.38, bottom + 0.12))
 
 
@@ -563,8 +639,20 @@ def render_media_gallery(slide, page, style, base_dir):
     y = geometry.get("content_y", 1.68)
     w = geometry.get("content_w", 12.03)
     bottom = geometry.get("content_bottom", 6.18)
+    x, y, w, bottom = semantic_content_geometry(page, (x, y, w, bottom))
     items = page.get("media_items", ())
-    boxes = media_grid_boxes(len(items), x, y, w, bottom - y, page.get("media_layout"))
+    heading_h = 0.68
+    add_text(
+        slide, page.get("lead", "多面板证据"), x, y, w * 0.34, 0.3,
+        14, colors["primary"], style["fonts"]["title"], bold=True, margin=0,
+    )
+    add_text(
+        slide, page.get("explanation", ""), x + w * 0.35, y, w * 0.65, 0.42,
+        11, colors["text"], style["fonts"]["body"], margin=0,
+    )
+    boxes = media_grid_boxes(
+        len(items), x, y + heading_h, w, bottom - y - heading_h, page.get("media_layout")
+    )
     for item, box in zip(items, boxes):
         add_panel(slide, box["x"], box["y"], box["w"], box["h"], style)
         caption_h = 0.28
@@ -592,7 +680,7 @@ def render_media_gallery(slide, page, style, base_dir):
             valign=MSO_ANCHOR.MIDDLE,
             margin=0,
         )
-    if page_conclusion(page):
+    if page_conclusion(page) and not page.get("_semantic_page"):
         add_page_conclusion(slide, page_conclusion(page), style, y=min(6.38, bottom + 0.12))
 
 
@@ -604,7 +692,9 @@ def render_module_media(slide, page, style, base_dir):
     w = geometry.get("content_w", 12.03)
     bottom = geometry.get("content_bottom", 6.18)
     modules = page.get("modules", ())
-    boxes = media_grid_boxes(len(modules), x, y, w, bottom - y)
+    boxes = semantic_panel_boxes(page, len(modules)) or media_grid_boxes(
+        len(modules), x, y, w, bottom - y
+    )
     for module, box in zip(modules, boxes):
         add_panel(slide, box["x"], box["y"], box["w"], box["h"], style)
         header_h = 0.38
@@ -635,7 +725,7 @@ def render_module_media(slide, page, style, base_dir):
             9, colors["muted"], style["fonts"]["body"], align=PP_ALIGN.CENTER,
             valign=MSO_ANCHOR.MIDDLE, margin=0,
         )
-    if page_conclusion(page):
+    if page_conclusion(page) and not page.get("_semantic_page"):
         add_page_conclusion(slide, page_conclusion(page), style, y=min(6.38, bottom + 0.12))
 
 
@@ -647,22 +737,30 @@ def render_comparison(slide, page, style):
     columns = page["columns"]
     gap = 0.28
     width = (total_w - gap * (len(columns) - 1)) / len(columns)
+    semantic_boxes = semantic_panel_boxes(page, len(columns))
     for index, column in enumerate(columns):
-        x = x0 + index * (width + gap)
-        add_box(slide, x, y0, width, bottom - y0, colors["surface"], colors["line"])
-        add_box(slide, x, y0, width, 0.48, colors["primary"] if index == 0 else colors["primary_soft"],
+        box = semantic_boxes[index] if semantic_boxes else {
+            "x": x0 + index * (width + gap), "y": y0, "w": width, "h": bottom - y0,
+        }
+        x, current_y, current_w, current_h = box["x"], box["y"], box["w"], box["h"]
+        add_box(slide, x, current_y, current_w, current_h, colors["surface"], colors["line"])
+        add_box(slide, x, current_y, current_w, 0.48, colors["primary"] if index == 0 else colors["primary_soft"],
                 colors["primary"] if index == 0 else colors["primary_soft"], radius=False)
-        add_text(slide, column["title"], x + 0.12, y0 + 0.02, width - 0.24, 0.42, 15,
+        add_text(slide, column["title"], x + 0.12, current_y + 0.02, current_w - 0.24, 0.42, 15,
                  "#FFFFFF" if index == 0 else colors["primary"], style["fonts"]["title"],
                  bold=True, align=PP_ALIGN.CENTER, valign=MSO_ANCHOR.MIDDLE)
         if column.get("lead"):
-            add_text(slide, column["lead"], x + 0.22, y0 + 0.7, width - 0.44, 0.65, 14,
+            add_text(slide, column["lead"], x + 0.22, current_y + 0.7, current_w - 0.44, 0.65, 14,
                      colors["text"], style["fonts"]["title"], bold=True)
-            y = y0 + 1.42
+            content_y = current_y + 1.42
         else:
-            y = y0 + 0.74
-        add_bullets(slide, column.get("bullets", []), x + 0.22, y, width - 0.44, bottom - y - 0.18, style)
-    add_page_conclusion(slide, page_conclusion(page), style, y=min(6.38, bottom + 0.12))
+            content_y = current_y + 0.74
+        add_bullets(
+            slide, column.get("bullets", []), x + 0.22, content_y,
+            current_w - 0.44, current_y + current_h - content_y - 0.18, style,
+        )
+    if not page.get("_semantic_page"):
+        add_page_conclusion(slide, page_conclusion(page), style, y=min(6.38, bottom + 0.12))
 
 
 def render_process(slide, page, style, base_dir, scaffold=None):
@@ -674,7 +772,16 @@ def render_process(slide, page, style, base_dir, scaffold=None):
         add_box(slide, x0 + 0.5, y0, total_w - 1.0, 2.55, colors["surface"], colors["line"])
         add_picture_contain(slide, (base_dir / page["image"]).resolve(), x0 + 0.7, y0 + 0.16, total_w - 1.4, 2.2)
     steps = page["steps"]
-    native_boxes = template_panel_boxes(scaffold, len(steps))
+    native_boxes = template_panel_boxes(scaffold, len(steps), page)
+    native_boxes = compact_semantic_module_boxes(
+        page,
+        native_boxes,
+        [
+            f"{step.get('title', '')} {step.get('body', '')}"
+            if isinstance(step, dict) else str(step)
+            for step in steps
+        ],
+    )
     gap = 0.13
     width = (total_w - gap * (len(steps) - 1)) / len(steps)
     if page.get("image"):
@@ -697,15 +804,16 @@ def render_process(slide, page, style, base_dir, scaffold=None):
         add_text(slide, module.get("body", ""), x + 0.1, current_y + 0.52,
                  current_w - 0.2, current_h - 0.65, 11, colors["text"],
                  style["fonts"]["body"], align=PP_ALIGN.CENTER, valign=MSO_ANCHOR.MIDDLE)
-    if native_boxes and template_mode(style) == "image_scaffold":
+    # Semantic modules already own numbered headers. Re-adding the legacy
+    # process circles would stack a second navigation system over those cards.
+    if (
+        native_boxes
+        and template_mode(style) == "image_scaffold"
+        and not page.get("_semantic_page")
+    ):
         centers = [box["x"] + box["w"] / 2 for box in native_boxes]
         top = min(box["y"] for box in native_boxes)
         circle_y, circle_size = max(y0, top - 0.88), 0.58
-        frame_x = min(box["x"] for box in native_boxes) - 0.12
-        frame_right = max(box["x"] + box["w"] for box in native_boxes) + 0.12
-        frame_bottom = max(box["y"] + box["h"] for box in native_boxes) + 0.12
-        add_outline(slide, frame_x, circle_y - 0.1, frame_right - frame_x,
-                    frame_bottom - circle_y + 0.1, colors["primary_soft"], dashed=True, radius=True)
         for index, center_x in enumerate(centers):
             circle = slide.shapes.add_shape(
                 MSO_SHAPE.OVAL, Inches(center_x - circle_size / 2), Inches(circle_y),
@@ -720,7 +828,7 @@ def render_process(slide, page, style, base_dir, scaffold=None):
                 add_arrow(slide, center_x + circle_size / 2 + 0.08, circle_y + circle_size / 2,
                           centers[index + 1] - circle_size / 2 - 0.08, circle_y + circle_size / 2,
                           colors["primary"])
-    if template_mode(style) != "image_scaffold" and not native_boxes:
+    if template_mode(style) != "image_scaffold" and not native_boxes and not page.get("_semantic_page"):
         add_page_conclusion(slide, page_conclusion(page), style, y=min(6.38, bottom + 0.12))
 
 
@@ -730,7 +838,12 @@ def render_points(slide, page, style, scaffold=None):
     x0, y0, total_w = g.get("content_x", 0.68), g.get("content_y", 1.7), g.get("content_w", 12.02)
     bottom = g.get("content_bottom", 6.18)
     points = page["points"]
-    native_boxes = template_panel_boxes(scaffold, len(points))
+    native_boxes = template_panel_boxes(scaffold, len(points), page)
+    native_boxes = compact_semantic_module_boxes(
+        page,
+        native_boxes,
+        [f"{point.get('title', '')} {point.get('body', '')}" for point in points],
+    )
     gap_x, gap_y = 0.3, 0.24
     box_w = (total_w - gap_x) / 2
     box_h = (bottom - y0 - gap_y) / 2
@@ -748,7 +861,7 @@ def render_points(slide, page, style, scaffold=None):
                  colors["primary"], style["fonts"]["title"], bold=True)
         add_text(slide, point["body"], x + 0.3, y + 0.72, current_w - 0.55, current_h - 0.9, 11.5,
                  colors["text"], style["fonts"]["body"])
-    if template_mode(style) != "image_scaffold" and not native_boxes:
+    if template_mode(style) != "image_scaffold" and not native_boxes and not page.get("_semantic_page"):
         add_page_conclusion(slide, page_conclusion(page), style, y=min(6.38, bottom + 0.12))
 
 
@@ -765,7 +878,7 @@ def render_architecture(slide, page, style, scaffold=None):
     bottom = g.get("content_bottom", 6.02)
     positions = {}
     node_records = []
-    native_boxes = template_panel_boxes(scaffold, len(columns))
+    native_boxes = template_panel_boxes(scaffold, len(columns), page)
 
     for col_index, column in enumerate(columns):
         if native_boxes:
@@ -775,7 +888,6 @@ def render_architecture(slide, page, style, scaffold=None):
         else:
             x, column_top, current_w, current_h = x0 + col_index * (col_w + gap), top, col_w, bottom - top
             column_bottom = bottom
-        add_panel(slide, x, column_top, current_w, current_h, style)
         add_box(slide, x, column_top, current_w, 0.46, colors["primary_soft"], colors["primary_soft"], radius=False)
         add_text(slide, column["title"], x + 0.08, column_top + 0.01, current_w - 0.16, 0.42, 13,
                  colors["primary"], style["fonts"]["title"], bold=True,
@@ -830,7 +942,7 @@ def render_architecture(slide, page, style, scaffold=None):
             add_text(slide, node["detail"], x + 0.26, y + 0.43, current_w - 0.52,
                      max(0.22, node_h - 0.49), 10.5, colors["muted"], style["fonts"]["body"],
                      align=PP_ALIGN.CENTER, valign=MSO_ANCHOR.MIDDLE, margin=0)
-    if template_mode(style) != "image_scaffold" and not native_boxes:
+    if template_mode(style) != "image_scaffold" and not native_boxes and not page.get("_semantic_page"):
         add_page_conclusion(slide, page_conclusion(page), style, y=min(6.38, bottom + 0.12))
 
 
@@ -879,26 +991,33 @@ def render_full_figure(slide, page, style, base_dir):
         add_text(slide, page["caption"], x0 + 0.22, bottom - 0.36, total_w - 0.44, 0.24,
                  style["typography"]["caption"], colors["muted"], style["fonts"]["body"],
                  align=PP_ALIGN.CENTER)
-    add_page_conclusion(slide, page_conclusion(page), style, y=min(6.38, bottom + 0.12))
+    if not page.get("_semantic_page"):
+        add_page_conclusion(slide, page_conclusion(page), style, y=min(6.38, bottom + 0.12))
 
 
 def render_ending(slide, page, style, grammar=None, has_scaffold=False):
     colors = style["colors"]
     if not has_scaffold:
-        add_box(slide, 0, 0, 13.333, 7.5, colors["background"], colors["background"], radius=False)
         add_box(slide, 1.0, 1.15, 11.3, 5.2, colors["surface"], colors["line"])
     title_box = (grammar or {}).get("geometry", {}).get("ending_title_box")
     if title_box:
         x, y, w, h = title_box["left"] * 13.333, title_box["top"] * 7.5, title_box["width"] * 13.333, title_box["height"] * 7.5
     else:
         x, y, w, h = 1.65, 2.25, 10.0, 1.0
-    add_text(slide, page["title"], x, y, w, max(0.9, h), 28, colors["primary"],
+    add_text(slide, page["title"], x, y, w, max(0.9, h), 24, colors["primary"],
              style["fonts"]["title"], bold=True, align=PP_ALIGN.CENTER)
-    add_text(slide, page.get("subtitle", ""), 2.05, y + max(1.2, h), 9.2, 1.0, 16, colors["text"],
+    add_text(slide, page.get("subtitle", ""), 2.05, y + max(1.2, h), 9.2, 1.0, 12, colors["text"],
              style["fonts"]["body"], align=PP_ALIGN.CENTER)
 
 
-def render(plan_path: Path, style_path: Path, output: Path, selected_page_ids: set[str] | None = None):
+def render(
+    plan_path: Path,
+    style_path: Path,
+    output: Path,
+    selected_page_ids: set[str] | None = None,
+    object_manifest_path: Path | None = None,
+    semantic_specification_path: Path | None = None,
+):
     plan = json.loads(plan_path.read_text(encoding="utf-8"))
     style = json.loads(style_path.read_text(encoding="utf-8"))
     latin_font = style.get("fonts", {}).get("latin")
@@ -907,6 +1026,7 @@ def render(plan_path: Path, style_path: Path, output: Path, selected_page_ids: s
         if isinstance(current, str):
             style["fonts"][role] = {"zh": current, "latin": latin_font or current}
     grammar = None
+    semantic_pages = {}
     if plan.get("template_grammar"):
         grammar_path = Path(plan["template_grammar"])
         if not grammar_path.is_absolute():
@@ -914,6 +1034,16 @@ def render(plan_path: Path, style_path: Path, output: Path, selected_page_ids: s
         grammar = json.loads(grammar_path.read_text(encoding="utf-8"))
         grammar["_base_dir"] = str(grammar_path.parent.resolve())
         style["_template_identity"] = dict(grammar.get("identity", {}))
+    semantic_path_value = semantic_specification_path or plan.get("template_semantic_spec")
+    if semantic_path_value:
+        semantic_path = Path(semantic_path_value)
+        if not semantic_path.is_absolute():
+            semantic_path = Path.cwd() / semantic_path
+        semantic_specification = json.loads(semantic_path.read_text(encoding="utf-8"))
+        plan["template_semantic_spec"] = str(semantic_path.resolve())
+        semantic_pages = {
+            page["page_id"]: page for page in semantic_specification.get("pages", ())
+        }
     style["_runtime"] = runtime_geometry(style, grammar)
     if not plan.get("confirmed"):
         raise ValueError("dynamic plan is not confirmed")
@@ -924,19 +1054,44 @@ def render(plan_path: Path, style_path: Path, output: Path, selected_page_ids: s
     if selected_page_ids:
         pages = [page for page in pages if page.get("page_id") in selected_page_ids]
     base_dir = Path(plan.get("asset_base_dir", plan_path.resolve().parent.parent)).resolve()
+    scaffold_shape_ids_by_slide = []
     for index, page in enumerate(pages, 1):
+        semantic_page_id = (page.get("template_reference") or {}).get("semantic_spec_page_id")
+        if semantic_pages and semantic_page_id not in semantic_pages:
+            reference = DynamicCompositionCompiler._semantic_template_reference(
+                page,
+                semantic_specification,
+            )
+            if reference:
+                page["template_reference"] = {
+                    **(page.get("template_reference") or {}),
+                    **reference,
+                }
+                page["scaffold_slide"] = reference["source_slide_index"]
+                semantic_page_id = reference["semantic_spec_page_id"]
+        if semantic_page_id in semantic_pages:
+            page["_semantic_page"] = semantic_pages[semantic_page_id]
         slide = prs.slides.add_slide(blank)
         slide.background.fill.solid(); slide.background.fill.fore_color.rgb = rgb(style["colors"]["background"])
         layout = page["layout"]
         scaffold_mode = page.get("use_template_scaffold")
         scaffold = scaffold_for_page(grammar, page) if scaffold_mode else None
+        before_scaffold = {int(shape.shape_id) for shape in slide.shapes}
         has_scaffold = add_template_scaffold(
             slide,
             scaffold,
             grammar.get("_base_dir") if grammar else None,
-            mode="identity" if scaffold_mode == "identity" else "full",
+            mode=(
+                scaffold_mode
+                if scaffold_mode in {"identity", "structure"}
+                else "full"
+            ),
             allow_logo=bool(plan.get("logo_path")),
         )
+        scaffold_shape_ids_by_slide.append([
+            int(shape.shape_id) for shape in slide.shapes
+            if int(shape.shape_id) not in before_scaffold
+        ])
         if layout == "cover":
             render_cover(slide, page, plan, style, grammar, has_scaffold)
         elif layout == "ending":
@@ -973,6 +1128,21 @@ def render(plan_path: Path, style_path: Path, output: Path, selected_page_ids: s
         remove_slide(prs, 0)
     output.parent.mkdir(parents=True, exist_ok=True)
     prs.save(output)
+    if object_manifest_path:
+        semantic_specification = plan.get("template_semantic_spec")
+        if not semantic_specification:
+            raise ValueError("object binding manifest requires template_semantic_spec")
+        object_manifest = RenderedObjectBindingManifestBuilder().build(
+            pptx_path=output,
+            dynamic_plan={**plan, "pages": pages},
+            semantic_specification_path=semantic_specification,
+            scaffold_shape_ids_by_slide=scaffold_shape_ids_by_slide,
+        )
+        object_manifest_path.parent.mkdir(parents=True, exist_ok=True)
+        object_manifest_path.write_text(
+            json.dumps(object_manifest, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
     print(f"Rendered {len(pages)} dynamic slides to {output}")
 
 
@@ -982,9 +1152,18 @@ def main():
     parser.add_argument("--visual-system", required=True)
     parser.add_argument("--output", required=True)
     parser.add_argument("--pages", help="Comma-separated page IDs for representative samples")
+    parser.add_argument("--object-manifest", help="Write actual semantic region/slot bindings")
+    parser.add_argument("--semantic-spec", help="Override or add a standard semantic specification")
     args = parser.parse_args()
     selected = {value.strip() for value in args.pages.split(",")} if args.pages else None
-    render(Path(args.plan), Path(args.visual_system), Path(args.output), selected)
+    render(
+        Path(args.plan),
+        Path(args.visual_system),
+        Path(args.output),
+        selected,
+        Path(args.object_manifest) if args.object_manifest else None,
+        Path(args.semantic_spec) if args.semantic_spec else None,
+    )
 
 
 if __name__ == "__main__":

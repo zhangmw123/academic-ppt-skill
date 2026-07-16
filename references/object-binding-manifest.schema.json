@@ -55,10 +55,27 @@
   "$defs": {
     "region": {
       "type": "object",
-      "required": ["module_id", "render_mode", "slot_bindings", "reflowed_or_removed_slots"],
+      "required": [
+        "module_id",
+        "render_mode",
+        "owned_shape_ids",
+        "removed_native_shape_ids",
+        "slot_bindings",
+        "reflowed_or_removed_slots"
+      ],
       "properties": {
         "module_id": {"type": "string", "minLength": 1},
         "render_mode": {"enum": ["native_reuse", "full_reconstruction"]},
+        "owned_shape_ids": {
+          "type": "array",
+          "items": {"type": "integer"},
+          "uniqueItems": true
+        },
+        "removed_native_shape_ids": {
+          "type": "array",
+          "items": {"type": "integer"},
+          "uniqueItems": true
+        },
         "slot_bindings": {
           "type": "array",
           "items": {"$ref": "#/$defs/binding"}
