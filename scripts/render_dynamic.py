@@ -192,7 +192,7 @@ def add_key_points(slide, items, x, y, w, h, style):
         add_text(slide, title, x, top, w, min(0.3, item_h * 0.34), 12.5,
                  colors["primary"], style["fonts"]["title"], bold=True, margin=0)
         add_text(slide, body, x, top + min(0.34, item_h * 0.38), w,
-                 max(0.24, item_h - min(0.34, item_h * 0.38)), 10.5,
+                 max(0.24, item_h - min(0.34, item_h * 0.38)), 11,
                  colors["text"], style["fonts"]["body"], margin=0)
 
 
@@ -515,6 +515,130 @@ def render_text_figure(slide, page, style, base_dir, scaffold=None):
         add_page_conclusion(slide, page_conclusion(page), style, y=min(6.38, bottom + 0.12))
 
 
+def media_grid_boxes(count, x, y, w, h, layout=None):
+    gap = 0.18
+    if layout == "primary_plus_supporting" and count >= 3:
+        primary_w = w * 0.58
+        support_x = x + primary_w + gap
+        support_w = w - primary_w - gap
+        support_count = count - 1
+        support_columns = 2 if support_count > 1 else 1
+        support_rows = (support_count + support_columns - 1) // support_columns
+        support_h = (h - gap * (support_rows - 1)) / support_rows
+        support_cell_w = (support_w - gap * (support_columns - 1)) / support_columns
+        boxes = [{"x": x, "y": y, "w": primary_w, "h": h, "primary": True}]
+        for index in range(support_count):
+            row, column = divmod(index, support_columns)
+            boxes.append({
+                "x": support_x + column * (support_cell_w + gap),
+                "y": y + row * (support_h + gap),
+                "w": support_cell_w,
+                "h": support_h,
+                "primary": False,
+            })
+        return boxes
+    columns, rows = {
+        1: (1, 1), 2: (2, 1), 3: (3, 1), 4: (2, 2), 5: (3, 2), 6: (3, 2),
+    }[count]
+    cell_w = (w - gap * (columns - 1)) / columns
+    cell_h = (h - gap * (rows - 1)) / rows
+    boxes = []
+    for index in range(count):
+        row, column = divmod(index, columns)
+        row_offset = (cell_w + gap) / 2 if count == 5 and row == 1 else 0
+        boxes.append({
+            "x": x + row_offset + column * (cell_w + gap),
+            "y": y + row * (cell_h + gap),
+            "w": cell_w,
+            "h": cell_h,
+            "primary": False,
+        })
+    return boxes
+
+
+def render_media_gallery(slide, page, style, base_dir):
+    colors = style["colors"]
+    geometry = style.get("_runtime", {})
+    x = geometry.get("content_x", 0.65)
+    y = geometry.get("content_y", 1.68)
+    w = geometry.get("content_w", 12.03)
+    bottom = geometry.get("content_bottom", 6.18)
+    items = page.get("media_items", ())
+    boxes = media_grid_boxes(len(items), x, y, w, bottom - y, page.get("media_layout"))
+    for item, box in zip(items, boxes):
+        add_panel(slide, box["x"], box["y"], box["w"], box["h"], style)
+        caption_h = 0.28
+        padding = 0.16 if not box.get("primary") else 0.2
+        image_path = (base_dir / item["path"]).resolve()
+        add_picture_contain(
+            slide,
+            image_path,
+            box["x"] + padding,
+            box["y"] + padding,
+            box["w"] - padding * 2,
+            max(0.35, box["h"] - caption_h - padding * 2),
+        )
+        add_text(
+            slide,
+            item.get("caption", ""),
+            box["x"] + padding,
+            box["y"] + box["h"] - caption_h - 0.04,
+            box["w"] - padding * 2,
+            caption_h,
+            9,
+            colors["muted"],
+            style["fonts"]["body"],
+            align=PP_ALIGN.CENTER,
+            valign=MSO_ANCHOR.MIDDLE,
+            margin=0,
+        )
+    if page_conclusion(page):
+        add_page_conclusion(slide, page_conclusion(page), style, y=min(6.38, bottom + 0.12))
+
+
+def render_module_media(slide, page, style, base_dir):
+    colors = style["colors"]
+    geometry = style.get("_runtime", {})
+    x = geometry.get("content_x", 0.65)
+    y = geometry.get("content_y", 1.68)
+    w = geometry.get("content_w", 12.03)
+    bottom = geometry.get("content_bottom", 6.18)
+    modules = page.get("modules", ())
+    boxes = media_grid_boxes(len(modules), x, y, w, bottom - y)
+    for module, box in zip(modules, boxes):
+        add_panel(slide, box["x"], box["y"], box["w"], box["h"], style)
+        header_h = 0.38
+        body_h = 0.64 if box["h"] >= 3.0 else 0.48
+        caption_h = 0.25
+        add_text(
+            slide, module["title"], box["x"] + 0.18, box["y"] + 0.14,
+            box["w"] - 0.36, header_h, 14, colors["primary"], style["fonts"]["title"],
+            bold=True, margin=0,
+        )
+        add_text(
+            slide, module["body"], box["x"] + 0.18, box["y"] + 0.54,
+            box["w"] - 0.36, body_h, 11, colors["text"], style["fonts"]["body"], margin=0,
+        )
+        image_y = box["y"] + 0.58 + body_h
+        image_h = box["h"] - (image_y - box["y"]) - caption_h - 0.28
+        add_picture_contain(
+            slide,
+            (base_dir / module["image"]).resolve(),
+            box["x"] + 0.18,
+            image_y,
+            box["w"] - 0.36,
+            max(0.3, image_h),
+        )
+        add_text(
+            slide, module.get("caption", ""), box["x"] + 0.18,
+            box["y"] + box["h"] - caption_h - 0.05, box["w"] - 0.36, caption_h,
+            9, colors["muted"], style["fonts"]["body"], align=PP_ALIGN.CENTER,
+            valign=MSO_ANCHOR.MIDDLE, margin=0,
+        )
+    if page_conclusion(page):
+        add_page_conclusion(slide, page_conclusion(page), style, y=min(6.38, bottom + 0.12))
+
+
 def render_comparison(slide, page, style):
     colors = style["colors"]
     g = style.get("_runtime", {})
@@ -567,11 +691,11 @@ def render_process(slide, page, style, base_dir, scaffold=None):
             x, current_y, current_w, current_h = x0 + index * (width + gap), step_y, width, step_h
         module = step if isinstance(step, dict) else {"title": f"步骤 {index + 1}", "body": str(step)}
         add_panel(slide, x, current_y, current_w, current_h, style)
-        add_box(slide, x, current_y, current_w, 0.34, colors["primary"], colors["primary"], radius=False)
-        add_text(slide, f"{index + 1:02d}  {module.get('title', '')}", x, current_y, current_w, 0.32, 10, "#FFFFFF",
+        add_box(slide, x, current_y, current_w, 0.44, colors["primary"], colors["primary"], radius=False)
+        add_text(slide, f"{index + 1:02d}  {module.get('title', '')}", x, current_y, current_w, 0.42, 13, "#FFFFFF",
                  style["fonts"]["body"], bold=True, align=PP_ALIGN.CENTER, valign=MSO_ANCHOR.MIDDLE, margin=0)
-        add_text(slide, module.get("body", ""), x + 0.1, current_y + 0.42,
-                 current_w - 0.2, current_h - 0.55, 11, colors["text"],
+        add_text(slide, module.get("body", ""), x + 0.1, current_y + 0.52,
+                 current_w - 0.2, current_h - 0.65, 11, colors["text"],
                  style["fonts"]["body"], align=PP_ALIGN.CENTER, valign=MSO_ANCHOR.MIDDLE)
     if native_boxes and template_mode(style) == "image_scaffold":
         centers = [box["x"] + box["w"] / 2 for box in native_boxes]
@@ -704,7 +828,7 @@ def render_architecture(slide, page, style, scaffold=None):
                  valign=MSO_ANCHOR.MIDDLE, margin=0)
         if node.get("detail"):
             add_text(slide, node["detail"], x + 0.26, y + 0.43, current_w - 0.52,
-                     max(0.22, node_h - 0.49), 9.5, colors["muted"], style["fonts"]["body"],
+                     max(0.22, node_h - 0.49), 10.5, colors["muted"], style["fonts"]["body"],
                      align=PP_ALIGN.CENTER, valign=MSO_ANCHOR.MIDDLE, margin=0)
     if template_mode(style) != "image_scaffold" and not native_boxes:
         add_page_conclusion(slide, page_conclusion(page), style, y=min(6.38, bottom + 0.12))
@@ -825,6 +949,10 @@ def render(plan_path: Path, style_path: Path, output: Path, selected_page_ids: s
                 render_agenda(slide, page, plan, style)
             elif layout == "text_figure":
                 render_text_figure(slide, page, style, base_dir, scaffold)
+            elif layout == "media_gallery":
+                render_media_gallery(slide, page, style, base_dir)
+            elif layout == "module_media":
+                render_module_media(slide, page, style, base_dir)
             elif layout == "full_figure":
                 render_full_figure(slide, page, style, base_dir)
             elif layout == "comparison":

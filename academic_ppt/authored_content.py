@@ -63,18 +63,70 @@ def apply_authored_content(
             raise ValueError(f"{draft.page_id}: first text value must equal the authored title")
         suppress_image = item.get("suppress_image") is True
         image_source_page = item.get("image_source_page")
-        if suppress_image and image_source_page is not None:
-            raise ValueError(f"{draft.page_id}: suppress_image and image_source_page are mutually exclusive")
+        image_source_pages = item.get("image_source_pages")
+        if image_source_pages is not None and (
+            not isinstance(image_source_pages, list)
+            or not image_source_pages
+            or not all(isinstance(value, int) and value > 0 for value in image_source_pages)
+        ):
+            raise ValueError(f"{draft.page_id}: image_source_pages must be a non-empty array of positive PDF pages")
+        if image_source_page is not None and image_source_pages is not None:
+            raise ValueError(f"{draft.page_id}: image_source_page and image_source_pages are mutually exclusive")
+        if suppress_image and (image_source_page is not None or image_source_pages is not None):
+            raise ValueError(
+                f"{draft.page_id}: suppress_image and image source selection are mutually exclusive"
+            )
         requirements = dict(draft.component_requirements)
         visual_strategy = str(item.get("visual_strategy") or draft.visual_strategy)
+        media_scope = draft.media_scope
+        media_layout = draft.media_layout
         if suppress_image:
             image_content.pop(draft.page_id, None)
             requirements.pop("picture", None)
+            media_scope = "none"
+            media_layout = "none"
             if "visual_strategy" not in item:
                 visual_strategy = "text_only"
+        elif image_source_pages is not None:
+            requested_media_scope = str(item.get("media_scope", "page"))
+            if requested_media_scope not in {"page", "module"}:
+                raise ValueError(f"{draft.page_id}: media_scope must be page or module")
+            allowed_counts = {1, 2, 3, 4, 6}
+            if requested_media_scope == "module":
+                allowed_counts.add(5)
+            if len(image_source_pages) not in allowed_counts:
+                allowed = "1, 2, 3, 4, 5, or 6" if requested_media_scope == "module" else "1, 2, 3, 4, or 6"
+                raise ValueError(f"{draft.page_id}: {requested_media_scope} media supports {allowed} images")
+            images = [_figure_for_source_page(package, int(value)) for value in image_source_pages]
+            if len(set(images)) != len(images):
+                raise ValueError(f"{draft.page_id}: image_source_pages resolve to duplicate figure assets")
+            media_scope = requested_media_scope
+            image_content[draft.page_id] = images
+            requirements["picture"] = len(images)
+            if media_scope == "module":
+                media_layout = "one_per_module"
+                if "visual_strategy" not in item:
+                    visual_strategy = "module_media"
+            else:
+                default_layout = {
+                    1: "one_image", 2: "two_image", 3: "three_image",
+                    4: "four_image", 6: "six_image",
+                }[len(images)]
+                media_layout = str(item.get("media_layout", default_layout))
+                if media_layout not in {
+                    "one_image", "two_image", "three_image", "four_image",
+                    "six_image", "primary_plus_supporting",
+                }:
+                    raise ValueError(f"{draft.page_id}: unsupported page media layout {media_layout}")
+                if media_layout == "primary_plus_supporting" and len(images) < 3:
+                    raise ValueError(f"{draft.page_id}: primary_plus_supporting requires at least three images")
+                if "visual_strategy" not in item:
+                    visual_strategy = "source_figure"
         elif image_source_page is not None:
             image_content[draft.page_id] = [_figure_for_source_page(package, int(image_source_page))]
             requirements["picture"] = 1
+            media_scope = "page"
+            media_layout = "one_image"
             if "visual_strategy" not in item:
                 visual_strategy = "source_figure"
         drafts.append(replace(
@@ -85,6 +137,8 @@ def apply_authored_content(
             next_link=str(item["next_link"]).strip(),
             visual_strategy=visual_strategy,
             component_requirements=requirements,
+            media_scope=media_scope,
+            media_layout=media_layout,
         ))
         text_content[draft.page_id] = [value.strip() for value in values]
 

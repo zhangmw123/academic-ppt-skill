@@ -29,6 +29,8 @@ class CompleteContentDraft:
     component_requirements: dict[str, int]
     coverage_tags: tuple[str, ...] = ()
     argument_units: tuple[str, ...] = ()
+    media_scope: str = "none"
+    media_layout: str = "none"
 
 
 SPACE = re.compile(r"\s+")
@@ -186,6 +188,8 @@ class CompleteContentCompiler:
             if index in {0, page_count - 1}:
                 visual_strategy = "text_only"
                 components = {"text": 2}
+                media_scope = "none"
+                media_layout = "none"
                 page_text = [
                     title,
                     self._cover_subtitle(scene, source_paths) if index == 0 else "核心结论与可验证的后续行动",
@@ -193,10 +197,14 @@ class CompleteContentCompiler:
             elif image is not None:
                 visual_strategy = "source_figure"
                 components = {"text": 3, "picture": 1}
+                media_scope = "page"
+                media_layout = "one_image"
                 image_content[page_id] = [image["path"]]
                 page_text = [title, claim, interpretation]
             else:
                 visual_strategy = self._native_strategy(focus, index, page_count)
+                media_scope = "none"
+                media_layout = "none"
                 if visual_strategy == "native_diagram":
                     components = {"text": 6}
                     page_text = [
@@ -222,6 +230,8 @@ class CompleteContentCompiler:
                 component_requirements=components,
                 coverage_tags=tags_by_page[index],
                 argument_units=arguments_by_page[index],
+                media_scope=media_scope,
+                media_layout=media_layout,
             )
             drafts.append(draft)
             text_content[page_id] = page_text

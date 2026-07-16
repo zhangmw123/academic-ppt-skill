@@ -136,3 +136,48 @@ def test_authored_content_can_bind_an_exact_pdf_figure_page(tmp_path: Path):
     assert result.image_content["P001"] == [str(figure.resolve())]
     assert result.drafts[0].visual_strategy == "source_figure"
     assert result.drafts[0].component_requirements["picture"] == 1
+
+
+def test_authored_content_can_bind_one_source_figure_per_semantic_module(tmp_path: Path):
+    items = []
+    expected = []
+    for page_number in (3, 4, 5, 6, 7):
+        figure = tmp_path / f"figure_p{page_number}.png"
+        figure.write_bytes(b"image")
+        expected.append(str(figure.resolve()))
+        items.append({
+            "accepted": True,
+            "source_page": page_number,
+            "path": str(figure),
+            "pixel_width": 1200,
+            "pixel_height": 700,
+        })
+    manifest = tmp_path / "manifest.json"
+    manifest.write_text(json.dumps({"source": str(tmp_path / "paper.pdf"), "items": items}), encoding="utf-8")
+    package = replace(_package(), figure_manifests=(str(manifest),))
+    path = tmp_path / "content.json"
+    path.write_text(json.dumps({
+        "schema_version": 1,
+        "scene": "组会-文献精读",
+        "pages": [
+            {
+                "page_id": "P001", "title": "Title 1", "claim": "Claim 1",
+                "interpretation": "Read 1", "next_link": "Next 1",
+                "text": ["Title 1", "Body 1"],
+                "image_source_pages": [3, 4, 5, 6, 7], "media_scope": "module",
+            },
+            {
+                "page_id": "P002", "title": "Title 2", "claim": "Claim 2",
+                "interpretation": "Read 2", "next_link": "Next 2",
+                "text": ["Title 2", "Body 2"],
+            },
+        ],
+    }, ensure_ascii=False), encoding="utf-8")
+
+    result = apply_authored_content(package, path, expected_scene="组会-文献精读")
+
+    assert result.image_content["P001"] == expected
+    assert result.drafts[0].media_scope == "module"
+    assert result.drafts[0].media_layout == "one_per_module"
+    assert result.drafts[0].visual_strategy == "module_media"
+    assert result.drafts[0].component_requirements["picture"] == 5

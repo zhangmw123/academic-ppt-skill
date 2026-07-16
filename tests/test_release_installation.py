@@ -60,9 +60,16 @@ class InstalledSkillReleaseTests(unittest.TestCase):
                     "scripts/analyze_sources.py",
                     "scripts/extract_figures.py",
                     "scripts/extract_template_grammar.py",
+                    "scripts/compile_bundled_source_templates.py",
+                    "scripts/validate_template_spec.py",
                     "scripts/render_scientific_visuals.py",
                     "scripts/validate_visual_tasks.py",
                     "scripts/build_complete_deck.py",
+                    "references/standard-template-spec.schema.json",
+                    "references/object-binding-manifest.schema.json",
+                    "references/template-semantic-prototypes.json",
+                    "assets/template_specs/T01_green_research.semantic.json",
+                    "assets/template_specs/T03_blue_defense.semantic.json",
                 ):
                     self.assertTrue((host_path / relative_path).is_file(), relative_path)
 

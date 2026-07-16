@@ -26,6 +26,8 @@ class TemplateSelection:
     substitution_reason: str | None = None
     source_fidelity: str | None = None
     source_limitations: str | None = None
+    semantic_spec_path: str | None = None
+    standardization_status: str | None = None
 
     def to_dict(self) -> dict:
         return {
@@ -38,6 +40,8 @@ class TemplateSelection:
             "substitution_reason": self.substitution_reason,
             "source_fidelity": self.source_fidelity,
             "source_limitations": self.source_limitations,
+            "semantic_spec_path": self.semantic_spec_path,
+            "standardization_status": self.standardization_status,
         }
 
 
@@ -124,6 +128,11 @@ class TemplateCatalog:
             ),
             source_fidelity=item.get("source_fidelity") if source_requested else None,
             source_limitations=item.get("source_limitations") if source_requested else None,
+            semantic_spec_path=(
+                str((self.root / item["semantic_spec_path"]).resolve())
+                if item.get("semantic_spec_path") else None
+            ),
+            standardization_status=item.get("standardization_status"),
         )
 
 

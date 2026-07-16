@@ -5,15 +5,9 @@ description: Create editable academic PPTX presentations from papers, theses, pr
 
 # Academic PPT
 
-Build a real, editable `.pptx`. Treat the source as evidence, the confirmed scene
-contract as the argument, and the selected template as a visual system plus a set
-of layout archetypes. Bind every content page to a compatible template archetype,
-then rebuild the evidence layer with editable text, shapes, charts, diagrams, and
-necessary local visual assets. Preserve template identity without carrying over
-sample frames whose capacity does not match the page.
+Build a real, editable `.pptx`. Treat the source as evidence, the confirmed scene contract as the argument, and the selected template as a visual system plus layout archetypes. Bind every content page to a compatible template archetype, then rebuild the evidence layer with editable text, shapes, charts, diagrams, and necessary local visual assets. Preserve template identity without carrying over sample frames whose capacity does not match the page.
 
-Own this workflow end to end. Do not invoke another presentation-generation Skill,
-create a user-managed project, or replace this Skill's contracts with another system.
+Own this workflow end to end. Do not invoke another presentation-generation Skill, create a user-managed project, or replace this Skill's contracts with another system.
 
 ## Hard rules
 
@@ -102,25 +96,12 @@ create a user-managed project, or replace this Skill's contracts with another sy
 28. Bind a selected PDF figure by verified source page and caption, not merely by
     nearest-page proximity. Record the PDF page in the visible caption or asset
     manifest and reject a figure whose semantic role does not match the page claim.
-29. Model every content composition as `page -> semantic module -> child slot`.
-    A repeated card may own its own heading, explanation, image or chart, icon, and
-    caption. Do not treat all visuals as page-level attachments.
-30. Distinguish page-level multi-image evidence from module-level media. Support
-    1, 2, 3, 4, and 6-image layouts plus primary-and-supporting compositions; bind
-    every visual to evidence and remove or reflow any slot that has no valid asset.
-31. For each semantic region, choose exactly one mode: reuse the complete native
-    editable component, or remove it and fully reconstruct the region. Never hide
-    old frames with masks or stack new panels over retained sample components.
-32. Remove unused components by ownership group, including frames, sample text,
-    icons, captions, connectors, and child placeholders. Treat duplicate, orphaned,
-    overlapping, or visibly empty components as blocking QA failures.
-33. Use these default typography ranges unless the confirmed template requires a
-    compatible alternative: cover 28-32 pt, page title 20-24 pt, module heading
-    13-16 pt, body 11-13 pt, caption 8.5-10 pt, with normal content no smaller than
-    10.5 pt. Shorten, split, or reflow before shrinking below the range.
-34. Treat T01-T08 as one release surface. Every template must pass parsing, semantic
-    compilation, editable binding, dense and multi-image rendering, object-level QA,
-    and PowerPoint visual acceptance; T01/T03-first is sequencing, not partial support.
+29. Model every content composition as `page -> semantic module -> child slot`. A repeated card may own its own heading, explanation, image or chart, icon, and caption. Do not treat all visuals as page-level attachments.
+30. Distinguish page-level multi-image evidence from module-level media. Support 1, 2, 3, 4, and 6-image layouts plus primary-and-supporting compositions; bind every visual to evidence and remove or reflow any slot that has no valid asset.
+31. For each semantic region, choose exactly one mode: reuse the complete native editable component, or remove it and fully reconstruct the region. Never hide old frames with masks or stack new panels over retained sample components.
+32. Remove unused components by ownership group, including frames, sample text, icons, captions, connectors, and child placeholders. Treat duplicate, orphaned, overlapping, or visibly empty components as blocking QA failures.
+33. Use these default typography ranges unless the confirmed template requires a compatible alternative: cover 28-32 pt, page title 20-24 pt, module heading 13-16 pt, body 11-13 pt, caption 8.5-10 pt, with normal content no smaller than 10.5 pt. Shorten, split, or reflow before shrinking below the range.
+34. Treat T01-T08 as one release surface. Every template must pass parsing, semantic compilation, editable binding, dense and multi-image rendering, object-level QA, and PowerPoint visual acceptance; T01/T03-first is sequencing, not partial support.
 
 ## First response
 
@@ -288,6 +269,14 @@ python scripts/extract_template_grammar.py "<template.pptx>" --output ppt_output
 python scripts/extract_figures.py "<source.pdf>" --output-dir ppt_output/working/figures
 ```
 
+For a bundled template, resolve its `semantic_spec_path` from `references/template-catalog.json` and validate the standard PPTX/spec pair before layout selection:
+
+```powershell
+python scripts/validate_template_spec.py "<template-semantic-spec.json>"
+```
+
+The low-level grammar is an extraction input, not the AI-facing template contract. Select pages and regions through the Standard Template Specification whenever the catalog provides one. A `pending_semantic_compilation` template is a development candidate and cannot satisfy formal bundled-template acceptance.
+
 Inspect actual previews. The learned visual system records colors, Chinese and
 Latin fonts, type scale, margins, navigation behavior, panel language, and chart
 style. It does not copy the template's sample content structure.
@@ -425,6 +414,14 @@ reviewed. Provide:
   selected storyline, content lock, and dynamic plan as retained supporting artifacts,
   not normal-user visible deliverables by default.
 
+Run object-level QA with the selected semantic specification and the renderer's actual region/slot binding manifest. The manifest records each region's exclusive render mode, actual shape IDs, complete removals, media provenance, PDF page, and semantic use:
+
+```powershell
+python scripts/validate_pptx.py ppt_output/final.pptx --layout-plan ppt_output/layout_plan.json --semantic-spec "<template-semantic-spec.json>" --object-manifest ppt_output/object_bindings.json --asset-root ppt_output --render-check required --render-engine powerpoint --output ppt_output/render_report.json
+```
+
+Omitting `--object-manifest` validates only the standardized template's static ownership and identity. It does not pass delivery checks for empty media slots, sample residue, bound font sizes, complete reconstruction, or image provenance.
+
 ## Rendering modes
 
 - `template_hybrid_editable` (default): bind the page to a template archetype and
@@ -488,6 +485,9 @@ python scripts/validate_template_usage.py ppt_output/dynamic_plan.json ppt_outpu
 - Machine-checkable scene profiles: [scene-profiles.json](references/scene-profiles.json)
 - Fixed ten-scene release benchmarks: [scene-benchmarks.json](references/scene-benchmarks.json)
 - Template choices: [template-catalog.md](references/template-catalog.md)
+- Standard template schema: [standard-template-spec.schema.json](references/standard-template-spec.schema.json)
+- Object binding schema: [object-binding-manifest.schema.json](references/object-binding-manifest.schema.json)
+- Curated page prototypes: [template-semantic-prototypes.json](references/template-semantic-prototypes.json)
 - Visual learning/navigation/layout: [visual-learning.md](references/visual-learning.md)
 - Academic typography/density: [academic-standards.md](references/academic-standards.md)
 - Scientific drawing/chart guidance: [drawing-prompts.md](references/drawing-prompts.md)

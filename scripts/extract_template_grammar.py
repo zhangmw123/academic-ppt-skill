@@ -148,6 +148,7 @@ def text_slots(record, repeated_texts, width, height):
             "role": slot_role,
             "box": box,
             "font_size_pt": round(font_size(shape), 1) or None,
+            "font_family": font_family(shape),
             "sample_text": text,
             "repeated": text in repeated_texts,
             "column": column,

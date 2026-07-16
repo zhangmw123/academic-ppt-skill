@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://academic-ppt-skill.local/object-binding-manifest.schema.json",
+  "title": "Academic PPT Object Binding Manifest",
+  "type": "object",
+  "required": ["schema_version", "template_id", "semantic_specification", "pages"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "template_id": {"pattern": "^T0[1-8]$"},
+    "semantic_specification": {"type": "string", "minLength": 1},
+    "pages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "slide_number",
+          "page_id",
+          "template_page_id",
+          "base_mode",
+          "source_components_present",
+          "regions"
+        ],
+        "properties": {
+          "slide_number": {"type": "integer", "minimum": 1},
+          "page_id": {"type": "string", "minLength": 1},
+          "template_page_id": {"type": "string", "minLength": 1},
+          "base_mode": {"enum": ["cloned_template", "blank_reconstruction"]},
+          "source_components_present": {"type": "boolean"},
+          "additional_identity_shape_ids": {
+            "type": "array",
+            "items": {"type": "integer"},
+            "uniqueItems": true
+          },
+          "identity_feature_bindings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["feature", "shape_ids"],
+              "properties": {
+                "feature": {"type": "string", "minLength": 1},
+                "shape_ids": {"type": "array", "items": {"type": "integer"}}
+              }
+            }
+          },
+          "regions": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"$ref": "#/$defs/region"}
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "region": {
+      "type": "object",
+      "required": ["module_id", "render_mode", "slot_bindings", "reflowed_or_removed_slots"],
+      "properties": {
+        "module_id": {"type": "string", "minLength": 1},
+        "render_mode": {"enum": ["native_reuse", "full_reconstruction"]},
+        "slot_bindings": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/binding"}
+        },
+        "reflowed_or_removed_slots": {
+          "type": "array",
+          "items": {"type": "string"},
+          "uniqueItems": true
+        }
+      }
+    },
+    "binding": {
+      "type": "object",
+      "required": ["slot_id", "shape_ids"],
+      "properties": {
+        "slot_id": {"type": "string", "minLength": 1},
+        "shape_ids": {
+          "type": "array",
+          "items": {"type": "integer"},
+          "uniqueItems": true
+        },
+        "source": {
+          "type": "object",
+          "required": ["source_id", "source_path", "pdf_page", "semantic_use", "asset_path"],
+          "properties": {
+            "source_id": {"type": "string", "minLength": 1},
+            "source_path": {"type": "string", "minLength": 1},
+            "pdf_page": {
+              "oneOf": [
+                {"type": "integer", "minimum": 1},
+                {"const": "not_applicable"}
+              ]
+            },
+            "semantic_use": {"type": "string", "minLength": 1},
+            "asset_path": {"type": "string", "minLength": 1},
+            "caption": {"type": "string"}
+          }
+        }
+      }
+    }
+  }
+}

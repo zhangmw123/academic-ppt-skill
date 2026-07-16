@@ -200,6 +200,7 @@ def _render_dynamic_candidate(
         content,
         visual_system_path=visual_system_path,
         template_grammar_path=grammar_path,
+        template_semantic_spec_path=selected_template.get("semantic_spec_path"),
         asset_base_dir=root,
         confirmed=True,
     )
@@ -491,6 +492,8 @@ def main() -> None:
             component_requirements=draft.component_requirements,
             coverage_tags=draft.coverage_tags,
             argument_units=draft.argument_units,
+            media_scope=draft.media_scope,
+            media_layout=draft.media_layout,
         ))
     plan = PagePlanner().build(
         scene.name,

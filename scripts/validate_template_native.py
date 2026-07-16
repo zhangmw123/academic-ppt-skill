@@ -89,11 +89,10 @@ def main():
                             "bind it to an existing picture shape or register an addition with fallback_reason"
                         )
             for mask in page.get("placeholder_masks", []):
-                if not mask.get("temporary_approved") or not mask.get("reason"):
-                    errors.append(
-                        f"{page_id}: placeholder mask is only allowed as an explicitly approved temporary repair; "
-                        "remove/replace the nested component or use a clean raster variant"
-                    )
+                errors.append(
+                    f"{page_id}: placeholder masks are forbidden; remove the complete ownership group "
+                    "or reuse the complete native component"
+                )
         elif mode == "freeform":
             if not page.get("fallback_reason"):
                 errors.append(f"{page_id}: freeform page requires fallback_reason")

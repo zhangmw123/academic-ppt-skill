@@ -1,0 +1,241 @@
+{
+  "schema_version": 1,
+  "templates": {
+    "T01": {
+      "identity_features": [
+        "six-segment green top navigation with a dark active tab",
+        "green chevron marker before each claim-led page title",
+        "pale mint canvas with white rounded evidence panels",
+        "dark-green vertical rails and compact panel headings",
+        "thin grey-green borders with restrained academic spacing"
+      ],
+      "pages": {
+        "1": {
+          "page_role": "cover",
+          "page_archetype": "research_cover",
+          "relationship": "identity_and_presentation_context",
+          "expected_module_count": 1,
+          "media_scope": "none",
+          "default_module_role": "cover_identity",
+          "recommended_argument_units": ["title", "subtitle", "presenter", "advisor", "institution", "date"]
+        },
+        "2": {
+          "page_role": "content",
+          "page_archetype": "four_problem_evidence_modules",
+          "relationship": "problem_evidence_response",
+          "expected_module_count": 4,
+          "media_scope": "none",
+          "module_roles": ["context", "pain_point", "technical_gap", "research_response"],
+          "recommended_argument_units": ["problem", "evidence", "gap", "research_value"]
+        },
+        "3": {
+          "page_role": "content",
+          "page_archetype": "two_way_research_status_comparison",
+          "relationship": "domestic_foreign_comparison",
+          "expected_module_count": 2,
+          "media_scope": "module",
+          "module_media_supported": true,
+          "module_roles": ["domestic_evidence", "international_evidence"],
+          "recommended_argument_units": ["comparison_basis", "domestic_state", "international_state", "unresolved_gap"]
+        },
+        "4": {
+          "page_role": "content",
+          "page_archetype": "three_research_content_modules",
+          "relationship": "parallel_work_packages",
+          "expected_module_count": 3,
+          "media_scope": "module",
+          "module_media_supported": true,
+          "module_roles": ["work_package", "work_package", "work_package"],
+          "recommended_argument_units": ["module_heading", "mechanism", "deliverable", "module_visual"]
+        },
+        "5": {
+          "page_role": "content",
+          "page_archetype": "five_step_research_route",
+          "relationship": "ordered_process",
+          "expected_module_count": 5,
+          "media_scope": "none",
+          "default_module_role": "method_step",
+          "recommended_argument_units": ["input", "operation", "output", "validation", "transition"]
+        },
+        "6": {
+          "page_role": "content",
+          "page_archetype": "four_innovation_modules",
+          "relationship": "parallel_contributions",
+          "expected_module_count": 4,
+          "media_scope": "module",
+          "module_media_supported": true,
+          "default_module_role": "innovation_module",
+          "recommended_argument_units": ["innovation_heading", "mechanism", "advantage", "supporting_visual"]
+        },
+        "7": {
+          "page_role": "content",
+          "page_archetype": "six_panel_evidence_gallery",
+          "relationship": "multi_panel_evidence",
+          "expected_module_count": 1,
+          "media_scope": "page",
+          "page_media_count": 6,
+          "page_media_native_reuse": false,
+          "media_layout": "six_image",
+          "default_module_role": "evidence_gallery",
+          "recommended_argument_units": ["page_claim", "six_source_bound_visuals", "captions", "cross_panel_interpretation"]
+        },
+        "8": {
+          "page_role": "content",
+          "page_archetype": "full_width_result_table_with_interpretation",
+          "relationship": "result_carrier_and_interpretation",
+          "expected_module_count": 1,
+          "media_scope": "page",
+          "page_media_count": 1,
+          "page_media_native_reuse": true,
+          "media_layout": "one_image",
+          "default_module_role": "result_evidence",
+          "recommended_argument_units": ["result_table_or_chart", "key_comparison", "interpretation", "boundary"]
+        },
+        "9": {
+          "page_role": "content",
+          "page_archetype": "project_timeline_or_milestone_plan",
+          "relationship": "ordered_milestones",
+          "expected_module_count": 1,
+          "media_scope": "page",
+          "page_media_count": 1,
+          "page_media_native_reuse": false,
+          "media_layout": "one_image",
+          "default_module_role": "timeline_evidence",
+          "recommended_argument_units": ["milestones", "schedule", "deliverables", "risk_boundary"]
+        },
+        "10": {
+          "page_role": "ending",
+          "page_archetype": "research_ending",
+          "relationship": "core_judgment_and_close",
+          "expected_module_count": 1,
+          "media_scope": "none",
+          "default_module_role": "ending_summary",
+          "recommended_argument_units": ["core_judgment", "next_action", "acknowledgement"]
+        }
+      }
+    },
+    "T03": {
+      "identity_features": [
+        "five-segment navy top navigation with a dark active tab",
+        "navy chevron marker before each claim-led page title",
+        "fine dashed content boundary on a white research canvas",
+        "navy header strips and numbered circular process markers",
+        "pale blue cover treatment with high-contrast navy typography"
+      ],
+      "pages": {
+        "1": {
+          "page_role": "cover",
+          "page_archetype": "defense_cover",
+          "relationship": "identity_and_formal_cover_fields",
+          "expected_module_count": 1,
+          "media_scope": "none",
+          "default_module_role": "cover_identity",
+          "recommended_argument_units": ["title", "degree_or_scene", "presenter", "advisor", "institution", "date"]
+        },
+        "2": {
+          "page_role": "agenda",
+          "page_archetype": "section_agenda",
+          "relationship": "ordered_story_sections",
+          "expected_module_count": 1,
+          "media_scope": "none",
+          "default_module_role": "agenda_sections",
+          "recommended_argument_units": ["dynamic_sections", "speaking_order"]
+        },
+        "3": {
+          "page_role": "content",
+          "page_archetype": "three_challenge_modules",
+          "relationship": "problem_evidence_need",
+          "expected_module_count": 3,
+          "media_scope": "none",
+          "module_roles": ["challenge", "challenge", "research_need"],
+          "recommended_argument_units": ["challenge_heading", "evidence", "consequence", "research_need"]
+        },
+        "4": {
+          "page_role": "content",
+          "page_archetype": "theory_plus_two_evidence_panels",
+          "relationship": "mechanism_and_two_evidence_carriers",
+          "expected_module_count": 1,
+          "media_scope": "page",
+          "page_media_count": 2,
+          "page_media_native_reuse": true,
+          "media_layout": "two_image",
+          "default_module_role": "theory_and_evidence",
+          "recommended_argument_units": ["mechanism", "evidence_a", "evidence_b", "interpretation"]
+        },
+        "5": {
+          "page_role": "content",
+          "page_archetype": "three_stage_method_pipeline",
+          "relationship": "ordered_method_stages",
+          "expected_module_count": 3,
+          "media_scope": "module",
+          "module_media_supported": true,
+          "default_module_role": "method_stage",
+          "recommended_argument_units": ["stage_heading", "operation", "output", "stage_visual"]
+        },
+        "6": {
+          "page_role": "content",
+          "page_archetype": "four_experiment_modules",
+          "relationship": "parallel_experiment_groups",
+          "expected_module_count": 4,
+          "media_scope": "module",
+          "module_media_supported": true,
+          "default_module_role": "experiment_module",
+          "recommended_argument_units": ["experiment_heading", "protocol", "measurement", "evidence_visual"]
+        },
+        "7": {
+          "page_role": "content",
+          "page_archetype": "five_stage_execution_process",
+          "relationship": "ordered_execution_stages",
+          "expected_module_count": 5,
+          "media_scope": "module",
+          "module_media_supported": true,
+          "default_module_role": "execution_stage",
+          "recommended_argument_units": ["stage_heading", "completed_work", "evidence", "next_gate"]
+        },
+        "8": {
+          "page_role": "content",
+          "page_archetype": "editable_schedule_board",
+          "relationship": "time_and_deliverables",
+          "expected_module_count": 1,
+          "media_scope": "page",
+          "page_media_count": 1,
+          "page_media_native_reuse": false,
+          "media_layout": "one_image",
+          "default_module_role": "schedule",
+          "recommended_argument_units": ["time_range", "milestones", "deliverables", "dependencies"]
+        },
+        "9": {
+          "page_role": "content",
+          "page_archetype": "six_panel_result_evidence",
+          "relationship": "multi_panel_evidence",
+          "expected_module_count": 1,
+          "media_scope": "page",
+          "page_media_count": 6,
+          "page_media_native_reuse": true,
+          "media_layout": "six_image",
+          "default_module_role": "result_evidence_gallery",
+          "recommended_argument_units": ["page_claim", "six_source_bound_visuals", "captions", "cross_panel_conclusion"]
+        },
+        "10": {
+          "page_role": "content",
+          "page_archetype": "two_outcome_and_contribution_modules",
+          "relationship": "contribution_and_expected_outcomes",
+          "expected_module_count": 2,
+          "media_scope": "module",
+          "module_media_supported": true,
+          "module_roles": ["core_contribution", "expected_outcomes"],
+          "recommended_argument_units": ["contribution", "support", "deliverable", "validation_metric"]
+        },
+        "11": {
+          "page_role": "ending",
+          "page_archetype": "defense_ending",
+          "relationship": "core_judgment_and_close",
+          "expected_module_count": 1,
+          "media_scope": "none",
+          "default_module_role": "ending_summary",
+          "recommended_argument_units": ["core_judgment", "next_action", "acknowledgement", "contact"]
+        }
+      }
+    }
+  }
+}

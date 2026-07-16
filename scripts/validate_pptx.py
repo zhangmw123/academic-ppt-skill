@@ -20,6 +20,13 @@ from export_preview import export_preview, find_powerpoint
 from pptx_utils import iter_shapes
 
 
+SKILL_ROOT = Path(__file__).resolve().parents[1]
+if str(SKILL_ROOT) not in sys.path:
+    sys.path.insert(0, str(SKILL_ROOT))
+
+from academic_ppt.object_qa import ObjectLevelQualityGate
+
+
 PKG_REL_NS = "http://schemas.openxmlformats.org/package/2006/relationships"
 DOC_REL_NS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
 SAMPLE_RE = re.compile(
@@ -125,7 +132,9 @@ def estimate_overflow(shape) -> float:
 
 
 def validate(pptx_path: Path, plan_path: Path | None, render_mode: str, preview_dir: Path,
-             selected_page_ids: set[str] | None = None, render_engine: str = "auto"):
+             selected_page_ids: set[str] | None = None, render_engine: str = "auto",
+             semantic_spec_path: Path | None = None, object_manifest_path: Path | None = None,
+             asset_root: Path | None = None):
     report = {
         "file": str(pptx_path.resolve()),
         "validated_at": datetime.now(timezone.utc).isoformat(),
@@ -163,6 +172,7 @@ def validate(pptx_path: Path, plan_path: Path | None, render_mode: str, preview_
     overflow_warnings = []
     overlap_errors = []
     out_of_bounds = []
+    delivery_text_checks = semantic_spec_path is None or object_manifest_path is not None
     for slide_index, slide in enumerate(prs.slides, 1):
         text_shapes = []
         for shape in iter_shapes(slide.shapes):
@@ -175,33 +185,70 @@ def validate(pptx_path: Path, plan_path: Path | None, render_mode: str, preview_
                     out_of_bounds.append(f"slide {slide_index}, shape {shape.shape_id}")
             if text and SAMPLE_RE.search(text):
                 residue.append(f"slide {slide_index}, shape {shape.shape_id}: {text[:60]}")
-            ratio = estimate_overflow(shape)
-            if ratio > 2.20:
-                overflow_errors.append(f"slide {slide_index}, shape {shape.shape_id}: {ratio:.0%}")
-            elif ratio > 1.60:
-                overflow_warnings.append(f"slide {slide_index}, shape {shape.shape_id}: {ratio:.0%}")
-        for left_index, first in enumerate(text_shapes):
-            for second in text_shapes[left_index + 1:]:
-                overlap_w = min(first.left + first.width, second.left + second.width) - max(first.left, second.left)
-                overlap_h = min(first.top + first.height, second.top + second.height) - max(first.top, second.top)
-                if overlap_w <= 0 or overlap_h <= 0:
-                    continue
-                intersection = overlap_w * overlap_h
-                smaller = min(first.width * first.height, second.width * second.height)
-                if smaller and intersection / smaller > 0.15:
-                    overlap_errors.append(
-                        f"slide {slide_index}: text shapes {first.shape_id} and {second.shape_id} overlap {intersection / smaller:.0%}"
-                    )
+            if delivery_text_checks:
+                ratio = estimate_overflow(shape)
+                if ratio > 2.20:
+                    overflow_errors.append(f"slide {slide_index}, shape {shape.shape_id}: {ratio:.0%}")
+                elif ratio > 1.60:
+                    overflow_warnings.append(f"slide {slide_index}, shape {shape.shape_id}: {ratio:.0%}")
+        if delivery_text_checks:
+            for left_index, first in enumerate(text_shapes):
+                for second in text_shapes[left_index + 1:]:
+                    overlap_w = min(first.left + first.width, second.left + second.width) - max(first.left, second.left)
+                    overlap_h = min(first.top + first.height, second.top + second.height) - max(first.top, second.top)
+                    if overlap_w <= 0 or overlap_h <= 0:
+                        continue
+                    intersection = overlap_w * overlap_h
+                    smaller = min(first.width * first.height, second.width * second.height)
+                    if smaller and intersection / smaller > 0.15:
+                        overlap_errors.append(
+                            f"slide {slide_index}: text shapes {first.shape_id} and {second.shape_id} overlap {intersection / smaller:.0%}"
+                        )
     add_check(report, "No template sample text remains", "ERROR", not residue,
               "OK" if not residue else "; ".join(residue[:10]))
-    add_check(report, "No severe estimated text overflow", "ERROR", not overflow_errors,
-              "OK" if not overflow_errors else "; ".join(overflow_errors[:10]))
-    add_check(report, "Text boxes do not materially overlap", "ERROR", not overlap_errors,
-              "OK" if not overlap_errors else "; ".join(overlap_errors[:10]))
+    if delivery_text_checks:
+        add_check(report, "No severe estimated text overflow", "ERROR", not overflow_errors,
+                  "OK" if not overflow_errors else "; ".join(overflow_errors[:10]))
+        add_check(report, "Text boxes do not materially overlap", "ERROR", not overlap_errors,
+                  "OK" if not overlap_errors else "; ".join(overlap_errors[:10]))
+    else:
+        report.setdefault("observations", []).append(
+            "Delivery text overflow and overlap checks require an object binding manifest; "
+            "the unbound standard template is checked through semantic ownership QA."
+        )
     add_check(report, "Text boxes stay inside the slide canvas", "ERROR", not out_of_bounds,
               "OK" if not out_of_bounds else "; ".join(out_of_bounds[:10]))
-    if overflow_warnings:
+    if delivery_text_checks and overflow_warnings:
         add_check(report, "No possible text overflow", "WARNING", False, "; ".join(overflow_warnings[:10]))
+
+    if semantic_spec_path:
+        object_result = ObjectLevelQualityGate().inspect(
+            pptx_path,
+            semantic_spec_path,
+            render_manifest=object_manifest_path,
+            asset_root=asset_root,
+        )
+        report["object_qa"] = object_result.to_dict()
+        labels = {
+            "duplicate_objects": "No duplicate content objects",
+            "cross_module_overlaps": "Semantic modules do not materially overlap",
+            "orphan_components": "No orphan or unowned content components",
+            "empty_media_slots": "No empty semantic media slots",
+            "template_residue": "No old template residue or internal labels",
+            "font_bounds": "Bound text respects typography capacity ranges",
+            "template_identity": "Template identity components remain intact",
+            "media_provenance": "Every bound media object has valid provenance",
+            "exclusive_render_modes": "Each semantic region uses one exclusive render mode",
+        }
+        for category, label in labels.items():
+            failures = object_result.categories.get(category, ())
+            add_check(
+                report,
+                label,
+                "ERROR",
+                not failures,
+                "OK" if not failures else "; ".join(failures[:10]),
+            )
 
     if render_mode != "off":
         try:
@@ -224,12 +271,18 @@ def main():
     parser.add_argument("--render-engine", choices=["auto", "powerpoint", "wps", "libreoffice"], default="auto")
     parser.add_argument("--preview-dir")
     parser.add_argument("--pages", help="Comma-separated page IDs when validating a sample render")
+    parser.add_argument("--semantic-spec", help="Standard template semantic specification for object-level QA")
+    parser.add_argument("--object-manifest", help="Actual region/slot binding manifest for rendered-delivery QA")
+    parser.add_argument("--asset-root", help="Base directory for media source paths in the object manifest")
     args = parser.parse_args()
     output = Path(args.output)
     preview_dir = Path(args.preview_dir) if args.preview_dir else output.parent / "rendered-preview"
     selected = {value.strip() for value in args.pages.split(",")} if args.pages else None
     report = validate(Path(args.pptx), Path(args.layout_plan) if args.layout_plan else None,
-                      args.render_check, preview_dir, selected, args.render_engine)
+                      args.render_check, preview_dir, selected, args.render_engine,
+                      Path(args.semantic_spec) if args.semantic_spec else None,
+                      Path(args.object_manifest) if args.object_manifest else None,
+                      Path(args.asset_root) if args.asset_root else None)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps({key: report[key] for key in ["passed", "failed_error", "failed_warning"]}, ensure_ascii=False))

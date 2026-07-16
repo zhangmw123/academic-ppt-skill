@@ -13,6 +13,7 @@ from academic_ppt.layout import ScientificPageContract
 from academic_ppt.manifest import SlideManifestBuilder
 from academic_ppt.planning import PagePlan, PlannedPage
 from academic_ppt.scenes import ScenePlanContract
+from scripts.render_dynamic import render as render_dynamic
 
 
 def _page(page_id: str, title: str, strategy: str, text_count: int) -> PlannedPage:
@@ -215,3 +216,102 @@ def test_slide_manifest_requires_editable_content_and_template_identity(tmp_path
     assert manifest["passed"]
     assert manifest["slides"][0]["editable_information_layer_pass"]
     assert manifest["slides"][0]["template_identity_bound"]
+
+
+def test_dynamic_composition_and_renderer_support_page_gallery_and_module_media(tmp_path: Path):
+    pages = (
+        _page("P001", "研究主题", "text_only", 2),
+        replace(
+            _page("P002", "四组图像共同证明处理效果", "source_figure", 4),
+            media_scope="page",
+            media_layout="four_image",
+        ),
+        replace(
+            _page("P003", "五个实验模块分别提供图像证据", "module_media", 5),
+            media_scope="module",
+            media_layout="one_per_module",
+        ),
+        _page("P004", "结论与行动", "text_only", 2),
+    )
+    images = []
+    for index in range(9):
+        path = tmp_path / f"evidence_{index + 1}.png"
+        Image.new("RGB", (320, 180), (240 - index * 8, 245, 250)).save(path)
+        images.append(str(path))
+    package = _package(pages, Path(images[0]))
+    package = replace(
+        package,
+        text_content={
+            "P001": ["研究主题", "完整证据汇报"],
+            "P002": [
+                "四组图像共同证明处理效果",
+                "对照组显示原始结构，处理组显示稳定改善",
+                "四个视野来自同一实验批次并采用一致尺度",
+                "跨面板比较支持结论，同时保留样本边界",
+            ],
+            "P003": [
+                "五个实验模块分别提供图像证据",
+                "细胞形态：处理后边界更清晰且异常区域减少",
+                "表达结果：目标蛋白变化与表型方向一致",
+                "结构验证：结合位点预测支持所提出的机制",
+                "剂量响应：效应随处理浓度增加并趋于稳定",
+                "外部验证：独立样本复现主要趋势并限定边界",
+            ],
+            "P004": ["结论与行动", "完成外部数据验证"],
+        },
+        image_content={"P002": images[:4], "P003": images[4:9]},
+    )
+    grammar_path = tmp_path / "grammar.json"
+    grammar_path.write_text(json.dumps({
+        "identity": {"panel_mode": "native_shapes", "navigation": "top"},
+        "geometry": {},
+        "archetypes": [
+            {"slide_index": 1, "role": "cover", "layout_signature": "cover"},
+            {"slide_index": 4, "role": "gallery", "layout_signature": "three_columns"},
+            {"slide_index": 7, "role": "gallery", "layout_signature": "image_grid"},
+            {"slide_index": 10, "role": "ending", "layout_signature": "ending"},
+        ],
+    }), encoding="utf-8")
+    semantic_path = Path(__file__).resolve().parents[1] / "assets" / "template_specs" / "T01_green_research.semantic.json"
+    plan = PagePlan("组会-文献精读", ("研究内容",), pages, deck_scope="complete")
+
+    payload = DynamicCompositionCompiler().compile(
+        plan,
+        package,
+        visual_system_path=tmp_path / "visual.json",
+        template_grammar_path=grammar_path,
+        template_semantic_spec_path=semantic_path,
+        asset_base_dir=tmp_path,
+        confirmed=True,
+    )
+
+    assert payload["pages"][1]["layout"] == "media_gallery"
+    assert len(payload["pages"][1]["media_items"]) == 4
+    assert payload["pages"][1]["template_reference"]["selection_source"] == "standard_template_specification"
+    assert payload["pages"][2]["layout"] == "module_media"
+    assert len(payload["pages"][2]["modules"]) == 5
+    assert all(module["media_source"]["semantic_use"] for module in payload["pages"][2]["modules"])
+
+    visual_path = tmp_path / "visual.json"
+    visual_path.write_text(json.dumps({
+        "colors": {
+            "background": "#F7FAF8", "surface": "#FFFFFF", "primary": "#176B4D",
+            "primary_soft": "#CDE8DB", "primary_pale": "#EDF7F2", "text": "#1F2933",
+            "muted": "#667085", "line": "#D9E2DD",
+        },
+        "fonts": {"title": "Microsoft YaHei", "body": "Microsoft YaHei", "latin": "Arial"},
+        "typography": {
+            "cover_title": 30, "cover_subtitle": 17, "page_title": 22, "section_nav": 10,
+            "panel_title": 14, "body": 12, "caption": 9, "footer": 8,
+        },
+    }), encoding="utf-8")
+    plan_path = tmp_path / "dynamic_plan.json"
+    plan_path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+    output = tmp_path / "media_deck.pptx"
+
+    render_dynamic(plan_path, visual_path, output)
+
+    rendered = Presentation(output)
+    assert len(rendered.slides) == 4
+    assert sum(1 for shape in rendered.slides[1].shapes if shape.shape_type == 13) == 4
+    assert sum(1 for shape in rendered.slides[2].shapes if shape.shape_type == 13) == 5

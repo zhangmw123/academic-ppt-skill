@@ -9,6 +9,43 @@ from academic_ppt.scenes import ScenePlanContract
 
 
 class PagePlannerTests(unittest.TestCase):
+    def test_allows_five_images_only_for_one_per_module_media(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            source_path = root / "evidence.md"
+            source_path.write_text("五个实验模块均有独立图像证据。", encoding="utf-8")
+            graph = EvidenceGraph.from_sources([SourceIngestor().ingest(source_path)])
+            evidence = graph.all()[0]
+            claim = graph.add_claim("五个模块分别绑定来源图像。", [evidence.evidence_id])
+            common = dict(
+                section="实验与结果",
+                title="五个模块分别绑定图像证据",
+                question_answered="每个模块是否有独立证据？",
+                claim_id=claim.claim_id,
+                interpretation="逐模块核对图像与结论的对应关系。",
+                next_link="进入跨模块综合判断。",
+                time_seconds=75,
+                visual_strategy="module_media",
+                component_requirements={"text": 5, "picture": 5},
+                media_layout="one_per_module",
+            )
+
+            plan = PagePlanner().build(
+                "毕业答辩",
+                ["实验与结果"],
+                [PageDraft(page_id="P001", media_scope="module", **common)],
+                graph,
+            )
+
+            self.assertEqual(plan.pages[0].contract.component_requirements["picture"], 5)
+            with self.assertRaisesRegex(ValueError, "page media picture count"):
+                PagePlanner().build(
+                    "毕业答辩",
+                    ["实验与结果"],
+                    [PageDraft(page_id="P002", media_scope="page", **common)],
+                    graph,
+                )
+
     def test_builds_evidence_bound_scientific_page_contract_and_reviewable_prd(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)

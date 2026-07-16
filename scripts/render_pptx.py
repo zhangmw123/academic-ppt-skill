@@ -153,34 +153,6 @@ def apply_shape_adjustments(slide, adjustments: list[dict], errors: list[str], p
                     run.font.size = Pt(float(adjustment["font_size_pt"]))
 
 
-def apply_placeholder_masks(slide, masks: list[dict], errors: list[str], page_id: str):
-    for mask in masks:
-        container_id = int(mask["container_shape_id"])
-        container = find_shape(slide, container_id)
-        if container is None:
-            errors.append(f"[{page_id}] placeholder mask container not found: {container_id}")
-            continue
-        box = mask.get("box", {})
-        if not all(key in box for key in ("left", "top", "width", "height")):
-            errors.append(f"[{page_id}] placeholder mask requires a complete box")
-            continue
-        color_hex = str(mask.get("fill", "FFFFFF")).lstrip("#")
-        color = RGBColor.from_string(color_hex)
-        overlay = slide.shapes.add_shape(
-            MSO_SHAPE.RECTANGLE,
-            Inches(float(box["left"])), Inches(float(box["top"])),
-            Inches(float(box["width"])), Inches(float(box["height"])),
-        )
-        overlay.fill.solid()
-        overlay.fill.fore_color.rgb = color
-        overlay.line.color.rgb = color
-        parent = container._element.getparent()
-        container_index = parent.index(container._element)
-        overlay_parent = overlay._element.getparent()
-        overlay_parent.remove(overlay._element)
-        parent.insert(container_index + 1, overlay._element)
-
-
 def picture_color(shape) -> tuple[int, int, int]:
     try:
         with Image.open(io.BytesIO(shape.image.blob)) as image:
@@ -441,7 +413,11 @@ def render(plan_path: Path, template_path: Path, output_path: Path, page_ids: se
             set_text(find_shape(slide, shape_id), str(binding.get("content", "")), font_policy)
 
         apply_shape_adjustments(slide, page.get("adjustments", []), errors, page_id)
-        apply_placeholder_masks(slide, page.get("placeholder_masks", []), errors, page_id)
+        if page.get("placeholder_masks"):
+            errors.append(
+                f"[{page_id}] placeholder masks are forbidden; remove the complete ownership group "
+                "or reuse the complete native component"
+            )
         navigation_enabled = page.get("navigation_enabled", True)
         native_navigation_count = apply_native_navigation_contract(
             slide, plan.get("sections", []), page.get("section"), navigation_contract,

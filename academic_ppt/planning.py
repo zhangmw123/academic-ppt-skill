@@ -26,6 +26,8 @@ class PageDraft:
     component_requirements: dict[str, int]
     coverage_tags: tuple[str, ...] = ()
     argument_units: tuple[str, ...] = ()
+    media_scope: str = "none"
+    media_layout: str = "none"
 
 
 @dataclass(frozen=True)
@@ -44,6 +46,8 @@ class PlannedPage:
     contract: ScientificPageContract
     coverage_tags: tuple[str, ...] = ()
     argument_units: tuple[str, ...] = ()
+    media_scope: str = "none"
+    media_layout: str = "none"
 
     def to_dict(self) -> dict:
         return {
@@ -106,6 +110,7 @@ class PagePlan:
                 f"- Argument units: {', '.join(page.argument_units)}",
                 f"- Interpretation or boundary: {page.interpretation}",
                 f"- Visual: {page.visual_strategy}",
+                f"- Media scope/layout: {page.media_scope} / {page.media_layout}",
                 f"- Time: {page.time_seconds}s",
                 f"- Transition: {page.next_link}",
                 "",
@@ -132,6 +137,8 @@ class PagePlan:
                 contract=ScientificPageContract(**item["contract"]),
                 coverage_tags=tuple(item.get("coverage_tags", ())),
                 argument_units=tuple(item.get("argument_units", ())),
+                media_scope=item.get("media_scope", "none"),
+                media_layout=item.get("media_layout", "none"),
             )
             for item in payload["pages"]
         )
@@ -185,6 +192,25 @@ class PagePlanner:
                 component_requirements=dict(draft.component_requirements),
             )
             contract.validate()
+            picture_count = int(draft.component_requirements.get("picture", 0))
+            media_scope = draft.media_scope
+            media_layout = draft.media_layout
+            if picture_count and media_scope == "none":
+                media_scope = "page"
+                media_layout = {
+                    1: "one_image", 2: "two_image", 3: "three_image",
+                    4: "four_image", 6: "six_image",
+                }.get(picture_count, "primary_plus_supporting")
+            if media_scope not in {"none", "page", "module"}:
+                raise ValueError(f"{draft.page_id}: invalid media scope {media_scope}")
+            allowed_picture_counts = {0, 1, 2, 3, 4, 6}
+            if media_scope == "module":
+                allowed_picture_counts.add(5)
+            if picture_count not in allowed_picture_counts:
+                allowed = "1, 2, 3, 4, 5, or 6" if media_scope == "module" else "1, 2, 3, 4, or 6"
+                raise ValueError(f"{draft.page_id}: {media_scope} media picture count must be {allowed}")
+            if media_scope == "module" and media_layout != "one_per_module":
+                raise ValueError(f"{draft.page_id}: module media requires one_per_module")
             evidence_graph.add_page(draft.page_id, [draft.claim_id])
             pages.append(PlannedPage(
                 page_id=draft.page_id,
@@ -201,6 +227,8 @@ class PagePlanner:
                 contract=contract,
                 coverage_tags=tuple(draft.coverage_tags),
                 argument_units=tuple(draft.argument_units),
+                media_scope=media_scope,
+                media_layout=media_layout,
             ))
         coverage_tags = tuple(dict.fromkeys(
             value

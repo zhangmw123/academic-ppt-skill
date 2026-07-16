@@ -72,7 +72,12 @@ class NativeRenderAdapter:
                 resolved_content = str(content)
                 geometry = geometry_by_id.get(shape_id)
                 if geometry:
-                    resolved_content, font_size = self._fit_text(resolved_content, geometry, value_index == 0)
+                    resolved_content, font_size = self._fit_text(
+                        resolved_content,
+                        geometry,
+                        value_index == 0,
+                        is_cover_title=value_index == 0 and page_index == 0,
+                    )
                     adjustments.append({"shape_id": shape_id, "font_size_pt": font_size})
                 text_bindings.append({"shape_id": shape_id, "content": resolved_content})
             pages.append({
@@ -138,11 +143,21 @@ class NativeRenderAdapter:
         ))
 
     @staticmethod
-    def _fit_text(content: str, geometry: dict[str, int], is_title: bool) -> tuple[str, float]:
+    def _fit_text(
+        content: str,
+        geometry: dict[str, int],
+        is_title: bool,
+        *,
+        is_cover_title: bool = False,
+    ) -> tuple[str, float]:
         width_pt = geometry["width"] / 12700
         height_pt = geometry["height"] / 12700
-        minimum = 14.0 if is_title else 11.5
-        maximum = 24.0 if is_title else 16.0
+        if is_cover_title:
+            minimum, maximum = 28.0, 32.0
+        elif is_title:
+            minimum, maximum = 20.0, 24.0
+        else:
+            minimum, maximum = 11.0, 13.0
         units = max(1.0, sum(1.0 if "\u4e00" <= char <= "\u9fff" else 0.55 for char in content))
         estimated = ((width_pt * height_pt) / max(units * 0.96, 1)) ** 0.5
         font_size = max(minimum, min(maximum, estimated))

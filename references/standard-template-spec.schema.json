@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://academic-ppt-skill.local/standard-template-spec.schema.json",
+  "title": "Academic PPT Standard Template Specification",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "contract",
+    "template",
+    "template_identity",
+    "typography_capacity_policy",
+    "render_contract",
+    "media_contract",
+    "pages",
+    "acceptance"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "contract": {"const": "standard_template_specification"},
+    "template": {
+      "type": "object",
+      "required": ["id", "standard_editable_pptx", "standard_pptx_sha256", "slide_count", "semantic_compile_status"],
+      "properties": {
+        "id": {"pattern": "^T0[1-8]$"},
+        "standard_editable_pptx": {"type": "string", "minLength": 1},
+        "standard_pptx_sha256": {"pattern": "^[0-9a-f]{64}$"},
+        "slide_count": {"type": "integer", "minimum": 1},
+        "semantic_compile_status": {"const": "compiled_not_release_accepted"}
+      }
+    },
+    "template_identity": {
+      "type": "object",
+      "required": ["identity_features", "identity_signature", "minimum_preserved_features"],
+      "properties": {
+        "identity_features": {"type": "array", "minItems": 4, "items": {"type": "string"}},
+        "identity_signature": {"pattern": "^[0-9a-f]{64}$"},
+        "minimum_preserved_features": {"type": "integer", "minimum": 4}
+      }
+    },
+    "typography_capacity_policy": {
+      "type": "object",
+      "required": ["cover_title", "page_title", "module_heading", "body", "caption", "normal_content_min_pt", "unbounded_shrink_forbidden"]
+    },
+    "render_contract": {
+      "type": "object",
+      "required": ["allowed_region_modes", "mutually_exclusive", "masking_forbidden", "stacking_old_and_new_forbidden"],
+      "properties": {
+        "allowed_region_modes": {
+          "const": ["native_reuse", "full_reconstruction"]
+        },
+        "mutually_exclusive": {"const": true},
+        "masking_forbidden": {"const": true},
+        "stacking_old_and_new_forbidden": {"const": true}
+      }
+    },
+    "media_contract": {
+      "type": "object",
+      "required": ["page_level_layouts", "module_level_media", "provenance_required_fields", "empty_slot_behavior"],
+      "properties": {
+        "page_level_layouts": {
+          "type": "array",
+          "allOf": [
+            {"contains": {"const": "one_image"}},
+            {"contains": {"const": "two_image"}},
+            {"contains": {"const": "three_image"}},
+            {"contains": {"const": "four_image"}},
+            {"contains": {"const": "six_image"}},
+            {"contains": {"const": "primary_plus_supporting"}}
+          ]
+        },
+        "module_level_media": {"const": true},
+        "provenance_required_fields": {
+          "const": ["source_id", "source_path", "pdf_page", "semantic_use"]
+        },
+        "empty_slot_behavior": {"const": "remove_or_reflow"}
+      }
+    },
+    "pages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["page_id", "source_slide_index", "page_archetype", "prototype", "semantic_modules", "identity_regions", "ownership_audit"],
+        "properties": {
+          "page_id": {"type": "string", "minLength": 1},
+          "source_slide_index": {"type": "integer", "minimum": 1},
+          "page_archetype": {"type": "string", "minLength": 1},
+          "semantic_modules": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"$ref": "#/$defs/module"}
+          }
+        }
+      }
+    },
+    "acceptance": {
+      "type": "object",
+      "required": ["semantic_compile_passed", "powerpoint_visual_review", "product_accepted"],
+      "properties": {
+        "product_accepted": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "module": {
+      "type": "object",
+      "required": ["module_id", "role", "semantic_region", "box", "render_contract", "ownership_group", "child_slots"],
+      "properties": {
+        "module_id": {"type": "string", "minLength": 1},
+        "child_slots": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/slot"}
+        },
+        "ownership_group": {
+          "type": "object",
+          "required": ["component_ids", "shape_ids", "complete_delete_shape_ids", "removal_policy"],
+          "properties": {
+            "removal_policy": {"const": "remove_complete_ownership_group"}
+          }
+        }
+      }
+    },
+    "slot": {
+      "type": "object",
+      "required": ["slot_id", "role", "content_types", "required", "native_shape_ids", "box"],
+      "properties": {
+        "slot_id": {"type": "string", "minLength": 1},
+        "role": {
+          "enum": ["cover_title", "page_title", "module_heading", "explanation", "image_or_chart", "caption", "icon", "metric"]
+        },
+        "native_shape_ids": {"type": "array", "items": {"type": "integer"}}
+      }
+    }
+  }
+}

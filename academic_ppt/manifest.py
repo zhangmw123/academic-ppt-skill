@@ -59,6 +59,14 @@ class SlideManifestBuilder:
                 page_errors.append(f"density {density_units:g} below 55")
             if layout == "text_figure" and not pictures:
                 page_errors.append("text_figure has no picture asset")
+            if layout == "media_gallery" and len(pictures) < len(page.get("media_items", ())):
+                page_errors.append(
+                    f"media_gallery has {len(pictures)} pictures for {len(page.get('media_items', ()))} slots"
+                )
+            if layout == "module_media" and len(pictures) < len(page.get("modules", ())):
+                page_errors.append(
+                    f"module_media has {len(pictures)} pictures for {len(page.get('modules', ()))} modules"
+                )
             expected_frames = self._expected_editable_frames(page)
             if content_page and len(editable_frames) < expected_frames:
                 page_errors.append(
@@ -114,6 +122,10 @@ class SlideManifestBuilder:
         layout = page.get("layout")
         if layout == "text_figure":
             return 3
+        if layout == "media_gallery":
+            return len(page.get("media_items", ()))
+        if layout == "module_media":
+            return len(page.get("modules", ())) * 2
         if layout == "points":
             return len(page.get("points", ())) * 2
         if layout == "process":

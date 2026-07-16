@@ -5,7 +5,15 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import sys
 from pathlib import Path
+
+
+SKILL_ROOT = Path(__file__).resolve().parents[1]
+if str(SKILL_ROOT) not in sys.path:
+    sys.path.insert(0, str(SKILL_ROOT))
+
+from academic_ppt.object_qa import TemplateIdentityDifferenceGate
 
 
 def distance(first, second):
@@ -30,12 +38,33 @@ def main():
     args = parser.parse_args()
     first = json.loads(Path(args.first).read_text(encoding="utf-8"))
     second = json.loads(Path(args.second).read_text(encoding="utf-8"))
-    value = distance(first, second)
-    result = {
-        "first": first["template_name"], "second": second["template_name"],
-        "identity_distance": value, "minimum": args.minimum, "passed": value >= args.minimum,
-        "first_identity": first["identity"], "second_identity": second["identity"],
-    }
+    if first.get("contract") == second.get("contract") == "standard_template_specification":
+        checked = TemplateIdentityDifferenceGate().compare([first, second])
+        first_id = first["template"]["id"]
+        second_id = second["template"]["id"]
+        first_features = set(first["template_identity"]["identity_features"])
+        second_features = set(second["template_identity"]["identity_features"])
+        union = first_features | second_features
+        similarity = len(first_features & second_features) / max(len(union), 1)
+        value = round(1 - similarity, 3)
+        result = {
+            "contract": "standard_template_identity_difference",
+            "first": first_id,
+            "second": second_id,
+            "identity_distance": value,
+            "minimum": args.minimum,
+            "signatures": checked.signatures,
+            "errors": list(checked.errors),
+            "passed": checked.passed and value >= args.minimum,
+            "product_accepted": False,
+        }
+    else:
+        value = distance(first, second)
+        result = {
+            "first": first["template_name"], "second": second["template_name"],
+            "identity_distance": value, "minimum": args.minimum, "passed": value >= args.minimum,
+            "first_identity": first["identity"], "second_identity": second["identity"],
+        }
     print(json.dumps(result, ensure_ascii=False, indent=2))
     if args.output:
         target = Path(args.output)
