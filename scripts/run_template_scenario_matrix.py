@@ -8,6 +8,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from export_preview import list_slide_images
+
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 
@@ -70,7 +72,7 @@ def main() -> None:
         if completed.returncode == 0:
             result = json.loads((destination / "audit" / "complete_build_result.json").read_text(encoding="utf-8"))
             render = json.loads((destination / "audit" / "delivery_qa" / "render_report.json").read_text(encoding="utf-8"))
-            preview_count = len(list((destination / "deliverables" / "preview").glob("slide-*.png")))
+            preview_count = len(list_slide_images(destination / "deliverables" / "preview"))
             case.update({
                 "selected_template_id": result["template"]["id"],
                 "render_failed_error": render["failed_error"],

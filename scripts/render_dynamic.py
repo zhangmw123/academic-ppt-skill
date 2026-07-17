@@ -371,7 +371,11 @@ def add_template_scaffold(slide, scaffold, base_dir=None, *, mode="full", allow_
             if all(abs(float(slot.get("box", {}).get(name, 0)) - float(box.get(name, 0))) < 0.002
                    for name in ("left", "top", "width", "height"))
         ), None)
-        asset_role = (matching_slot or {}).get("role")
+        asset_role = asset.get("role") or (matching_slot or {}).get("role")
+        if asset_role == "navigation":
+            # Navigation is rebuilt as one protected stateful component below.
+            # Retaining a source page's active backing would show two active states.
+            continue
         if mode == "identity":
             touches_edge = (
                 float(box.get("top", 1)) < 0.12

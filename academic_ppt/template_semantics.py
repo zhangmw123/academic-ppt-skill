@@ -453,7 +453,7 @@ class StandardTemplateCompiler:
                 values.update(int(shape_id) for shape_id in item.get("shape_ids", ()))
         for item in archetype.get("picture_slots", ()):
             box = item.get("box", {})
-            if item.get("role") == "logo" or (
+            if item.get("role") in {"logo", "navigation"} or (
                 item.get("role") == "decoration"
                 and (box.get("top", 0) < 0.14 or box.get("top", 0) + box.get("height", 0) > 0.96)
             ):
@@ -761,6 +761,8 @@ class StandardTemplateCompiler:
         for component in components:
             shape_ids = [int(value) for value in component.get("shape_ids", ())]
             if component.get("component_role") == "navigation":
+                role = "navigation"
+            elif any(picture_roles.get(shape_id) == "navigation" for shape_id in shape_ids):
                 role = "navigation"
             elif any(picture_roles.get(shape_id) == "logo" for shape_id in shape_ids):
                 role = "logo"

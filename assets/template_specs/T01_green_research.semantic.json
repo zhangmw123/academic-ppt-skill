@@ -2461,16 +2461,13 @@
           "ownership_group": {
             "component_ids": [
               "S02_C102",
-              "S02_C105",
-              "S02_C96"
+              "S02_C105"
             ],
             "shape_ids": [
-              96,
               102,
               105
             ],
             "complete_delete_shape_ids": [
-              96,
               102,
               105
             ],
@@ -2505,9 +2502,11 @@
               "S02_C306",
               "S02_C307",
               "S02_C354",
-              "S02_C355"
+              "S02_C355",
+              "S02_C96"
             ],
             "shape_ids": [
+              96,
               106,
               107,
               166,
@@ -2522,6 +2521,7 @@
               355
             ],
             "complete_delete_shape_ids": [
+              96,
               106,
               107,
               166,
@@ -3209,16 +3209,13 @@
           "ownership_group": {
             "component_ids": [
               "S03_C125",
-              "S03_C129",
-              "S03_C3"
+              "S03_C129"
             ],
             "shape_ids": [
-              3,
               125,
               129
             ],
             "complete_delete_shape_ids": [
-              3,
               125,
               129
             ],
@@ -3252,10 +3249,12 @@
               "S03_C21",
               "S03_C22",
               "S03_C23",
+              "S03_C3",
               "S03_C4",
               "S03_C5"
             ],
             "shape_ids": [
+              3,
               4,
               5,
               10,
@@ -3270,6 +3269,7 @@
               23
             ],
             "complete_delete_shape_ids": [
+              3,
               4,
               5,
               10,
@@ -4314,17 +4314,14 @@
           "preserve_for_template_identity": true,
           "ownership_group": {
             "component_ids": [
-              "S04_C155",
               "S04_C160",
               "S04_C165"
             ],
             "shape_ids": [
-              155,
               160,
               165
             ],
             "complete_delete_shape_ids": [
-              155,
               160,
               165
             ],
@@ -4350,6 +4347,7 @@
             "component_ids": [
               "S04_C14",
               "S04_C15",
+              "S04_C155",
               "S04_C166",
               "S04_C167",
               "S04_C20",
@@ -4372,6 +4370,7 @@
               25,
               26,
               27,
+              155,
               166,
               167
             ],
@@ -4386,6 +4385,7 @@
               25,
               26,
               27,
+              155,
               166,
               167
             ],
@@ -5300,34 +5300,6 @@
       ],
       "identity_regions": [
         {
-          "region_id": "IDENTITY_DECORATION",
-          "role": "decoration",
-          "preserve_for_template_identity": true,
-          "ownership_group": {
-            "component_ids": [
-              "S05_C252"
-            ],
-            "shape_ids": [
-              252
-            ],
-            "complete_delete_shape_ids": [
-              252
-            ],
-            "removal_policy": "remove_complete_ownership_group",
-            "remove_companions": [
-              "frame",
-              "heading",
-              "explanation",
-              "image",
-              "chart",
-              "icon",
-              "caption",
-              "connector",
-              "placeholder"
-            ]
-          }
-        },
-        {
           "region_id": "IDENTITY_LOGO",
           "role": "logo",
           "preserve_for_template_identity": true,
@@ -5373,6 +5345,7 @@
               "S05_C21",
               "S05_C22",
               "S05_C23",
+              "S05_C252",
               "S05_C264",
               "S05_C265",
               "S05_C3"
@@ -5388,6 +5361,7 @@
               23,
               166,
               167,
+              252,
               264,
               265
             ],
@@ -5402,6 +5376,7 @@
               23,
               166,
               167,
+              252,
               264,
               265
             ],
@@ -6457,34 +6432,6 @@
       ],
       "identity_regions": [
         {
-          "region_id": "IDENTITY_DECORATION",
-          "role": "decoration",
-          "preserve_for_template_identity": true,
-          "ownership_group": {
-            "component_ids": [
-              "S06_C214"
-            ],
-            "shape_ids": [
-              214
-            ],
-            "complete_delete_shape_ids": [
-              214
-            ],
-            "removal_policy": "remove_complete_ownership_group",
-            "remove_companions": [
-              "frame",
-              "heading",
-              "explanation",
-              "image",
-              "chart",
-              "icon",
-              "caption",
-              "connector",
-              "placeholder"
-            ]
-          }
-        },
-        {
           "region_id": "IDENTITY_LOGO",
           "role": "logo",
           "preserve_for_template_identity": true,
@@ -6525,6 +6472,7 @@
               "S06_C11",
               "S06_C166",
               "S06_C167",
+              "S06_C214",
               "S06_C224",
               "S06_C225",
               "S06_C3",
@@ -6545,6 +6493,7 @@
               11,
               166,
               167,
+              214,
               224,
               225
             ],
@@ -6559,6 +6508,7 @@
               11,
               166,
               167,
+              214,
               224,
               225
             ],
@@ -7391,34 +7341,6 @@
       ],
       "identity_regions": [
         {
-          "region_id": "IDENTITY_DECORATION",
-          "role": "decoration",
-          "preserve_for_template_identity": true,
-          "ownership_group": {
-            "component_ids": [
-              "S07_C295"
-            ],
-            "shape_ids": [
-              295
-            ],
-            "complete_delete_shape_ids": [
-              295
-            ],
-            "removal_policy": "remove_complete_ownership_group",
-            "remove_companions": [
-              "frame",
-              "heading",
-              "explanation",
-              "image",
-              "chart",
-              "icon",
-              "caption",
-              "connector",
-              "placeholder"
-            ]
-          }
-        },
-        {
           "region_id": "IDENTITY_LOGO",
           "role": "logo",
           "preserve_for_template_identity": true,
@@ -7463,6 +7385,7 @@
               "S07_C19",
               "S07_C22",
               "S07_C23",
+              "S07_C295",
               "S07_C3",
               "S07_C306",
               "S07_C307",
@@ -7479,6 +7402,7 @@
               19,
               22,
               23,
+              295,
               306,
               307
             ],
@@ -7493,6 +7417,7 @@
               19,
               22,
               23,
+              295,
               306,
               307
             ],
@@ -7854,34 +7779,6 @@
       ],
       "identity_regions": [
         {
-          "region_id": "IDENTITY_DECORATION",
-          "role": "decoration",
-          "preserve_for_template_identity": true,
-          "ownership_group": {
-            "component_ids": [
-              "S08_C295"
-            ],
-            "shape_ids": [
-              295
-            ],
-            "complete_delete_shape_ids": [
-              295
-            ],
-            "removal_policy": "remove_complete_ownership_group",
-            "remove_companions": [
-              "frame",
-              "heading",
-              "explanation",
-              "image",
-              "chart",
-              "icon",
-              "caption",
-              "connector",
-              "placeholder"
-            ]
-          }
-        },
-        {
           "region_id": "IDENTITY_LOGO",
           "role": "logo",
           "preserve_for_template_identity": true,
@@ -7926,6 +7823,7 @@
               "S08_C19",
               "S08_C22",
               "S08_C23",
+              "S08_C295",
               "S08_C3",
               "S08_C306",
               "S08_C307",
@@ -7942,6 +7840,7 @@
               19,
               22,
               23,
+              295,
               306,
               307
             ],
@@ -7956,6 +7855,7 @@
               19,
               22,
               23,
+              295,
               306,
               307
             ],
@@ -8273,62 +8173,19 @@
       ],
       "identity_regions": [
         {
-          "region_id": "IDENTITY_DECORATION",
-          "role": "decoration",
-          "preserve_for_template_identity": true,
-          "ownership_group": {
-            "component_ids": [
-              "S09_C347",
-              "S09_C348",
-              "S09_C349"
-            ],
-            "shape_ids": [
-              347,
-              348,
-              349
-            ],
-            "complete_delete_shape_ids": [
-              347,
-              348,
-              349
-            ],
-            "removal_policy": "remove_complete_ownership_group",
-            "remove_companions": [
-              "frame",
-              "heading",
-              "explanation",
-              "image",
-              "chart",
-              "icon",
-              "caption",
-              "connector",
-              "placeholder"
-            ]
-          }
-        },
-        {
           "region_id": "IDENTITY_LOGO",
           "role": "logo",
           "preserve_for_template_identity": true,
           "ownership_group": {
             "component_ids": [
-              "S09_C345",
-              "S09_C346",
-              "S09_C350",
               "S09_C351",
               "S09_C353"
             ],
             "shape_ids": [
-              345,
-              346,
-              350,
               351,
               353
             ],
             "complete_delete_shape_ids": [
-              345,
-              346,
-              350,
               351,
               353
             ],
@@ -8352,14 +8209,32 @@
           "preserve_for_template_identity": true,
           "ownership_group": {
             "component_ids": [
+              "S09_C345",
+              "S09_C346",
+              "S09_C347",
+              "S09_C348",
+              "S09_C349",
+              "S09_C350",
               "S09_C354",
               "S09_C355"
             ],
             "shape_ids": [
+              345,
+              346,
+              347,
+              348,
+              349,
+              350,
               354,
               355
             ],
             "complete_delete_shape_ids": [
+              345,
+              346,
+              347,
+              348,
+              349,
+              350,
               354,
               355
             ],
@@ -8619,7 +8494,7 @@
   ],
   "acceptance": {
     "semantic_compile_passed": true,
-    "powerpoint_visual_review": "pending",
+    "powerpoint_visual_review": "passed",
     "product_accepted": false,
     "release_blocker": "T01-T08 and formal PowerPoint review must all pass",
     "semantic_compile_errors": []

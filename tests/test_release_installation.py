@@ -61,6 +61,8 @@ class InstalledSkillReleaseTests(unittest.TestCase):
                     "scripts/extract_figures.py",
                     "scripts/extract_template_grammar.py",
                     "scripts/compile_bundled_source_templates.py",
+                    "scripts/check_powerpoint_runtime.py",
+                    "scripts/repair_rendered_navigation.py",
                     "scripts/validate_template_spec.py",
                     "scripts/render_scientific_visuals.py",
                     "scripts/validate_visual_tasks.py",

@@ -4,9 +4,9 @@
 
 | 编号 | 短名称 | 主要场景 | 标准 PowerPoint 资产 | 当前标准化状态 |
 |---|---|---|---|---|
-| `T01` | 绿色科研 | 组会、开题、学术报告 | `T01_green_research.pptx` | 语义编译通过，PowerPoint 视觉验收待完成 |
+| `T01` | 绿色科研 | 组会、开题、学术报告 | `T01_green_research.pptx` | 语义编译、真实内容对象级 QA 与 PowerPoint 逐页视觉验收通过 |
 | `T02` | 蓝色科研 | 毕业答辩、课题进展、学术报告 | `T02_blue_research.pptx` | 待语义编译，不得作为已验收模板发布 |
-| `T03` | 蓝色答辩 | 开题、中期、毕业答辩 | `T03_blue_defense.pptx` | 语义编译通过，PowerPoint 视觉验收待完成 |
+| `T03` | 蓝色答辩 | 开题、中期、毕业答辩 | `T03_blue_defense.pptx` | 语义编译、真实内容对象级 QA 与 PowerPoint 逐页视觉验收通过 |
 | `T04` | 项目申报 | 项目申报、比赛、中期与结题 | `T04_project_application.pptx` | 待语义编译，不得作为已验收模板发布 |
 | `T05` | 红色通用 | 开题、中期、科研比赛 | `T05_red_general.pptx` | 待语义编译，不得作为已验收模板发布 |
 | `T06` | 云大紫色 | 云南大学开题、中期、毕业答辩 | `T06_yunnan_purple.pptx` | 待语义编译，不得作为已验收模板发布 |

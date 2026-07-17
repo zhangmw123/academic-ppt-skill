@@ -32,7 +32,7 @@ def _page(specification: dict, page_id: str) -> dict:
     return next(page for page in specification["pages"] if page["page_id"] == page_id)
 
 
-def test_t01_t03_standard_specs_validate_and_remain_non_release_artifacts():
+def test_t01_t03_standard_specs_record_powerpoint_review_without_claiming_release():
     validator = StandardTemplateSpecValidator()
 
     for template_id, path in SPEC_PATHS.items():
@@ -43,7 +43,7 @@ def test_t01_t03_standard_specs_validate_and_remain_non_release_artifacts():
         assert specification["template"]["id"] == template_id
         assert specification["acceptance"]["semantic_compile_passed"]
         assert specification["acceptance"]["product_accepted"] is False
-        assert specification["acceptance"]["powerpoint_visual_review"] == "pending"
+        assert specification["acceptance"]["powerpoint_visual_review"] == "passed"
         assert path.is_file()
 
 
@@ -362,7 +362,7 @@ def test_catalog_discloses_semantic_compile_status_without_claiming_all_template
     t02 = catalog.select("学术会议报告", "T02")
 
     assert Path(t01.semantic_spec_path).is_file()
-    assert t01.standardization_status == "semantic_compiled_pending_powerpoint_review"
+    assert t01.standardization_status == "semantic_compiled_powerpoint_review_passed"
     assert t02.semantic_spec_path is None
     assert t02.standardization_status == "pending_semantic_compilation"
 

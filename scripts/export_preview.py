@@ -13,6 +13,7 @@ import time
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
+from pptx import Presentation
 
 
 def find_powerpoint() -> bool:
@@ -125,6 +126,17 @@ def natural_key(path: Path):
     return [int(part) if part.isdigit() else part.lower() for part in re.split(r"(\d+)", path.name)]
 
 
+def list_slide_images(output_dir: Path) -> list[Path]:
+    """Return exported slide PNGs regardless of PowerPoint UI language."""
+    images = {
+        path.resolve()
+        for pattern in ("*.PNG", "*.png")
+        for path in output_dir.glob(pattern)
+        if path.name.casefold() != "contact-sheet.png"
+    }
+    return sorted(images, key=natural_key)
+
+
 def build_contact_sheet(images: list[Path], output: Path, columns: int = 3) -> None:
     if not images:
         raise RuntimeError("No slide images were exported")
@@ -188,7 +200,12 @@ def export_preview(pptx: Path, output_dir: Path, engine: str, width: int, height
         else:
             export_with_libreoffice(pptx, output_dir, width, height)
 
-    images = sorted({path.resolve() for path in [*output_dir.glob("*.PNG"), *output_dir.glob("*.png")]}, key=natural_key)
+    images = list_slide_images(output_dir)
+    expected_count = len(Presentation(pptx).slides)
+    if len(images) != expected_count:
+        raise RuntimeError(
+            f"Preview export is incomplete: expected {expected_count} slide images; rendered {len(images)}"
+        )
     contact_sheet = output_dir / "contact-sheet.jpg"
     build_contact_sheet(images, contact_sheet)
     print(f"Exported {len(images)} slides with {selected}")

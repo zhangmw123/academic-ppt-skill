@@ -7,7 +7,7 @@
   ],
   "semantic_compile_passed": true,
   "render_check_requested": true,
-  "render_check_passed": false,
+  "render_check_passed": true,
   "templates": [
     {
       "template_id": "T01",
@@ -65,9 +65,9 @@
       "object_qa_observations": [
         "No render manifest supplied; empty media, replacement fonts, source provenance, and sample residue are checked only after binding."
       ],
-      "powerpoint_visual_review": "failed",
-      "powerpoint_preview_count": 0,
-      "powerpoint_error": "PowerPoint image-render path failed with 0x80070570: file or directory is corrupted and unreadable (BadImageFormatException).",
+      "powerpoint_visual_review": "passed",
+      "powerpoint_preview_count": 10,
+      "powerpoint_error": null,
       "product_accepted": false
     },
     {
@@ -132,9 +132,9 @@
       "object_qa_observations": [
         "No render manifest supplied; empty media, replacement fonts, source provenance, and sample residue are checked only after binding."
       ],
-      "powerpoint_visual_review": "failed",
-      "powerpoint_preview_count": 0,
-      "powerpoint_error": "PowerPoint image-render path failed with 0x80070570: file or directory is corrupted and unreadable (BadImageFormatException).",
+      "powerpoint_visual_review": "passed",
+      "powerpoint_preview_count": 11,
+      "powerpoint_error": null,
       "product_accepted": false
     }
   ],

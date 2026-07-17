@@ -18,7 +18,7 @@ from academic_ppt.template_semantics import (
     load_semantic_prototypes,
 )
 from apply_template_palette import transform
-from export_preview import export_preview
+from export_preview import export_preview, list_slide_images
 from extract_template_grammar import extract as extract_template_grammar
 
 
@@ -65,6 +65,14 @@ def compile_template(
     if not semantic_path_value:
         raise ValueError(f"{template_id} has no semantic_spec_path in template-catalog.json")
     semantic_path = (root / semantic_path_value).resolve()
+    prior_powerpoint_review = None
+    if semantic_path.is_file():
+        try:
+            prior_powerpoint_review = json.loads(
+                semantic_path.read_text(encoding="utf-8")
+            ).get("acceptance", {}).get("powerpoint_visual_review")
+        except (OSError, json.JSONDecodeError):
+            prior_powerpoint_review = None
     if repackage:
         if entry.get("source_fidelity") != "complete_structure_recompile":
             raise ValueError(f"{template_id} cannot be repackaged as complete source structure")
@@ -90,26 +98,34 @@ def compile_template(
     validation = StandardTemplateSpecValidator().validate(specification)
     if not validation.passed:
         raise ValueError("; ".join(validation.errors))
+    if not render_check and prior_powerpoint_review in {"passed", "failed"}:
+        specification["acceptance"]["powerpoint_visual_review"] = prior_powerpoint_review
     semantic_path.parent.mkdir(parents=True, exist_ok=True)
     semantic_path.write_text(json.dumps(specification, ensure_ascii=False, indent=2), encoding="utf-8")
     object_qa = ObjectLevelQualityGate().inspect(standard, specification)
     if not object_qa.passed:
         raise ValueError("object-level template QA failed: " + "; ".join(object_qa.errors))
 
-    render_status = "not_run"
+    render_status = (
+        prior_powerpoint_review
+        if not render_check and prior_powerpoint_review in {"passed", "failed"}
+        else "not_run"
+    )
     render_error = None
     preview_count = 0
     if render_check:
         try:
             preview_dir = template_work / "powerpoint_preview"
             export_preview(standard, preview_dir, "powerpoint", 1600, 900)
-            preview_count = len(list(preview_dir.glob("slide-*.png")))
+            preview_count = len(list_slide_images(preview_dir))
             render_status = "passed" if preview_count == len(specification["pages"]) else "failed"
             if render_status == "failed":
                 render_error = f"expected {len(specification['pages'])} slides; rendered {preview_count}"
         except Exception as exc:
             render_status = "failed"
             render_error = _summarize_runtime_error(exc)
+        specification["acceptance"]["powerpoint_visual_review"] = render_status
+        semantic_path.write_text(json.dumps(specification, ensure_ascii=False, indent=2), encoding="utf-8")
 
     media_archetypes = [
         {

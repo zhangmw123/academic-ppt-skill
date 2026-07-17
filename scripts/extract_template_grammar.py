@@ -252,6 +252,10 @@ def extract(template: Path, output: Path, asset_dir: Path):
         navigation = "top"
     else:
         navigation = "minimal"
+    navigation_reference_boxes = [
+        norm_box(shape, width, height)
+        for shape in (top_nav if navigation == "top" else side_nav if navigation == "sidebar" else ())
+    ]
 
     navigation_shape_ids_by_slide = defaultdict(set)
     for text, entries in repeated:
@@ -296,6 +300,37 @@ def extract(template: Path, output: Path, asset_dir: Path):
             box = norm_box(shape, width, height)
             area = box["width"] * box["height"]
             digest = hashlib.sha256(shape.image.blob).hexdigest()
+            is_navigation = shape.shape_id in navigation_shape_ids_by_slide[record["slide_index"] - 1]
+            if not is_navigation and record["role"] not in {"cover", "ending"}:
+                in_navigation_band = (
+                    navigation == "top"
+                    and box["top"] < 0.16
+                    and box["width"] < 0.26
+                    and box["height"] < 0.16
+                ) or (
+                    navigation == "sidebar"
+                    and box["left"] < 0.27
+                    and box["width"] < 0.3
+                    and box["height"] < 0.25
+                )
+                if in_navigation_band:
+                    for nav_box in navigation_reference_boxes:
+                        horizontal_overlap = max(
+                            0.0,
+                            min(box["left"] + box["width"], nav_box["left"] + nav_box["width"])
+                            - max(box["left"], nav_box["left"]),
+                        )
+                        vertical_overlap = max(
+                            0.0,
+                            min(box["top"] + box["height"], nav_box["top"] + nav_box["height"])
+                            - max(box["top"], nav_box["top"]),
+                        )
+                        if (
+                            horizontal_overlap >= min(box["width"], nav_box["width"]) * 0.7
+                            and vertical_overlap >= min(box["height"], nav_box["height"]) * 0.4
+                        ):
+                            is_navigation = True
+                            break
             decorative = (
                 picture_digests[digest] >= 2
                 or area >= 0.42
@@ -303,11 +338,21 @@ def extract(template: Path, output: Path, asset_dir: Path):
                 or (box["left"] < 0.035 and area < 0.22)
                 or (box["top"] + box["height"] > 0.93 and area < 0.18)
             )
-            logo_candidate = area <= 0.045 and box["top"] <= 0.2 and (box["left"] <= 0.2 or box["left"] + box["width"] >= 0.8)
+            logo_candidate = (
+                not is_navigation
+                and area <= 0.045
+                and box["top"] <= 0.2
+                and (box["left"] <= 0.2 or box["left"] + box["width"] >= 0.8)
+            )
+            asset_role = (
+                "navigation"
+                if is_navigation
+                else ("logo" if logo_candidate else ("decoration" if decorative else "content_image"))
+            )
             picture_slots.append({
                 "shape_id": shape.shape_id,
                 "name": shape.name,
-                "role": "logo" if logo_candidate else ("decoration" if decorative else "content_image"),
+                "role": asset_role,
                 "box": box,
                 "area": round(area, 4),
                 "replaceable": not decorative or logo_candidate,
@@ -327,7 +372,15 @@ def extract(template: Path, output: Path, asset_dir: Path):
                 stored_path = str(target.resolve().relative_to(output.parent.resolve()))
             except ValueError:
                 stored_path = str(target.resolve())
-            assets.append({"path": stored_path, "box": box, "digest": digest, "area": round(area, 4)})
+            assets.append({
+                "shape_id": shape.shape_id,
+                "name": shape.name,
+                "role": asset_role,
+                "path": stored_path,
+                "box": box,
+                "digest": digest,
+                "area": round(area, 4),
+            })
         for slot in picture_slots:
             inner = slot["box"]
             containers = []
@@ -410,6 +463,20 @@ def extract(template: Path, output: Path, asset_dir: Path):
             )
             if parent:
                 parent["child_component_ids"].append(item["component_id"])
+        nav_components = [item for item in components if item["component_role"] == "navigation"]
+        navigation_backing_ids = {
+            int(item["nested_within_shape_id"])
+            for item in nav_components
+            if item.get("nested_within_shape_id") is not None
+        }
+        for slot in picture_slots:
+            if int(slot["shape_id"]) in navigation_backing_ids:
+                slot["role"] = "navigation"
+                slot["replaceable"] = False
+                slot["logo_candidate"] = False
+        for asset in assets:
+            if int(asset["shape_id"]) in navigation_backing_ids:
+                asset["role"] = "navigation"
         signature, column_count = infer_layout_signature(
             record["role"], record["text_shapes"], record["pictures"], width, height
         )
@@ -429,7 +496,6 @@ def extract(template: Path, output: Path, asset_dir: Path):
             "decorative_assets": assets,
         })
 
-        nav_components = [item for item in components if item["component_role"] == "navigation"]
         if nav_components:
             members = []
             for item in sorted(nav_components, key=lambda value: (value["box"]["top"], value["box"]["left"])):

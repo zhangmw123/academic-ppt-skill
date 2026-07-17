@@ -441,6 +441,7 @@ Install `requirements.txt`. PowerPoint on Windows is the preferred render check;
 LibreOffice plus `pdftoppm` is the cross-platform fallback. If neither is
 available, do not claim visual QA passed.
 
+After a PowerPoint COM failure or Office repair, require three alternating rounds of the generated one-slide control and a known-good complete candidate, exact PNG counts, and a return to the starting PowerPoint process count: `python scripts/check_powerpoint_runtime.py "<known-good-candidate.pptx>" --rounds 3 --output-root "<empty-control-dir>" --report "<runtime-control-report.json>"`.
 When templates change, run:
 
 ```powershell

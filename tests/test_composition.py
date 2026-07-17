@@ -355,6 +355,8 @@ def test_image_scaffold_reconstruction_has_no_nested_old_and_new_frames(tmp_path
     Image.new("RGB", (1280, 720), "red").save(old_frame)
     identity_strip = tmp_path / "identity-strip.png"
     Image.new("RGB", (1280, 32), "green").save(identity_strip)
+    old_navigation_state = tmp_path / "old-navigation-state.png"
+    Image.new("RGB", (240, 70), "darkgreen").save(old_navigation_state)
     grammar_path = tmp_path / "grammar.json"
     grammar_path.write_text(json.dumps({
         "identity": {"panel_mode": "image_scaffold", "navigation": "top"},
@@ -382,6 +384,13 @@ def test_image_scaffold_reconstruction_has_no_nested_old_and_new_frames(tmp_path
                     "path": str(identity_strip),
                     "area": 0.02,
                     "box": {"left": 0.05, "top": 0.03, "width": 0.9, "height": 0.025},
+                },
+                {
+                    "shape_id": 7,
+                    "role": "navigation",
+                    "path": str(old_navigation_state),
+                    "area": 0.009,
+                    "box": {"left": 0.3, "top": 0.05, "width": 0.12, "height": 0.075},
                 },
             ],
         }],
@@ -434,7 +443,9 @@ def test_image_scaffold_reconstruction_has_no_nested_old_and_new_frames(tmp_path
 
     slide = Presentation(output).slides[0]
     pictures = [shape for shape in slide.shapes if shape.shape_type == MSO_SHAPE_TYPE.PICTURE]
-    assert len(pictures) == 2  # Evidence image plus the small identity strip; old content raster is excluded.
+    # Keep the evidence and identity strip; exclude both the old content raster and
+    # the source page's active navigation backing.
+    assert len(pictures) == 2
     frames = [
         shape for shape in slide.shapes
         if shape.shape_type == MSO_SHAPE_TYPE.AUTO_SHAPE

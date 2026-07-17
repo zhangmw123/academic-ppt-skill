@@ -2,7 +2,7 @@
 
 This context defines how source evidence, presentation arguments, template identity, and slide composition interact when producing research presentations.
 
-## Development Handoff (2026-07-16)
+## Development Handoff (2026-07-17)
 
 - The product remains an installable, self-contained Skill. It is not released and must not be described as complete.
 - The standard semantic template compiler now models page -> semantic module -> child slot, including capacity, typography, media scope, ownership, complete removal, and template identity.
@@ -11,9 +11,11 @@ This context defines how source evidence, presentation arguments, template ident
 - Rendered object-binding manifests and object-level QA cover duplicate objects, cross-module overlap, orphan components, empty media slots, template residue, font bounds, identity, provenance, and exclusive render modes.
 - The complete automated suite passes with `82 passed`.
 - Real-content regression candidates are retained under `real_product_outputs/test_file_lab_share_v9` and `real_product_outputs/liujinping_defense_v9`; v7 and v8 remain preserved as requested. Their curated PPTX files each pass 16/16 static, semantic, and object checks.
-- Windows PowerPoint successfully exported the v9 candidates once (10 and 18 slides), and those preview directories remain available. Later in the same session, PowerPoint COM regressed and returned `0x80070570` even for the previously successful candidate and minimal image decks. Therefore formal PowerPoint acceptance remains blocked by an unstable local runtime; do not report it as continuously passing.
-- The tracked compilation report intentionally records the current PowerPoint failure. T02, T04, T05, T06, T07, and T08 still require full semantic compilation and real-content regression. All eight templates remain mandatory for release.
-- Next work should first re-establish a repeatable PowerPoint image-render control, rerun T01/T03 formal review, and only then continue with T02 followed by T04-T08. Do not rebuild the deleted V2 project or delegate core work to another PPT Skill.
+- PowerPoint COM control now alternates a generated colored one-slide image deck with the T01 v9 candidate for three rounds. All 6/6 exports passed at 1600 x 900, every slide count matched, and the PowerPoint process count returned from 0 to 0 after every run.
+- T01 and T03 standard-template render checks pass with 10/10 and 11/11 PowerPoint previews. Their curated real-content candidates each pass 17/17 static, semantic, object, and real-render checks; full-resolution human review passes 10/10 and 18/18 slides.
+- Human review found and fixed inherited T01 navigation backing images that automated object QA had missed. Template grammar now marks source navigation pictures explicitly, reconstruction excludes them, and a localized curated-baseline repair removed only those eight pictures; all pixels below the navigation band remained unchanged.
+- T02, T04, T05, T06, T07, and T08 still require full semantic compilation, real-content regression, object QA, and PowerPoint review. All eight templates remain mandatory for release, so the product is not released and `product_accepted` remains false.
+- Next work should begin T02 complete-structure semantic compilation and real-content regression, then continue T04-T08. Do not rebuild the deleted V2 project or delegate core work to another PPT Skill.
 
 ## Language
 

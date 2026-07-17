@@ -1273,7 +1273,6 @@
               "S02_C120",
               "S02_C121",
               "S02_C123",
-              "S02_C124",
               "S02_C125",
               "S02_C126",
               "S02_C127",
@@ -1288,7 +1287,6 @@
               120,
               121,
               123,
-              124,
               125,
               126,
               127,
@@ -1303,7 +1301,6 @@
               120,
               121,
               123,
-              124,
               125,
               126,
               127,
@@ -1424,34 +1421,6 @@
       ],
       "identity_regions": [
         {
-          "region_id": "IDENTITY_DECORATION",
-          "role": "decoration",
-          "preserve_for_template_identity": true,
-          "ownership_group": {
-            "component_ids": [
-              "S02_C110"
-            ],
-            "shape_ids": [
-              110
-            ],
-            "complete_delete_shape_ids": [
-              110
-            ],
-            "removal_policy": "remove_complete_ownership_group",
-            "remove_companions": [
-              "frame",
-              "heading",
-              "explanation",
-              "image",
-              "chart",
-              "icon",
-              "caption",
-              "connector",
-              "placeholder"
-            ]
-          }
-        },
-        {
           "region_id": "IDENTITY_FOOTER_OR_NAVIGATION_LABEL",
           "role": "footer_or_navigation_label",
           "preserve_for_template_identity": true,
@@ -1515,12 +1484,43 @@
               "placeholder"
             ]
           }
+        },
+        {
+          "region_id": "IDENTITY_NAVIGATION",
+          "role": "navigation",
+          "preserve_for_template_identity": true,
+          "ownership_group": {
+            "component_ids": [
+              "S02_C110",
+              "S02_C124"
+            ],
+            "shape_ids": [
+              110,
+              124
+            ],
+            "complete_delete_shape_ids": [
+              110,
+              124
+            ],
+            "removal_policy": "remove_complete_ownership_group",
+            "remove_companions": [
+              "frame",
+              "heading",
+              "explanation",
+              "image",
+              "chart",
+              "icon",
+              "caption",
+              "connector",
+              "placeholder"
+            ]
+          }
         }
       ],
       "ownership_audit": {
         "component_count": 20,
-        "semantic_owned_component_count": 14,
-        "identity_owned_component_count": 6,
+        "semantic_owned_component_count": 13,
+        "identity_owned_component_count": 7,
         "unowned_component_ids": [],
         "duplicate_component_ids": []
       }
@@ -8071,7 +8071,7 @@
   ],
   "acceptance": {
     "semantic_compile_passed": true,
-    "powerpoint_visual_review": "pending",
+    "powerpoint_visual_review": "passed",
     "product_accepted": false,
     "release_blocker": "T01-T08 and formal PowerPoint review must all pass",
     "semantic_compile_errors": []
