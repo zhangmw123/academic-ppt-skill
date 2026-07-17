@@ -114,6 +114,110 @@
         }
       }
     },
+    "T02": {
+      "identity_features": [
+        "six-segment blue top navigation with a dark active rounded tab",
+        "navy vertical rule before each claim-led page title",
+        "white research canvas with pale-blue image-backed panel scaffolds",
+        "deep-blue cover and ending fields separated by a thin gold rule",
+        "compact dashed institution-logo placeholder at the upper right"
+      ],
+      "pages": {
+        "1": {
+          "page_role": "cover",
+          "page_archetype": "blue_research_cover",
+          "relationship": "identity_and_formal_research_context",
+          "expected_module_count": 1,
+          "media_scope": "none",
+          "default_module_role": "cover_identity",
+          "recommended_argument_units": ["title", "subtitle", "presenter", "advisor", "discipline", "date"]
+        },
+        "2": {
+          "page_role": "content",
+          "page_archetype": "single_summary_with_large_system_figure",
+          "relationship": "research_summary_and_system_overview",
+          "expected_module_count": 1,
+          "media_scope": "page",
+          "page_media_count": 1,
+          "page_media_native_reuse": false,
+          "media_layout": "one_image",
+          "default_module_role": "research_overview",
+          "recommended_argument_units": ["research_question", "scope", "system_or_method_figure", "core_judgment"]
+        },
+        "3": {
+          "page_role": "content",
+          "page_archetype": "two_way_problem_deployment_comparison",
+          "relationship": "limitation_and_deployable_alternative",
+          "expected_module_count": 2,
+          "media_scope": "module",
+          "module_media_supported": true,
+          "module_roles": ["current_limitations", "proposed_advantages"],
+          "recommended_argument_units": ["comparison_basis", "limitation", "advantage", "supporting_visual"]
+        },
+        "4": {
+          "page_role": "content",
+          "page_archetype": "three_innovation_pillars",
+          "relationship": "parallel_innovation_contributions",
+          "expected_module_count": 3,
+          "media_scope": "none",
+          "default_module_role": "innovation_pillar",
+          "recommended_argument_units": ["innovation_heading", "mechanism", "technical_gain", "research_value"]
+        },
+        "5": {
+          "page_role": "content",
+          "page_archetype": "four_stage_multi_evidence_pipeline",
+          "relationship": "ordered_research_execution_stages",
+          "expected_module_count": 4,
+          "media_scope": "module",
+          "module_media_supported": true,
+          "default_module_role": "research_stage",
+          "recommended_argument_units": ["stage_heading", "operation", "output", "stage_evidence"]
+        },
+        "6": {
+          "page_role": "content",
+          "page_archetype": "five_module_translational_chain",
+          "relationship": "ordered_mechanism_to_translation_chain",
+          "expected_module_count": 5,
+          "media_scope": "module",
+          "module_media_supported": true,
+          "default_module_role": "translation_stage",
+          "recommended_argument_units": ["stage_heading", "method", "evidence", "transition_or_gate"]
+        },
+        "7": {
+          "page_role": "content",
+          "page_archetype": "six_panel_result_gallery",
+          "relationship": "multi_panel_result_evidence",
+          "expected_module_count": 1,
+          "media_scope": "page",
+          "page_media_count": 6,
+          "page_media_native_reuse": false,
+          "media_layout": "six_image",
+          "default_module_role": "result_evidence_gallery",
+          "recommended_argument_units": ["page_claim", "six_source_bound_visuals", "captions", "cross_panel_interpretation"]
+        },
+        "8": {
+          "page_role": "content",
+          "page_archetype": "full_width_editable_result_table",
+          "relationship": "cohort_comparison_and_statistical_interpretation",
+          "expected_module_count": 1,
+          "media_scope": "page",
+          "page_media_count": 1,
+          "page_media_native_reuse": false,
+          "media_layout": "one_image",
+          "default_module_role": "statistical_result",
+          "recommended_argument_units": ["cohort_definition", "result_table", "key_comparison", "statistical_boundary"]
+        },
+        "9": {
+          "page_role": "ending",
+          "page_archetype": "blue_research_ending",
+          "relationship": "core_judgment_and_close",
+          "expected_module_count": 1,
+          "media_scope": "none",
+          "default_module_role": "ending_summary",
+          "recommended_argument_units": ["core_judgment", "next_action", "acknowledgement", "contact"]
+        }
+      }
+    },
     "T03": {
       "identity_features": [
         "five-segment navy top navigation with a dark active tab",

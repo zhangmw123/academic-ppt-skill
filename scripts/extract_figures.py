@@ -14,11 +14,45 @@ from PIL import Image
 
 
 CAPTION_RE = re.compile(r"^(figure|fig\.|table|图|表)\s*[A-Za-z0-9一二三四五六七八九十.-]+", re.I)
+LABEL_ONLY_RE = re.compile(r"^(?:figure|fig\.|table|图|表)\s*[A-Za-z0-9一二三四五六七八九十.-]+\s*$", re.I)
 
 
-def page_captions(page) -> list[str]:
-    lines = [line.strip() for line in page.get_text("text").splitlines()]
-    return [line for line in lines if CAPTION_RE.match(line)][:8]
+def page_captions(page) -> list[dict]:
+    candidates = []
+    for block in page.get_text("blocks"):
+        x0, y0, x1, y1, text = block[:5]
+        for line in str(text).splitlines():
+            cleaned = line.strip()
+            if CAPTION_RE.match(cleaned):
+                candidates.append({
+                    "text": cleaned,
+                    "bbox": [float(x0), float(y0), float(x1), float(y1)],
+                    "label_only": bool(LABEL_ONLY_RE.match(cleaned)),
+                })
+    return candidates[:16]
+
+
+def select_caption(candidates: list[dict], image_bbox: list[float]) -> str:
+    if not candidates:
+        return ""
+    explicit = [candidate for candidate in candidates if candidate.get("label_only")]
+    pool = explicit or candidates
+    image_left, image_top, image_right, image_bottom = image_bbox
+    image_center = (image_left + image_right) / 2
+
+    def score(candidate: dict) -> tuple[float, float]:
+        left, top, right, bottom = candidate["bbox"]
+        center = (left + right) / 2
+        if top >= image_bottom:
+            vertical = top - image_bottom
+        elif bottom <= image_top:
+            vertical = image_top - bottom + 200
+        else:
+            vertical = 50
+        horizontal = max(0, image_left - right, left - image_right)
+        return vertical + horizontal * 0.5, abs(center - image_center)
+
+    return min(pool, key=score)["text"]
 
 
 def extract(pdf_path: Path, output_dir: Path, min_width: int, min_height: int, max_aspect: float):
@@ -29,7 +63,7 @@ def extract(pdf_path: Path, output_dir: Path, min_width: int, min_height: int, m
 
     for page_index, page in enumerate(document, 1):
         page_area = page.rect.width * page.rect.height
-        captions = page_captions(page)
+        caption_candidates = page_captions(page)
         for info in page.get_image_info(xrefs=True):
             xref = info.get("xref", 0)
             if not xref:
@@ -45,7 +79,8 @@ def extract(pdf_path: Path, output_dir: Path, min_width: int, min_height: int, m
                 "pixel_width": extracted["width"], "pixel_height": extracted["height"],
                 "bbox": [round(v, 2) for v in bbox],
                 "bbox_area_ratio": round((bbox.width * bbox.height) / page_area, 4),
-                "captions_on_page": captions,
+                "captions_on_page": [candidate["text"] for candidate in caption_candidates],
+                "_caption_candidates": caption_candidates,
             })
 
     manifest = []
@@ -64,8 +99,8 @@ def extract(pdf_path: Path, output_dir: Path, min_width: int, min_height: int, m
         if digest_counts[item["digest"]] > 1:
             reasons.append("repeated_asset")
         accepted = not reasons and item["digest"] not in written
-        record = {key: value for key, value in item.items() if key != "data"}
-        caption = item["captions_on_page"][0] if item["captions_on_page"] else ""
+        record = {key: value for key, value in item.items() if key not in {"data", "_caption_candidates"}}
+        caption = select_caption(item["_caption_candidates"], item["bbox"])
         asset_type = "table" if caption.lower().startswith("table") or caption.startswith("表") else "figure"
         record.update({"accepted": accepted, "rejection_reasons": reasons, "path": None})
         if accepted:

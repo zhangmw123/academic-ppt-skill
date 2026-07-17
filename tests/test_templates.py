@@ -46,6 +46,13 @@ class TemplateCapabilityGraphTests(unittest.TestCase):
         self.assertIn("all 10 source slides", green.source_limitations)
         self.assertIn("all 11 source slides", blue_defense.source_limitations)
 
+    def test_formal_bundled_selection_retains_source_fidelity_provenance(self):
+        selection = TemplateCatalog.load().select("学术会议报告", "T02")
+
+        self.assertEqual(selection.support_level, "bundled_formal")
+        self.assertEqual(selection.source_fidelity, "complete_structure_recompile")
+        self.assertIn("all 9 source slides", selection.source_limitations)
+
     def test_accepts_an_existing_unregistered_template_as_conditional(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             template_path = Path(temp_dir) / "custom.pptx"

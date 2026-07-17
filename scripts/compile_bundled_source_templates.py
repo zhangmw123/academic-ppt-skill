@@ -22,7 +22,7 @@ from export_preview import export_preview, list_slide_images
 from extract_template_grammar import extract as extract_template_grammar
 
 
-DEFAULT_TEMPLATE_IDS = ("T01", "T03")
+DEFAULT_TEMPLATE_IDS = ("T01", "T02", "T03")
 
 
 def _summarize_runtime_error(exc: Exception) -> str:
@@ -166,7 +166,7 @@ def main() -> None:
     parser.add_argument(
         "--templates",
         default=",".join(DEFAULT_TEMPLATE_IDS),
-        help="Comma-separated catalog IDs. The current completed prototype batch is T01,T03.",
+        help="Comma-separated catalog IDs. The current completed prototype batch is T01,T02,T03.",
     )
     parser.add_argument(
         "--repackage",

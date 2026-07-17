@@ -208,7 +208,11 @@ class ObjectLevelQualityGate:
                 else native_identity_shape_ids | additional_identity_shape_ids
             )
             self._check_duplicates(slide_number, shapes, identity_shape_ids, categories)
-            module_map = self._module_shape_map(page)
+            # Native template IDs and newly rendered IDs use independent
+            # namespaces after a blank reconstruction. Seed only retained
+            # source slides with native ownership; the manifest fills the
+            # rendered ownership map below.
+            module_map = {} if blank_reconstruction else self._module_shape_map(page)
             regions = {
                 region.get("module_id"): region
                 for region in manifest_page.get("regions", ())

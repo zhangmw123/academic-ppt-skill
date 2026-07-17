@@ -8,7 +8,7 @@ import hashlib
 from dataclasses import dataclass
 from pathlib import Path
 
-from .autobuild import CompleteContentPackage
+from .autobuild import CompleteContentCompiler, CompleteContentPackage
 from .planning import PagePlan, PlannedPage
 
 
@@ -53,14 +53,15 @@ def _headline_detail(value: str, *, fallback: str = "要点") -> dict[str, str]:
         if separator in cleaned:
             headline, detail = (_clean(item) for item in cleaned.split(separator, 1))
             if headline and detail:
-                return {"title": headline[:18], "body": detail}
+                return {"title": CompleteContentCompiler._clip_text(headline, 24), "body": detail}
     for separator in ("，", ","):
         if separator in cleaned:
             headline, detail = (_clean(item) for item in cleaned.split(separator, 1))
             if 2 <= text_units(headline) <= 20 and text_units(detail) >= 6:
-                return {"title": headline[:18], "body": detail}
-    headline = cleaned[:16].rstrip("，,。；; ") or fallback
-    return {"title": headline, "body": cleaned}
+                return {"title": CompleteContentCompiler._clip_text(headline, 24), "body": detail}
+    headline = CompleteContentCompiler._clip_text(cleaned, 28) or fallback
+    detail = cleaned[len(headline):].lstrip(" ，,。；;:：")
+    return {"title": headline, "body": detail or cleaned}
 
 
 def _panel_boxes(archetype: dict) -> list[dict]:
@@ -336,22 +337,25 @@ class DynamicCompositionCompiler:
 
     @staticmethod
     def _text_figure(page: PlannedPage, values: list[str], media: dict) -> dict:
-        body = values[1:]
-        bullet_values = _sentences(*body, page.claim_text, page.interpretation, limit=4)
-        bullets = [_headline_detail(value) for value in bullet_values]
+        summary = _headline_detail(page.claim_text, fallback="核心要点")
+        bullets = []
+        if summary["body"] != _clean(page.claim_text):
+            bullets.append({"title": "证据", "body": summary["body"]})
+        bullet_values = _sentences(*values[2:], page.interpretation, page.next_link, limit=4)
+        bullets.extend(_headline_detail(value) for value in bullet_values)
         while len(bullets) < 3:
-            candidates = (page.claim_text, page.interpretation, page.next_link)
+            candidates = (page.interpretation, page.next_link, page.question_answered)
             candidate = _clean(candidates[len(bullets) % len(candidates)])
             module = _headline_detail(candidate)
-            if candidate and module not in bullets:
+            if candidate and module not in bullets and module["title"] != summary["title"]:
                 bullets.append(module)
             else:
                 break
         return {
             "layout": "text_figure",
             "title": page.title,
-            "lead": _headline_detail(page.claim_text, fallback="核心要点")["title"],
-            "bullets": bullets,
+            "lead": summary["title"],
+            "bullets": bullets[:4],
             "image": media["path"],
             "image_fit": "contain",
             "caption": media["caption"],
@@ -411,7 +415,7 @@ class DynamicCompositionCompiler:
 
     @staticmethod
     def _process(page: PlannedPage, values: list[str]) -> dict:
-        steps = _sentences(*values[1:], page.claim_text, limit=5)
+        steps = _sentences(*values[1:], limit=5)
         if len(steps) < 3:
             steps = _sentences(page.claim_text, page.interpretation, page.next_link, limit=5)
         return {
@@ -457,7 +461,13 @@ class DynamicCompositionCompiler:
 
     @staticmethod
     def _points(page: PlannedPage, values: list[str]) -> dict:
-        bodies = _sentences(*values[1:], page.claim_text, page.interpretation, page.next_link, limit=4)
+        bodies = []
+        for value in (*values[1:], page.interpretation, page.next_link, page.claim_text):
+            cleaned = _clean(value)
+            if text_units(cleaned) >= 6 and cleaned not in bodies:
+                bodies.append(cleaned)
+            if len(bodies) >= 4:
+                break
         while len(bodies) < 4:
             bodies.append((page.claim_text, page.interpretation, page.next_link)[len(bodies) % 3])
         return {
@@ -608,6 +618,16 @@ class CompositionQualityGate:
                 for step in page.get("steps", ())
             ):
                 errors.append(f"{page_id}: every process step requires a specific heading and explanation")
+            elif layout == "process" and any(
+                text_units(_clean(step.get("body", ""))) < 2
+                for step in page.get("steps", ())
+            ):
+                errors.append(f"{page_id}: process explanations cannot be single-word fragments")
+            elif layout == "process" and any(
+                re.search(r"\b(?:a|an|and|of|show|shows|that|the|to|with)$", _clean(step.get("body", "")), flags=re.I)
+                for step in page.get("steps", ())
+            ):
+                errors.append(f"{page_id}: process explanations cannot end with dangling English connectors")
             elif layout == "points" and len(page.get("points", ())) != 4:
                 errors.append(f"{page_id}: points layout requires four editable evidence modules")
             elif layout == "points" and any(

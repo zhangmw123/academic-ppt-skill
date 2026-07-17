@@ -3,6 +3,7 @@
   "contract": "standard_template_semantic_compilation",
   "requested_templates": [
     "T01",
+    "T02",
     "T03"
   ],
   "semantic_compile_passed": true,
@@ -67,6 +68,67 @@
       ],
       "powerpoint_visual_review": "passed",
       "powerpoint_preview_count": 10,
+      "powerpoint_error": null,
+      "product_accepted": false
+    },
+    {
+      "template_id": "T02",
+      "standard_editable_pptx": "assets/powerpoint_templates/T02_blue_research.pptx",
+      "semantic_specification": "assets/template_specs/T02_blue_research.semantic.json",
+      "slide_count": 9,
+      "semantic_module_count": 26,
+      "child_slot_count": 83,
+      "media_archetypes": [
+        {
+          "page_id": "T02_P02",
+          "scope": "page",
+          "kind": "one_image",
+          "slot_count": 1
+        },
+        {
+          "page_id": "T02_P03",
+          "scope": "module",
+          "kind": "one_per_module",
+          "slot_count": 2
+        },
+        {
+          "page_id": "T02_P05",
+          "scope": "module",
+          "kind": "one_per_module",
+          "slot_count": 4
+        },
+        {
+          "page_id": "T02_P06",
+          "scope": "module",
+          "kind": "one_per_module",
+          "slot_count": 5
+        },
+        {
+          "page_id": "T02_P07",
+          "scope": "page",
+          "kind": "six_image",
+          "slot_count": 6
+        },
+        {
+          "page_id": "T02_P08",
+          "scope": "page",
+          "kind": "one_image",
+          "slot_count": 1
+        }
+      ],
+      "identity_signature": "b51b451be953452756003b42de8265dfe31503c321317bba64ec566a0e04ab91",
+      "structure_identity": {
+        "passed": true,
+        "source_fingerprint": "70290d3f24fe6e3c7dec53c17d02aaa7667e96c53e594b48a22f577d491ab9c6",
+        "standard_fingerprint": "70290d3f24fe6e3c7dec53c17d02aaa7667e96c53e594b48a22f577d491ab9c6"
+      },
+      "semantic_compile_passed": true,
+      "object_qa_passed": true,
+      "object_qa_observations": [
+        "No render manifest supplied; empty media, replacement fonts, source provenance, and sample residue are checked only after binding."
+      ],
+      "powerpoint_visual_review": "passed",
+      "powerpoint_preview_count": 9,
       "powerpoint_error": null,
       "product_accepted": false
     },
@@ -140,7 +202,6 @@
   ],
   "failures": [],
   "remaining_templates": [
-    "T02",
     "T04",
     "T05",
     "T06",

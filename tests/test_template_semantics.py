@@ -356,6 +356,87 @@ def test_object_gate_rejects_nested_frames_and_incomplete_native_removal(tmp_pat
     assert any("incomplete native removal" in value for value in result.categories["template_residue"])
 
 
+def test_blank_reconstruction_keeps_native_and_rendered_shape_id_namespaces_separate(tmp_path: Path):
+    presentation = Presentation()
+    slide = presentation.slides.add_slide(presentation.slide_layouts[6])
+    identity_shapes = []
+    for index in range(7):
+        shape = slide.shapes.add_textbox(
+            Inches(0.1 + index * 0.2), Inches(0.1), Inches(0.15), Inches(0.15)
+        )
+        shape.text = f"N{index + 1}"
+        identity_shapes.append(shape)
+    second = slide.shapes.add_textbox(Inches(1), Inches(2), Inches(3), Inches(0.6))
+    second.text = "Rendered module two"
+    first = slide.shapes.add_textbox(Inches(5), Inches(2), Inches(3), Inches(0.6))
+    first.text = "Rendered module one"
+    assert first.shape_id == 10
+    pptx = tmp_path / "blank-id-collision.pptx"
+    presentation.save(pptx)
+
+    def module(module_id: str, native_shape_id: int, rendered_shape_id: int) -> dict:
+        return {
+            "module_id": module_id,
+            "ownership_group": {
+                "shape_ids": [native_shape_id],
+                "complete_delete_shape_ids": [native_shape_id],
+            },
+            "render_contract": {"allowed_modes": ["full_reconstruction"]},
+            "child_slots": [{
+                "slot_id": f"{module_id}_TEXT",
+                "role": "explanation",
+                "required": True,
+                "typography": {"min_pt": 11, "max_pt": 13},
+            }],
+            "rendered_shape_id": rendered_shape_id,
+        }
+
+    first_module = module("T02_P01_M01", 101, first.shape_id)
+    second_module = module("T02_P01_M02", 10, second.shape_id)
+    specification = {
+        "template_identity": {"minimum_preserved_features": 4},
+        "pages": [{
+            "page_id": "T02_P01",
+            "page_role": "content",
+            "semantic_modules": [first_module, second_module],
+            "identity_regions": [],
+        }],
+    }
+    manifest = {
+        "pages": [{
+            "slide_number": 1,
+            "template_page_id": "T02_P01",
+            "base_mode": "blank_reconstruction",
+            "source_components_present": False,
+            "additional_identity_shape_ids": [shape.shape_id for shape in identity_shapes],
+            "identity_feature_bindings": [
+                {"feature": f"feature-{index}", "shape_ids": [identity_shapes[index].shape_id]}
+                for index in range(4)
+            ],
+            "regions": [{
+                "module_id": item["module_id"],
+                "render_mode": "full_reconstruction",
+                "owned_shape_ids": [item["rendered_shape_id"]],
+                "removed_native_shape_ids": item["ownership_group"]["shape_ids"],
+                "slot_bindings": [{
+                    "slot_id": f"{item['module_id']}_TEXT",
+                    "shape_ids": [item["rendered_shape_id"]],
+                }],
+                "reflowed_or_removed_slots": [],
+            } for item in (first_module, second_module)],
+        }],
+    }
+
+    result = ObjectLevelQualityGate().inspect(
+        pptx,
+        specification,
+        render_manifest=manifest,
+        asset_root=tmp_path,
+    )
+
+    assert result.passed, result.errors
+
+
 def test_catalog_discloses_semantic_compile_status_without_claiming_all_templates_complete():
     catalog = TemplateCatalog.load()
     t01 = catalog.select("组会-文献精读", "T01")
@@ -363,8 +444,8 @@ def test_catalog_discloses_semantic_compile_status_without_claiming_all_template
 
     assert Path(t01.semantic_spec_path).is_file()
     assert t01.standardization_status == "semantic_compiled_powerpoint_review_passed"
-    assert t02.semantic_spec_path is None
-    assert t02.standardization_status == "pending_semantic_compilation"
+    assert Path(t02.semantic_spec_path).is_file()
+    assert t02.standardization_status == "semantic_compilation_in_progress"
 
 
 def test_validate_pptx_cli_runs_object_qa_when_semantic_spec_is_supplied(tmp_path: Path):

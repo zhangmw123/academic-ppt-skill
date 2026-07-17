@@ -126,8 +126,8 @@ class TemplateCatalog:
                 "its complete slide structure; this is a package recompile, not a style-family substitute."
                 if source_requested else None
             ),
-            source_fidelity=item.get("source_fidelity") if source_requested else None,
-            source_limitations=item.get("source_limitations") if source_requested else None,
+            source_fidelity=item.get("source_fidelity"),
+            source_limitations=item.get("source_limitations"),
             semantic_spec_path=(
                 str((self.root / item["semantic_spec_path"]).resolve())
                 if item.get("semantic_spec_path") else None

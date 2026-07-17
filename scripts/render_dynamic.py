@@ -402,6 +402,48 @@ def add_template_scaffold(slide, scaffold, base_dir=None, *, mode="full", allow_
     return added
 
 
+def scaffold_text_color(scaffold, region, base_dir, fallback, light="#FFFFFF"):
+    if not scaffold or not region:
+        return fallback
+    center_x = float(region.get("left", 0)) + float(region.get("width", 0)) / 2
+    center_y = float(region.get("top", 0)) + float(region.get("height", 0)) / 2
+    candidates = []
+    for asset in scaffold.get("decorative_assets", ()):
+        box = asset.get("box", {})
+        if not (
+            float(box.get("left", 0)) <= center_x <= float(box.get("left", 0)) + float(box.get("width", 0))
+            and float(box.get("top", 0)) <= center_y <= float(box.get("top", 0)) + float(box.get("height", 0))
+        ):
+            continue
+        path = Path(asset["path"])
+        if not path.is_absolute() and base_dir:
+            path = Path(base_dir) / path
+        if path.is_file():
+            candidates.append((float(asset.get("area", 1)), path, box))
+    if not candidates:
+        return fallback
+    _, path, box = min(candidates, key=lambda item: item[0])
+    try:
+        with Image.open(path) as source:
+            image = source.convert("RGBA")
+            background = Image.new("RGBA", image.size, "white")
+            background.alpha_composite(image)
+            left = max(0, round((float(region["left"]) - float(box["left"])) / float(box["width"]) * image.width))
+            top = max(0, round((float(region["top"]) - float(box["top"])) / float(box["height"]) * image.height))
+            right = min(image.width, round((float(region["left"]) + float(region["width"]) - float(box["left"])) / float(box["width"]) * image.width))
+            bottom = min(image.height, round((float(region["top"]) + float(region["height"]) - float(box["top"])) / float(box["height"]) * image.height))
+            sample = background.crop((left, top, max(left + 1, right), max(top + 1, bottom))).convert("RGB")
+            sample.thumbnail((48, 48))
+            pixels = list(sample.getdata())
+    except (OSError, ValueError, ZeroDivisionError):
+        return fallback
+    luminance = sum(
+        0.2126 * red + 0.7152 * green + 0.0722 * blue
+        for red, green, blue in pixels
+    ) / max(255 * len(pixels), 1)
+    return light if luminance < 0.48 else fallback
+
+
 def add_navigation(slide, sections, active, style, logo_path=None):
     if not sections:
         return
@@ -527,7 +569,7 @@ def add_chrome(slide, page, page_number, total, plan, style):
              align=PP_ALIGN.RIGHT)
 
 
-def render_cover(slide, page, plan, style, grammar=None, has_scaffold=False):
+def render_cover(slide, page, plan, style, grammar=None, has_scaffold=False, scaffold=None):
     colors, fonts, type_ = style["colors"], style["fonts"], style["typography"]
     if not has_scaffold:
         add_box(slide, 0.0, 0.0, 13.333, 7.5, colors["background"], colors["background"], radius=False)
@@ -537,12 +579,28 @@ def render_cover(slide, page, plan, style, grammar=None, has_scaffold=False):
         tx, ty, tw, th = title_box["left"] * 13.333, title_box["top"] * 7.5, title_box["width"] * 13.333, title_box["height"] * 7.5
     else:
         tx, ty, tw, th = 1.15, 1.65, 10.9, 1.25
-    title_color = colors["text"] if has_scaffold else colors["primary"]
+    title_region = title_box or {
+        "left": tx / 13.333, "top": ty / 7.5, "width": tw / 13.333, "height": th / 7.5,
+    }
+    title_color = scaffold_text_color(
+        scaffold,
+        title_region,
+        (grammar or {}).get("_base_dir"),
+        colors["text"] if has_scaffold else colors["primary"],
+    )
     rendered_title_h = max(1.05, th)
     add_text(slide, page["title"], tx, ty, tw, rendered_title_h, type_["cover_title"], title_color, fonts["title"], bold=True,
              align=PP_ALIGN.CENTER if title_box else PP_ALIGN.LEFT, valign=MSO_ANCHOR.MIDDLE)
-    add_text(slide, page.get("subtitle", ""), max(1.0, tx), ty + rendered_title_h + 0.18, min(11.2, tw), 0.7,
-             type_["cover_subtitle"], colors["text"], fonts["body"], align=PP_ALIGN.CENTER if title_box else PP_ALIGN.LEFT)
+    subtitle_x, subtitle_y, subtitle_w, subtitle_h = max(1.0, tx), ty + rendered_title_h + 0.18, min(11.2, tw), 0.7
+    subtitle_color = scaffold_text_color(
+        scaffold,
+        {"left": subtitle_x / 13.333, "top": subtitle_y / 7.5, "width": subtitle_w / 13.333, "height": subtitle_h / 7.5},
+        (grammar or {}).get("_base_dir"),
+        colors["text"],
+        light="#E8EEF7",
+    )
+    add_text(slide, page.get("subtitle", ""), subtitle_x, subtitle_y, subtitle_w, subtitle_h,
+             type_["cover_subtitle"], subtitle_color, fonts["body"], align=PP_ALIGN.CENTER if title_box else PP_ALIGN.LEFT)
     metadata = page.get("metadata", [])
     meta_y = max(4.15, ty + rendered_title_h + 1.1) if title_box else 4.15
     add_text(slide, "\n".join(metadata), 2.4 if title_box else 1.18, meta_y, 8.6, min(1.45, 7.15 - meta_y), 12, colors["muted"], fonts["body"],
@@ -999,7 +1057,7 @@ def render_full_figure(slide, page, style, base_dir):
         add_page_conclusion(slide, page_conclusion(page), style, y=min(6.38, bottom + 0.12))
 
 
-def render_ending(slide, page, style, grammar=None, has_scaffold=False):
+def render_ending(slide, page, style, grammar=None, has_scaffold=False, scaffold=None):
     colors = style["colors"]
     if not has_scaffold:
         add_box(slide, 1.0, 1.15, 11.3, 5.2, colors["surface"], colors["line"])
@@ -1008,9 +1066,23 @@ def render_ending(slide, page, style, grammar=None, has_scaffold=False):
         x, y, w, h = title_box["left"] * 13.333, title_box["top"] * 7.5, title_box["width"] * 13.333, title_box["height"] * 7.5
     else:
         x, y, w, h = 1.65, 2.25, 10.0, 1.0
-    add_text(slide, page["title"], x, y, w, max(0.9, h), 24, colors["primary"],
+    title_color = scaffold_text_color(
+        scaffold,
+        title_box or {"left": x / 13.333, "top": y / 7.5, "width": w / 13.333, "height": h / 7.5},
+        (grammar or {}).get("_base_dir"),
+        colors["primary"],
+    )
+    add_text(slide, page["title"], x, y, w, max(0.9, h), 24, title_color,
              style["fonts"]["title"], bold=True, align=PP_ALIGN.CENTER)
-    add_text(slide, page.get("subtitle", ""), 2.05, y + max(1.2, h), 9.2, 1.0, 12, colors["text"],
+    subtitle_y = y + max(1.2, h)
+    subtitle_color = scaffold_text_color(
+        scaffold,
+        {"left": 2.05 / 13.333, "top": subtitle_y / 7.5, "width": 9.2 / 13.333, "height": 1.0 / 7.5},
+        (grammar or {}).get("_base_dir"),
+        colors["text"],
+        light="#E8EEF7",
+    )
+    add_text(slide, page.get("subtitle", ""), 2.05, subtitle_y, 9.2, 1.0, 12, subtitle_color,
              style["fonts"]["body"], align=PP_ALIGN.CENTER)
 
 
@@ -1097,9 +1169,9 @@ def render(
             if int(shape.shape_id) not in before_scaffold
         ])
         if layout == "cover":
-            render_cover(slide, page, plan, style, grammar, has_scaffold)
+            render_cover(slide, page, plan, style, grammar, has_scaffold, scaffold)
         elif layout == "ending":
-            render_ending(slide, page, style, grammar, has_scaffold)
+            render_ending(slide, page, style, grammar, has_scaffold, scaffold)
         elif layout == "section":
             render_section(slide, page, style)
         else:

@@ -15,7 +15,7 @@ from academic_ppt.manifest import SlideManifestBuilder
 from academic_ppt.object_qa import ObjectLevelQualityGate
 from academic_ppt.planning import PagePlan, PlannedPage
 from academic_ppt.scenes import ScenePlanContract
-from scripts.render_dynamic import render as render_dynamic
+from scripts.render_dynamic import render as render_dynamic, scaffold_text_color
 
 
 def _page(page_id: str, title: str, strategy: str, text_count: int) -> PlannedPage:
@@ -68,6 +68,26 @@ def _package(pages: tuple[PlannedPage, ...], image_path: Path) -> CompleteConten
     )
 
 
+def test_scaffold_text_color_uses_light_foreground_only_on_dark_assets(tmp_path: Path):
+    dark = tmp_path / "dark.png"
+    light = tmp_path / "light.png"
+    Image.new("RGB", (320, 180), "#1A4B8C").save(dark)
+    Image.new("RGB", (320, 180), "#F8FAFC").save(light)
+    region = {"left": 0.2, "top": 0.2, "width": 0.6, "height": 0.3}
+
+    def scaffold(path: Path) -> dict:
+        return {
+            "decorative_assets": [{
+                "path": str(path),
+                "area": 1.0,
+                "box": {"left": 0.0, "top": 0.0, "width": 1.0, "height": 1.0},
+            }],
+        }
+
+    assert scaffold_text_color(scaffold(dark), region, tmp_path, "#1F2933") == "#FFFFFF"
+    assert scaffold_text_color(scaffold(light), region, tmp_path, "#1F2933") == "#1F2933"
+
+
 def test_dynamic_composition_routes_figures_and_missing_figures_to_editable_visuals(tmp_path: Path):
     pages = (
         _page("P001", "论文题目", "text_only", 2),
@@ -99,6 +119,9 @@ def test_dynamic_composition_routes_figures_and_missing_figures_to_editable_visu
     assert [page["layout"] for page in payload["pages"]] == ["cover", "text_figure", "architecture", "ending"]
     assert len(payload["pages"][1]["bullets"]) >= 3
     assert all(set(item) == {"title", "body"} for item in payload["pages"][1]["bullets"])
+    assert payload["pages"][1]["lead"] not in {
+        item["title"] for item in payload["pages"][1]["bullets"]
+    }
     assert sum(len(column["nodes"]) for column in payload["pages"][2]["architecture"]["columns"]) >= 4
     assert all(page.get("use_template_scaffold") == "identity" for page in payload["pages"][1:-1])
 
@@ -168,6 +191,44 @@ def test_composition_gate_rejects_sparse_placeholder_pages():
     assert not result.passed
     assert any("visible modules" in error for error in result.errors)
     assert any("at least three" in error for error in result.errors)
+
+
+def test_composition_gate_rejects_single_word_process_explanations():
+    result = CompositionQualityGate().inspect({
+        "pages": [{
+            "page_id": "P006",
+            "layout": "process",
+            "title": "Research contribution",
+            "steps": [
+                {"title": "Framework", "body": "an"},
+                {"title": "Retrieval", "body": "query-specific strategy"},
+                {"title": "Validation", "body": "validated through experiments"},
+            ],
+            "page_conclusion": "The framework is validated.",
+        }],
+    })
+
+    assert not result.passed
+    assert any("single-word fragments" in error for error in result.errors)
+
+
+def test_composition_gate_rejects_dangling_process_explanations():
+    result = CompositionQualityGate().inspect({
+        "pages": [{
+            "page_id": "P006",
+            "layout": "process",
+            "title": "Research contribution",
+            "steps": [
+                {"title": "Framework", "body": "selects retrieval strategies"},
+                {"title": "Evaluation", "body": "dataset results show"},
+                {"title": "Validation", "body": "validated through experiments"},
+            ],
+            "page_conclusion": "The framework is validated.",
+        }],
+    })
+
+    assert not result.passed
+    assert any("dangling English connectors" in error for error in result.errors)
 
 
 def test_semantic_selector_prefers_exact_module_count_over_reflowable_media_scope():
