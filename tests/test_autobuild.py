@@ -271,6 +271,19 @@ def test_terminal_pages_do_not_consume_source_figures():
     assert not figures
 
 
+def test_figure_reading_preserves_a_distinct_source_grounded_interpretation():
+    passage = EvidencePassage(
+        (),
+        "实验结果显示该模型在测试集上取得稳定提升。进一步比较表明，性能改善来自全局边界解码。",
+        6,
+    )
+
+    reading = CompleteContentCompiler._figure_reading(passage, "results")
+
+    assert reading.startswith("图示解读：")
+    assert "进一步比较" in reading
+
+
 def test_contribution_page_rejects_unrelated_adjacent_metric_figure():
     figures = [{"path": "metrics.png", "source_page": 12, "caption": "Comparative experiment scoring"}]
 

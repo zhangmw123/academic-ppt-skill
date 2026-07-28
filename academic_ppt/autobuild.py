@@ -224,11 +224,16 @@ class CompleteContentCompiler:
             elif image is not None:
                 interpretation = self._interpretation(primary, index, page_count, focus=focus)
                 visual_strategy = "source_figure"
-                components = {"text": 3, "picture": 1}
+                components = {"text": 4, "picture": 1}
                 media_scope = "page"
                 media_layout = "one_image"
                 image_content[page_id] = [image["path"]]
-                page_text = [title, claim, interpretation]
+                page_text = [
+                    title,
+                    evidence_line,
+                    self._figure_reading(primary, focus),
+                    interpretation,
+                ]
             else:
                 visual_strategy = self._native_strategy(focus, index, page_count)
                 interpretation = self._interpretation(
@@ -495,6 +500,18 @@ class CompleteContentCompiler:
         else:
             second = CompleteContentCompiler._clip_text(remainder, EVIDENCE_LINE_LIMIT)
         return f"{first}\n补充证据：{second}"
+
+    @staticmethod
+    def _figure_reading(primary: EvidencePassage, focus: str | None = None) -> str:
+        """Turn source text adjacent to a figure into a separate reading claim."""
+        cleaned = CompleteContentCompiler._role_excerpt(primary.text, focus)
+        _, remainder = CompleteContentCompiler._claim_parts(cleaned, focus)
+        excerpt, _ = CompleteContentCompiler._complete_sentence_excerpt(
+            remainder or cleaned,
+            EVIDENCE_LINE_LIMIT,
+            maximum_extra=40,
+        )
+        return f"图示解读：{excerpt}"
 
     @staticmethod
     def _interpretation(

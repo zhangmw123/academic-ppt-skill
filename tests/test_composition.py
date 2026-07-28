@@ -343,6 +343,22 @@ def test_text_figure_never_renders_transition_or_question_as_evidence_bullets():
     assert len(composed["bullets"]) >= 3
 
 
+def test_automatic_figure_page_content_satisfies_the_three_bullet_contract():
+    page = _page("P008", "实验结果", "source_figure", 4)
+    composed = DynamicCompositionCompiler._text_figure(
+        page,
+        [
+            "实验结果",
+            "来源：第 6 页；补充证据：测试指标在多组比较中保持提升",
+            "图示解读：性能改善与全局边界解码的比较结果一致",
+            "解读：该图支持当前结果判断，但仍需结合测试集范围解释",
+        ],
+        {"path": "figure.png", "caption": "来源图", "source": {}},
+    )
+
+    assert len(composed["bullets"]) >= 3
+
+
 def test_headline_detail_preserves_hybrid_scientific_identifier_boundary():
     content = DynamicCompositionCompiler._text_figure(
         _page("P007", "实体识别模型", "source_figure", 3),
