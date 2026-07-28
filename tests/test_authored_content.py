@@ -49,6 +49,60 @@ def test_apply_authored_content_requires_complete_unique_plan(tmp_path: Path):
         apply_authored_content(_package(), path, expected_scene="组会-文献精读")
 
 
+def test_authored_content_can_reset_text_component_contract(tmp_path: Path):
+    path = tmp_path / "content.json"
+    path.write_text(json.dumps({
+        "schema_version": 1,
+        "scene": "组会-文献精读",
+        "pages": [
+            {
+                "page_id": "P001", "title": "Title 1", "claim": "Claim 1",
+                "interpretation": "Read 1", "next_link": "Next 1",
+                "text": ["Title 1", "Module 1", "Module 2", "Module 3", "Read 1", "Next 1"],
+            },
+            {
+                "page_id": "P002", "title": "Title 2", "claim": "Claim 2",
+                "interpretation": "Read 2", "next_link": "Next 2",
+                "text": ["Title 2", "Body 2"],
+            },
+        ],
+    }, ensure_ascii=False), encoding="utf-8")
+
+    result = apply_authored_content(_package(), path, expected_scene="组会-文献精读")
+
+    assert result.drafts[0].component_requirements["text"] == 6
+    assert result.text_content["P001"] == [
+        "Title 1", "Module 1", "Module 2", "Module 3", "Read 1", "Next 1",
+    ]
+
+
+@pytest.mark.parametrize("component_count", [1, 7])
+def test_authored_content_rejects_text_component_count_outside_supported_range(
+    tmp_path: Path,
+    component_count: int,
+):
+    values = ["Title 1"] + [f"Body {index}" for index in range(1, component_count)]
+    path = tmp_path / "content.json"
+    path.write_text(json.dumps({
+        "schema_version": 1,
+        "scene": "组会-文献精读",
+        "pages": [
+            {
+                "page_id": "P001", "title": "Title 1", "claim": "Claim 1",
+                "interpretation": "Read 1", "next_link": "Next 1", "text": values,
+            },
+            {
+                "page_id": "P002", "title": "Title 2", "claim": "Claim 2",
+                "interpretation": "Read 2", "next_link": "Next 2",
+                "text": ["Title 2", "Body 2"],
+            },
+        ],
+    }, ensure_ascii=False), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="2 to 6 components"):
+        apply_authored_content(_package(), path, expected_scene="组会-文献精读")
+
+
 def test_adapt_native_text_capacity_preserves_title_interpretation_and_transition():
     package = _package()
     draft = replace(

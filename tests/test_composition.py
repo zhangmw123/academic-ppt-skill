@@ -9,7 +9,7 @@ from pptx.enum.shapes import MSO_SHAPE
 from pptx.util import Inches
 
 from academic_ppt.autobuild import CompleteContentDraft, CompleteContentPackage
-from academic_ppt.composition import CompositionQualityGate, DynamicCompositionCompiler
+from academic_ppt.composition import CompositionQualityGate, DynamicCompositionCompiler, _headline_detail
 from academic_ppt.layout import ScientificPageContract
 from academic_ppt.manifest import SlideManifestBuilder
 from academic_ppt.object_qa import ObjectLevelQualityGate
@@ -251,6 +251,119 @@ def test_semantic_selector_prefers_exact_module_count_over_reflowable_media_scop
 
     assert reference["semantic_spec_page_id"] == "T03_P06"
     assert reference["content_module_count"] == 4
+
+
+def test_semantic_selector_binds_t02_three_module_page_without_padding_a_fourth_card():
+    root = Path(__file__).resolve().parents[1]
+    specification = json.loads(
+        (root / "assets" / "template_specs" / "T02_blue_research.semantic.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    reference = DynamicCompositionCompiler._semantic_template_reference(
+        {
+            "layout": "points",
+            "points": [
+                {"title": f"创新 {index}", "body": "由来源材料支持的完整机制与价值说明"}
+                for index in range(1, 4)
+            ],
+        },
+        specification,
+    )
+
+    assert reference["semantic_spec_page_id"] == "T02_P04"
+    assert reference["module_count_exact"]
+    assert len(reference["semantic_module_bindings"]) == 3
+    assert all(binding["slot_ids"] for binding in reference["semantic_module_bindings"])
+
+
+def test_composition_gate_rejects_semantic_template_module_mismatch():
+    result = CompositionQualityGate().inspect({
+        "pages": [{
+            "page_id": "P002",
+            "layout": "points",
+            "points": [
+                {"title": f"要点 {index}", "body": "完整可复核的证据说明"}
+                for index in range(1, 4)
+            ],
+            "template_reference": {
+                "source_slide_index": 4,
+                "layout_signature": "three_columns",
+                "selection_source": "standard_template_specification",
+                "module_count_exact": False,
+                "semantic_module_bindings": [{"module_id": "T02_P04_M01", "slot_ids": ["heading"]}],
+            },
+            "use_template_scaffold": "structure",
+        }],
+    })
+
+    assert not result.passed
+    assert any("wrong module count" in error for error in result.errors)
+    assert any("one-to-one" in error for error in result.errors)
+
+
+def test_points_never_render_transition_or_question_as_evidence_cards():
+    page = _page("P007", "局限与边界", "text_only", 4)
+    composed = DynamicCompositionCompiler._points(
+        page,
+        [
+            "局限与边界",
+            "时延：实时检索仍需优化",
+            "模态：当前方法主要处理长文本",
+            "评审：自动评价仍需人工复核",
+        ],
+    )
+
+    visible = " ".join(
+        f"{point['title']} {point['body']}" for point in composed["points"]
+    )
+    assert "下一页" not in visible
+    assert page.question_answered not in visible
+    assert len(composed["points"]) == 4
+
+
+def test_text_figure_never_renders_transition_or_question_as_evidence_bullets():
+    page = _page("P007", "实体识别模型", "source_figure", 3)
+    composed = DynamicCompositionCompiler._text_figure(
+        page,
+        [
+            "实体识别模型",
+            "BERT 与 BiLSTM：先获取上下文语义，再补充字符序列的前后依赖",
+            "GlobalPointer 与 ADV：统一判断实体起止位置，并用对抗训练提高鲁棒性",
+        ],
+        {"path": "figure.png", "caption": "来源图", "source": {}},
+    )
+
+    visible = " ".join(
+        f"{bullet['title']} {bullet['body']}" for bullet in composed["bullets"]
+    )
+    assert page.next_link not in visible
+    assert page.question_answered not in visible
+    assert len(composed["bullets"]) >= 3
+
+
+def test_headline_detail_preserves_hybrid_scientific_identifier_boundary():
+    content = DynamicCompositionCompiler._text_figure(
+        _page("P007", "实体识别模型", "source_figure", 3),
+        [
+            "实体识别模型",
+            "BERT-ADV-BiLSTM-GlobalPointer 组合上下文编码、对抗训练、序列建模和全局边界解码",
+            "结构说明：各模块共同提高实体识别稳定性",
+        ],
+        {"path": "figure.png", "caption": "来源图", "source": {}},
+    )
+
+    visible = " ".join(
+        f"{bullet['title']} {bullet['body']}" for bullet in content["bullets"]
+    )
+    assert "BERT-ADV-BiLSTM-GlobalPointer" in visible
+    assert "GlobalPointe r" not in visible
+
+    metric = _headline_detail(
+        "BERT-BiLSTM-GlobalPointer：P 90.46%｜R 90.95%｜F1 90.76%，全局边界解码优于 CRF"
+    )
+    assert metric["title"] == "BERT-BiLSTM-GlobalPointer"
 
 
 def test_slide_manifest_requires_editable_content_and_template_identity(tmp_path: Path):

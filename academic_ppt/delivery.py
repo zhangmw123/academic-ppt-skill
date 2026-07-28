@@ -82,5 +82,7 @@ class DeliveryBundle:
     def _copy(source: Path, destination: Path) -> Path:
         if source == destination.resolve():
             return source
-        shutil.copy2(source, destination)
+        # Delivery artifacts need byte fidelity, not source timestamps. copy2()
+        # fails on Windows/WSL and some network mounts that reject copystat.
+        shutil.copyfile(source, destination)
         return destination

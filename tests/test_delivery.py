@@ -1,6 +1,7 @@
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from academic_ppt.delivery import DeliveryBundle
 
@@ -44,6 +45,22 @@ class DeliveryBundleTests(unittest.TestCase):
             self.assertTrue(summary.is_file())
             self.assertNotIn(summary, delivery.visible_files)
             self.assertIn('"visual": false', summary.read_text(encoding="utf-8"))
+
+    def test_delivery_copy_does_not_require_metadata_preservation(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            source = root / "source.pptx"
+            destination = root / "published.pptx"
+            source.write_bytes(b"portable delivery")
+
+            with patch(
+                "academic_ppt.delivery.shutil.copy2",
+                side_effect=AssertionError("copy2 must not be used for delivery"),
+            ):
+                result = DeliveryBundle._copy(source, destination)
+
+            self.assertEqual(result, destination)
+            self.assertEqual(destination.read_bytes(), source.read_bytes())
 
 
 if __name__ == "__main__":

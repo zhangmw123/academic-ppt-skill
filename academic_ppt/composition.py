@@ -23,6 +23,7 @@ INTERNAL_LABELS = (
     "边界与行动",
     "读图重点",
 )
+TOKEN_CHARACTER = re.compile(r"[A-Za-z0-9_+#./-]")
 
 
 def text_units(value: str) -> float:
@@ -32,6 +33,21 @@ def text_units(value: str) -> float:
 
 def _clean(value: str) -> str:
     return SPACE.sub(" ", str(value)).strip()
+
+
+def _safe_headline(value: str, limit: int) -> str:
+    """Clip a title without cutting a Latin or hybrid scientific identifier."""
+    cleaned = _clean(value)
+    headline = CompleteContentCompiler._clip_text(cleaned, limit)
+    if len(headline) < len(cleaned) and (
+        TOKEN_CHARACTER.fullmatch(headline[-1:])
+        and TOKEN_CHARACTER.fullmatch(cleaned[len(headline):len(headline) + 1])
+    ):
+        boundary = len(headline)
+        while boundary < len(cleaned) and TOKEN_CHARACTER.fullmatch(cleaned[boundary]):
+            boundary += 1
+        headline = cleaned[:boundary].rstrip(" ，,。；;:：")
+    return headline
 
 
 def _sentences(*values: str, limit: int = 5) -> list[str]:
@@ -53,13 +69,13 @@ def _headline_detail(value: str, *, fallback: str = "要点") -> dict[str, str]:
         if separator in cleaned:
             headline, detail = (_clean(item) for item in cleaned.split(separator, 1))
             if headline and detail:
-                return {"title": CompleteContentCompiler._clip_text(headline, 24), "body": detail}
+                return {"title": _safe_headline(headline, 24), "body": detail}
     for separator in ("，", ","):
         if separator in cleaned:
             headline, detail = (_clean(item) for item in cleaned.split(separator, 1))
             if 2 <= text_units(headline) <= 20 and text_units(detail) >= 6:
-                return {"title": CompleteContentCompiler._clip_text(headline, 24), "body": detail}
-    headline = CompleteContentCompiler._clip_text(cleaned, 28) or fallback
+                return {"title": _safe_headline(headline, 24), "body": detail}
+    headline = _safe_headline(cleaned, 28) or fallback
     detail = cleaned[len(headline):].lstrip(" ，,。；;:：")
     return {"title": headline, "body": detail or cleaned}
 
@@ -296,11 +312,24 @@ class DynamicCompositionCompiler:
             return value, -int(candidate.get("source_slide_index", 0))
 
         candidates = specification.get("pages", ())
-        selected = max(candidates, key=score, default=None)
+        # A standard template specification is a component contract, not a
+        # style suggestion. Prefer an archetype with the exact module count;
+        # a mismatch would silently turn a three-pillar page into four cards.
+        exact_module_candidates = [
+            candidate
+            for candidate in candidates
+            if int(candidate.get("prototype", {}).get("content_module_count", 1))
+            == max(desired_modules, 1)
+        ]
+        selected = max(exact_module_candidates or candidates, key=score, default=None)
         if not selected or score(selected)[0] < 0:
             return None
         prototype = selected.get("prototype", {})
         media = selected.get("media_layout", {})
+        content_modules = [
+            module for module in selected.get("semantic_modules", ())
+            if module.get("semantic_region") == "content"
+        ]
         return {
             "source_slide_index": int(selected["source_slide_index"]),
             "source_role": selected.get("page_role"),
@@ -312,6 +341,14 @@ class DynamicCompositionCompiler:
             "content_module_count": int(prototype.get("content_module_count", 1)),
             "media_scope": media.get("scope", "none"),
             "media_slot_count": int(media.get("slot_count", 0)),
+            "module_count_exact": len(content_modules) == max(desired_modules, 1),
+            "semantic_module_bindings": [
+                {
+                    "module_id": module["module_id"],
+                    "slot_ids": [slot["slot_id"] for slot in module.get("child_slots", ())],
+                }
+                for module in content_modules
+            ],
             "identity_signature": specification.get("template_identity", {}).get("identity_signature"),
             "selection_source": "standard_template_specification",
         }
@@ -338,19 +375,17 @@ class DynamicCompositionCompiler:
     @staticmethod
     def _text_figure(page: PlannedPage, values: list[str], media: dict) -> dict:
         summary = _headline_detail(page.claim_text, fallback="核心要点")
-        bullets = []
-        if summary["body"] != _clean(page.claim_text):
-            bullets.append({"title": "证据", "body": summary["body"]})
-        bullet_values = _sentences(*values[2:], page.interpretation, page.next_link, limit=4)
-        bullets.extend(_headline_detail(value) for value in bullet_values)
-        while len(bullets) < 3:
-            candidates = (page.interpretation, page.next_link, page.question_answered)
-            candidate = _clean(candidates[len(bullets) % len(candidates)])
-            module = _headline_detail(candidate)
-            if candidate and module not in bullets and module["title"] != summary["title"]:
-                bullets.append(module)
-            else:
-                break
+        # Transitions and questions are production metadata, never visible
+        # scientific evidence. A page without three substantive authored,
+        # claimed, or interpreted modules must fail the composition gate.
+        bullet_values = _sentences(
+            *values[1:], page.interpretation, page.claim_text, limit=4,
+        )
+        bullets = [
+            module
+            for value in bullet_values
+            if (module := _headline_detail(value))["title"] != summary["title"]
+        ]
         return {
             "layout": "text_figure",
             "title": page.title,
@@ -462,18 +497,23 @@ class DynamicCompositionCompiler:
     @staticmethod
     def _points(page: PlannedPage, values: list[str]) -> dict:
         bodies = []
-        for value in (*values[1:], page.interpretation, page.next_link, page.claim_text):
+        for value in (
+            *values[1:],
+            page.interpretation,
+            page.claim_text,
+        ):
             cleaned = _clean(value)
             if text_units(cleaned) >= 6 and cleaned not in bodies:
                 bodies.append(cleaned)
             if len(bodies) >= 4:
                 break
-        while len(bodies) < 4:
-            bodies.append((page.claim_text, page.interpretation, page.next_link)[len(bodies) % 3])
         return {
             "layout": "points",
             "title": page.title,
-            "points": [_headline_detail(body, fallback=f"要点 {index + 1}") for index, body in enumerate(bodies[:4])],
+            "points": [
+                _headline_detail(body, fallback=f"要点 {index + 1}")
+                for index, body in enumerate(bodies[:4])
+            ],
             "page_conclusion": page.claim_text,
         }
 
@@ -524,7 +564,7 @@ class DynamicCompositionCompiler:
         candidates = grammar.get("archetypes", ())
         target_panels = 0
         if layout == "points":
-            target_panels = 4
+            target_panels = len(page.get("points", ()))
         elif layout == "process":
             target_panels = len(page.get("steps", ()))
         elif layout == "architecture":
@@ -576,6 +616,16 @@ class CompositionQualityGate:
                 errors.append(f"{page_id}: content page is not bound to a template layout archetype")
             if page.get("use_template_scaffold") not in {"identity", "structure"}:
                 errors.append(f"{page_id}: template structure layer is not enabled")
+            if reference and reference.get("selection_source") == "standard_template_specification":
+                bindings = reference.get("semantic_module_bindings", ())
+                if not reference.get("module_count_exact"):
+                    errors.append(f"{page_id}: selected template archetype has the wrong module count")
+                if len(bindings) != self._semantic_module_count(page):
+                    errors.append(
+                        f"{page_id}: visible modules do not map one-to-one to semantic template modules"
+                    )
+                if any(not binding.get("slot_ids") for binding in bindings):
+                    errors.append(f"{page_id}: semantic template module is missing child-slot bindings")
             modules = [value for value in self._modules(page) if _clean(value)]
             leaked = sorted({label for label in INTERNAL_LABELS for value in modules if label in value})
             if leaked:
@@ -628,8 +678,8 @@ class CompositionQualityGate:
                 for step in page.get("steps", ())
             ):
                 errors.append(f"{page_id}: process explanations cannot end with dangling English connectors")
-            elif layout == "points" and len(page.get("points", ())) != 4:
-                errors.append(f"{page_id}: points layout requires four editable evidence modules")
+            elif layout == "points" and not 3 <= len(page.get("points", ())) <= 4:
+                errors.append(f"{page_id}: points layout requires three or four editable evidence modules")
             elif layout == "points" and any(
                 not _clean(item.get("title", "")) or not _clean(item.get("body", ""))
                 for item in page.get("points", ())
@@ -689,3 +739,18 @@ class CompositionQualityGate:
                 for item in page.get("columns", ())
             ]
         return []
+
+    @staticmethod
+    def _semantic_module_count(page: dict) -> int:
+        layout = page.get("layout")
+        if layout == "text_figure" or layout == "media_gallery":
+            return 1
+        if layout == "module_media":
+            return len(page.get("modules", ()))
+        if layout == "points":
+            return len(page.get("points", ()))
+        if layout == "process":
+            return len(page.get("steps", ()))
+        if layout == "architecture":
+            return len(page.get("architecture", {}).get("columns", ()))
+        return 0

@@ -54,11 +54,8 @@ def apply_authored_content(
         values = item["text"]
         if not isinstance(values, list) or not all(isinstance(value, str) and value.strip() for value in values):
             raise ValueError(f"{draft.page_id}: text must be a non-empty string array")
-        expected_text_count = int(draft.component_requirements.get("text", 0))
-        if len(values) != expected_text_count:
-            raise ValueError(
-                f"{draft.page_id}: authored text count {len(values)} does not match component contract {expected_text_count}"
-            )
+        if not 2 <= len(values) <= 6:
+            raise ValueError(f"{draft.page_id}: authored text must contain 2 to 6 components")
         if values[0].strip() != str(item["title"]).strip():
             raise ValueError(f"{draft.page_id}: first text value must equal the authored title")
         suppress_image = item.get("suppress_image") is True
@@ -77,6 +74,7 @@ def apply_authored_content(
                 f"{draft.page_id}: suppress_image and image source selection are mutually exclusive"
             )
         requirements = dict(draft.component_requirements)
+        requirements["text"] = len(values)
         visual_strategy = str(item.get("visual_strategy") or draft.visual_strategy)
         media_scope = draft.media_scope
         media_layout = draft.media_layout

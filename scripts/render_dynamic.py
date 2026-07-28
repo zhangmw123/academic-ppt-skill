@@ -144,6 +144,30 @@ def semantic_panel_boxes(page, expected):
     ]
 
 
+def semantic_slot_boxes(page, role, expected):
+    """Use recorded template child-slot geometry only for an exact slot match."""
+    semantic_page = page.get("_semantic_page") or {}
+    boxes = []
+    for module in semantic_page.get("semantic_modules", ()):
+        if module.get("semantic_region") != "content":
+            continue
+        for slot in module.get("child_slots", ()):
+            if slot.get("role") != role:
+                continue
+            box = slot.get("box", {})
+            if not all(name in box for name in ("left", "top", "width", "height")):
+                continue
+            boxes.append({
+                "x": float(box["left"]) * 13.333,
+                "y": float(box["top"]) * 7.5,
+                "w": float(box["width"]) * 13.333,
+                "h": float(box["height"]) * 7.5,
+            })
+    if len(boxes) != expected:
+        return []
+    return sorted(boxes, key=lambda box: (box["y"], box["x"]))
+
+
 def semantic_content_geometry(page, fallback):
     boxes = semantic_panel_boxes(
         page,
@@ -259,19 +283,30 @@ def template_figure_box(scaffold):
 def add_key_points(slide, items, x, y, w, h, style):
     """Render heading/explanation pairs without exposing internal slot labels."""
     colors = style["colors"]
-    gap = 0.12
-    item_h = (h - gap * max(0, len(items) - 1)) / max(1, len(items))
-    for index, item in enumerate(items):
+    gap = 0.18
+    values = []
+    for item in items:
         if isinstance(item, str):
             title, body = "要点", item
         else:
             title, body = item.get("title", "要点"), item.get("body", "")
-        top = y + index * (item_h + gap)
-        add_text(slide, title, x, top, w, min(0.3, item_h * 0.34), 12.5,
+        visual_units = sum(1.0 if ord(char) > 127 else 0.55 for char in str(body))
+        estimated_lines = max(1, math.ceil(visual_units / max(16.0, w * 8.0)))
+        values.append((title, body, min(1.18, max(0.7, 0.38 + estimated_lines * 0.22))))
+    required = sum(value[2] for value in values) + gap * max(0, len(values) - 1)
+    if required > h and values:
+        scale = max(0.72, (h - gap * max(0, len(values) - 1)) / sum(value[2] for value in values))
+        values = [(title, body, item_h * scale) for title, body, item_h in values]
+        required = sum(value[2] for value in values) + gap * max(0, len(values) - 1)
+    top = y + max(0.0, (h - required) / 2)
+    for title, body, item_h in values:
+        heading_h = min(0.3, item_h * 0.38)
+        add_text(slide, title, x, top, w, heading_h, 12.5,
                  colors["primary"], style["fonts"]["title"], bold=True, margin=0)
-        add_text(slide, body, x, top + min(0.34, item_h * 0.38), w,
-                 max(0.24, item_h - min(0.34, item_h * 0.38)), 11,
+        add_text(slide, body, x, top + heading_h + 0.04, w,
+                 max(0.24, item_h - heading_h - 0.04), 11,
                  colors["text"], style["fonts"]["body"], margin=0)
+        top += item_h + gap
 
 
 def add_picture_contain(slide, path: Path, x, y, w, h):
@@ -703,19 +738,24 @@ def render_media_gallery(slide, page, style, base_dir):
     bottom = geometry.get("content_bottom", 6.18)
     x, y, w, bottom = semantic_content_geometry(page, (x, y, w, bottom))
     items = page.get("media_items", ())
+    semantic_images = semantic_slot_boxes(page, "image_or_chart", len(items))
+    semantic_captions = semantic_slot_boxes(page, "caption", len(items))
     heading_h = 0.68
-    add_text(
-        slide, page.get("lead", "多面板证据"), x, y, w * 0.34, 0.3,
-        14, colors["primary"], style["fonts"]["title"], bold=True, margin=0,
-    )
-    add_text(
-        slide, page.get("explanation", ""), x + w * 0.35, y, w * 0.65, 0.42,
-        11, colors["text"], style["fonts"]["body"], margin=0,
-    )
-    boxes = media_grid_boxes(
-        len(items), x, y + heading_h, w, bottom - y - heading_h, page.get("media_layout")
-    )
-    for item, box in zip(items, boxes):
+    if semantic_images:
+        boxes = semantic_images
+    else:
+        add_text(
+            slide, page.get("lead", "多面板证据"), x, y, w * 0.34, 0.3,
+            14, colors["primary"], style["fonts"]["title"], bold=True, margin=0,
+        )
+        add_text(
+            slide, page.get("explanation", ""), x + w * 0.35, y, w * 0.65, 0.42,
+            11, colors["text"], style["fonts"]["body"], margin=0,
+        )
+        boxes = media_grid_boxes(
+            len(items), x, y + heading_h, w, bottom - y - heading_h, page.get("media_layout")
+        )
+    for index, (item, box) in enumerate(zip(items, boxes)):
         add_panel(slide, box["x"], box["y"], box["w"], box["h"], style)
         caption_h = 0.28
         padding = 0.16 if not box.get("primary") else 0.2
@@ -728,13 +768,15 @@ def render_media_gallery(slide, page, style, base_dir):
             box["w"] - padding * 2,
             max(0.35, box["h"] - caption_h - padding * 2),
         )
+        caption_box = semantic_captions[index] if semantic_captions else {
+            "x": box["x"] + padding,
+            "y": box["y"] + box["h"] - caption_h - 0.04,
+            "w": box["w"] - padding * 2,
+            "h": caption_h,
+        }
         add_text(
-            slide,
-            item.get("caption", ""),
-            box["x"] + padding,
-            box["y"] + box["h"] - caption_h - 0.04,
-            box["w"] - padding * 2,
-            caption_h,
+            slide, item.get("caption", ""), caption_box["x"], caption_box["y"],
+            caption_box["w"], caption_box["h"],
             9,
             colors["muted"],
             style["fonts"]["body"],
@@ -757,7 +799,9 @@ def render_module_media(slide, page, style, base_dir):
     boxes = semantic_panel_boxes(page, len(modules)) or media_grid_boxes(
         len(modules), x, y, w, bottom - y
     )
-    for module, box in zip(modules, boxes):
+    semantic_images = semantic_slot_boxes(page, "image_or_chart", len(modules))
+    semantic_captions = semantic_slot_boxes(page, "caption", len(modules))
+    for index, (module, box) in enumerate(zip(modules, boxes)):
         add_panel(slide, box["x"], box["y"], box["w"], box["h"], style)
         header_h = 0.38
         body_h = 0.64 if box["h"] >= 3.0 else 0.48
@@ -771,19 +815,26 @@ def render_module_media(slide, page, style, base_dir):
             slide, module["body"], box["x"] + 0.18, box["y"] + 0.54,
             box["w"] - 0.36, body_h, 11, colors["text"], style["fonts"]["body"], margin=0,
         )
-        image_y = box["y"] + 0.58 + body_h
-        image_h = box["h"] - (image_y - box["y"]) - caption_h - 0.28
+        image_box = semantic_images[index] if semantic_images else {
+            "x": box["x"] + 0.18,
+            "y": box["y"] + 0.58 + body_h,
+            "w": box["w"] - 0.36,
+            "h": box["h"] - (0.58 + body_h) - caption_h - 0.28,
+        }
         add_picture_contain(
             slide,
             (base_dir / module["image"]).resolve(),
-            box["x"] + 0.18,
-            image_y,
-            box["w"] - 0.36,
-            max(0.3, image_h),
+            image_box["x"], image_box["y"], image_box["w"], max(0.3, image_box["h"]),
         )
+        caption_box = semantic_captions[index] if semantic_captions else {
+            "x": box["x"] + 0.18,
+            "y": box["y"] + box["h"] - caption_h - 0.05,
+            "w": box["w"] - 0.36,
+            "h": caption_h,
+        }
         add_text(
-            slide, module.get("caption", ""), box["x"] + 0.18,
-            box["y"] + box["h"] - caption_h - 0.05, box["w"] - 0.36, caption_h,
+            slide, module.get("caption", ""), caption_box["x"], caption_box["y"],
+            caption_box["w"], caption_box["h"],
             9, colors["muted"], style["fonts"]["body"], align=PP_ALIGN.CENTER,
             valign=MSO_ANCHOR.MIDDLE, margin=0,
         )

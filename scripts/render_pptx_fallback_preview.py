@@ -6,6 +6,7 @@ import argparse
 import io
 import json
 import math
+import os
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
@@ -22,13 +23,16 @@ def color(value, default):
 
 
 def font_for(size: int, chinese: bool):
-    candidates = (
-        (Path("C:/Windows/Fonts/msyh.ttc"), Path("C:/Windows/Fonts/msyhbd.ttc"))
-        if chinese else (Path("C:/Windows/Fonts/arial.ttf"), Path("C:/Windows/Fonts/arialbd.ttf"))
+    windows_font_dirs = (
+        Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts",
+        Path("/mnt/c/Windows/Fonts"),
     )
-    for path in candidates:
-        if path.is_file():
-            return ImageFont.truetype(str(path), max(8, size))
+    names = ("msyh.ttc", "msyhbd.ttc") if chinese else ("arial.ttf", "arialbd.ttf")
+    for directory in windows_font_dirs:
+        for name in names:
+            path = directory / name
+            if path.is_file():
+                return ImageFont.truetype(str(path), max(8, size))
     return ImageFont.load_default()
 
 
