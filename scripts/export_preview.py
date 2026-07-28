@@ -24,6 +24,13 @@ def find_powerpoint() -> bool:
     return sys.platform == "win32" and any(path.exists() for path in candidates)
 
 
+def powerpoint_unavailable_detail() -> str:
+    """Explain whether PowerPoint itself or the current runtime is unavailable."""
+    if sys.platform != "win32":
+        return "PowerPoint COM export requires native Windows Python; this process is not running on Windows"
+    return "Microsoft PowerPoint executable was not found in the standard Office locations"
+
+
 def find_wps() -> bool:
     if sys.platform != "win32":
         return False
@@ -191,7 +198,7 @@ def export_preview(pptx: Path, output_dir: Path, engine: str, width: int, height
         selected = engine
         if selected == "powerpoint":
             if not find_powerpoint():
-                raise RuntimeError("PowerPoint is not installed")
+                raise RuntimeError(powerpoint_unavailable_detail())
             export_with_powerpoint(pptx, output_dir, width, height)
         elif selected == "wps":
             if not find_wps():

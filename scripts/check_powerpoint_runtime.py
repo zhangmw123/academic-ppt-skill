@@ -16,7 +16,12 @@ from pptx import Presentation
 from pptx.enum.text import PP_ALIGN
 from pptx.util import Inches, Pt
 
-from export_preview import export_preview, find_powerpoint, list_slide_images
+from export_preview import (
+    export_preview,
+    find_powerpoint,
+    list_slide_images,
+    powerpoint_unavailable_detail,
+)
 
 
 def sha256(path: Path) -> str:
@@ -129,7 +134,7 @@ def main() -> None:
     if args.rounds < 1:
         raise SystemExit("--rounds must be at least 1")
     if not find_powerpoint():
-        raise SystemExit("Microsoft PowerPoint is not installed")
+        raise SystemExit(powerpoint_unavailable_detail())
     candidate = Path(args.candidate).resolve()
     if not candidate.is_file():
         raise SystemExit(f"candidate not found: {candidate}")

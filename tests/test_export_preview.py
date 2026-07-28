@@ -73,6 +73,16 @@ class PowerPointExportTests(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, "expected 2 slide images; rendered 1"):
                     export_preview(source, output, "powerpoint", 1600, 900)
 
+    def test_explains_that_wsl_cannot_run_powerpoint_com(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            source = root / "deck.pptx"
+            Presentation().save(source)
+
+            with patch("export_preview.sys.platform", "linux"):
+                with self.assertRaisesRegex(RuntimeError, "native Windows Python"):
+                    export_preview(source, root / "preview", "powerpoint", 1600, 900)
+
 
 if __name__ == "__main__":
     unittest.main()
