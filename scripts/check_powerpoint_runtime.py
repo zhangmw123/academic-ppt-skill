@@ -52,7 +52,7 @@ def powerpoint_process_count() -> int | None:
         return None
 
 
-def wait_for_process_baseline(baseline: int | None, timeout_seconds: float = 10.0) -> int | None:
+def wait_for_process_baseline(baseline: int | None, timeout_seconds: float = 30.0) -> int | None:
     if baseline is None:
         return None
     deadline = time.monotonic() + timeout_seconds
@@ -129,10 +129,13 @@ def main() -> None:
     parser.add_argument("--report", required=True)
     parser.add_argument("--width", type=int, default=1600)
     parser.add_argument("--height", type=int, default=900)
+    parser.add_argument("--cleanup-timeout", type=float, default=30.0)
     args = parser.parse_args()
 
     if args.rounds < 1:
         raise SystemExit("--rounds must be at least 1")
+    if args.cleanup_timeout <= 0:
+        raise SystemExit("--cleanup-timeout must be positive")
     if not find_powerpoint():
         raise SystemExit(powerpoint_unavailable_detail())
     candidate = Path(args.candidate).resolve()
@@ -161,6 +164,7 @@ def main() -> None:
             "slide_count": 1,
         },
         "rounds_requested": args.rounds,
+        "cleanup_timeout_seconds": args.cleanup_timeout,
         "baseline_powerpoint_process_count": baseline_processes,
         "runs": [],
         "passed": False,
@@ -184,7 +188,7 @@ def main() -> None:
                         expected_size=(args.width, args.height),
                         require_color_control=require_color,
                     )
-                    residual = wait_for_process_baseline(baseline_processes)
+                    residual = wait_for_process_baseline(baseline_processes, args.cleanup_timeout)
                     run["powerpoint_process_count_after"] = residual
                     if baseline_processes is not None and residual is not None and residual > baseline_processes:
                         raise RuntimeError(

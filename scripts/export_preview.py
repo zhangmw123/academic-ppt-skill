@@ -60,8 +60,9 @@ def export_with_powerpoint(pptx: Path, output_dir: Path, width: int, height: int
             f"$pres=$ppt.Presentations.Open('{safe_in}',$true,$true,$false); "
             f"$pres.Export('{safe_out}','PNG',{width},{height}); "
             "} finally { "
-            "if($pres){$pres.Close(); [Runtime.InteropServices.Marshal]::ReleaseComObject($pres)|Out-Null}; "
-            "if($ppt){$ppt.Quit(); [Runtime.InteropServices.Marshal]::ReleaseComObject($ppt)|Out-Null} "
+            "if($pres){$pres.Close(); [Runtime.InteropServices.Marshal]::ReleaseComObject($pres)|Out-Null; $pres=$null}; "
+            "if($ppt){$ppt.Quit(); [Runtime.InteropServices.Marshal]::ReleaseComObject($ppt)|Out-Null; $ppt=$null}; "
+            "[GC]::Collect(); [GC]::WaitForPendingFinalizers(); [GC]::Collect() "
             "}"
         )
         encoded = base64.b64encode(command.encode("utf-16-le")).decode("ascii")

@@ -40,6 +40,7 @@ class PowerPointExportTests(unittest.TestCase):
             command_text = base64.b64decode(commands[0][-1]).decode("utf-16-le")
             self.assertIn("deck.pptx", command_text)
             self.assertNotIn("材料", command_text)
+            self.assertIn("WaitForPendingFinalizers", command_text)
             self.assertTrue((output / "Slide1.PNG").is_file())
 
     def test_lists_localized_slide_images_without_assuming_english_names(self):
