@@ -468,6 +468,26 @@ def test_automatic_figure_page_content_satisfies_the_three_bullet_contract():
     assert len(composed["bullets"]) >= 3
 
 
+def test_process_preserves_authored_model_identifiers_in_comparison_steps():
+    composed = DynamicCompositionCompiler._process(
+        _page("P013", "模型对比", "native_diagram", 5),
+        [
+            "模型对比",
+            "BiLSTM-CRF：传统序列模型基线",
+            "BERT-CRF：上下文预训练带来最大增益",
+            "BERT-BiLSTM-CRF：序列依赖继续改善召回",
+            "GlobalPointer 与对抗训练：最终模型继续提升 F1",
+        ],
+    )
+
+    assert [step["title"] for step in composed["steps"]] == [
+        "BiLSTM-CRF",
+        "BERT-CRF",
+        "BERT-BiLSTM-CRF",
+        "GlobalPointer 与对抗训练",
+    ]
+
+
 def test_headline_detail_preserves_hybrid_scientific_identifier_boundary():
     content = DynamicCompositionCompiler._text_figure(
         _page("P007", "实体识别模型", "source_figure", 3),

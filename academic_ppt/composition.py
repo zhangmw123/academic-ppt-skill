@@ -111,6 +111,11 @@ def _headline_detail(value: str, *, fallback: str = "要点") -> dict[str, str]:
 
 def _process_heading(content: dict[str, str], index: int) -> str:
     """Use a concise semantic heading when raw source prose has no usable label."""
+    title = content["title"]
+    # In comparisons, the authored heading is the evidence carrier. Do not
+    # replace a model identifier merely because its explanation mentions BERT.
+    if re.search(r"\b(?:bert|bilstm|globalpointer|crf)\b", title, re.I):
+        return title
     text = f"{content['title']} {content['body']}".casefold()
     for needles, label in (
         (("bert", "向量", "编码"), "语义编码"),
@@ -121,7 +126,6 @@ def _process_heading(content: dict[str, str], index: int) -> str:
     ):
         if any(needle in text for needle in needles):
             return label
-    title = content["title"]
     if title == content["body"] or title in {"然后", "因此", "同时", "解读"}:
         return f"步骤 {index:02d}"
     return title
