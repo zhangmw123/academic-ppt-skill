@@ -1994,6 +1994,11 @@
       "layout_signature": "title_body",
       "prototype": {
         "relationship": "result_comparison_and_applicability_boundary",
+        "reconstructive_module_counts": [
+          2,
+          4,
+          5
+        ],
         "recommended_argument_units": [
           "result_or_indicator",
           "comparison",

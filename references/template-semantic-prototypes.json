@@ -386,6 +386,7 @@
           "page_archetype": "result_interpretation_with_evidence_carrier",
           "relationship": "result_comparison_and_applicability_boundary",
           "expected_module_count": 1,
+          "reconstructive_module_counts": [2, 4, 5],
           "media_scope": "page",
           "page_media_count": 1,
           "page_media_native_reuse": false,
