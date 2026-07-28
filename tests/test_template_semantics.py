@@ -25,6 +25,11 @@ SPEC_PATHS = {
 
 T04_SPEC_PATH = ROOT / "assets" / "template_specs" / "T04_project_application.semantic.json"
 T05_SPEC_PATH = ROOT / "assets" / "template_specs" / "T05_red_general.semantic.json"
+SIDEBAR_SPEC_PATHS = (
+    (ROOT / "assets" / "template_specs" / "T06_yunnan_purple.semantic.json", "云大紫色", "T06"),
+    (ROOT / "assets" / "template_specs" / "T07_yunnan_red.semantic.json", "云大红色", "T07"),
+    (ROOT / "assets" / "template_specs" / "T08_yunnan_blue.semantic.json", "云大蓝色", "T08"),
+)
 
 
 def _load(template_id: str) -> dict:
@@ -475,6 +480,20 @@ def test_t05_semantic_spec_is_valid_but_stays_pending_powerpoint_review():
     assert specification["acceptance"]["product_accepted"] is False
     assert selection.standardization_status == "semantic_compilation_in_progress"
     assert selection.support_level == "bundled_development"
+
+
+def test_sidebar_template_specs_are_valid_but_stay_pending_powerpoint_review():
+    for path, scene, template_id in SIDEBAR_SPEC_PATHS:
+        specification = json.loads(path.read_text(encoding="utf-8"))
+        result = StandardTemplateSpecValidator().validate(specification)
+        selection = TemplateCatalog.load().select(scene, template_id)
+
+        assert result.passed, result.errors
+        assert specification["acceptance"]["semantic_compile_passed"] is True
+        assert specification["acceptance"]["powerpoint_visual_review"] == "pending"
+        assert specification["acceptance"]["product_accepted"] is False
+        assert selection.standardization_status == "semantic_compilation_in_progress"
+        assert selection.support_level == "bundled_development"
 
 
 def test_validate_pptx_cli_runs_object_qa_when_semantic_spec_is_supplied(tmp_path: Path):
