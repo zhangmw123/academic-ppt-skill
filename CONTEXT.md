@@ -55,6 +55,12 @@ This context defines how source evidence, presentation arguments, template ident
 - A real entrypoint smoke build now passes without `--template`: `测试文件.pdf` plus `--scene "面向学术同行的会议报告"` resolves to `学术会议报告`, automatically selects T01, and generates an 8-page candidate under `/tmp/academic-ppt-template-auto-smoke-v2`. The automatic source-figure payload now supplies evidence, a source-grounded figure reading, and interpretation so it meets the three-bullet composition gate. This candidate remains unaccepted because it has no authoritative PowerPoint render or human visual review.
 - No new real deck or authoritative Windows PowerPoint visual review was produced in this continuation. Keep T02 and T03 real-content candidates unaccepted until their existing Windows PowerPoint and full-resolution human-review gates are complete.
 
+## Release Validation Continuation (2026-07-28)
+
+- Current-head T02 real regression was rebuilt from `测试文件.pdf` with `benchmarks/real_products/test_file_conference_t02.content.json` into the ignored working bundle `/tmp/academic-ppt-t02-v16`. The 8-page candidate passes composition QA, object QA, and all 7 structural checks. Its source-figure captions resolve to `FIGURE 1`, `FIGURE 4`, `FIGURE 5`, `FIGURE 6`, and `FIGURE 7`; this confirms the earlier Figure 5/6 caption shift is absent in the current build.
+- The full fallback contact sheet was inspected for geometry and content association. No obvious overflow, overlap, or caption/image mismatch was found. This is non-authoritative fallback evidence only: the WSL runtime reports `find_powerpoint() == False`, so it cannot run the required Windows PowerPoint export or satisfy the formal visual gate.
+- Keep T02 `semantic_compilation_in_progress` and `product_accepted=false`. Its remaining gates are an authoritative Windows PowerPoint render, explicit full-resolution visual-review decisions for all 8 pages, and user confirmation. Apply the same distinction to the existing T03 real regression.
+
 ## Language
 
 **Scientific Page Contract**:
