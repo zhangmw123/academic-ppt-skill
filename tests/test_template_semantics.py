@@ -236,6 +236,58 @@ def test_object_gate_rejects_duplicate_empty_bad_source_small_font_and_sample_re
     assert result.categories["template_residue"]
 
 
+def test_object_gate_does_not_treat_a_generic_short_label_as_template_residue(tmp_path: Path):
+    presentation = Presentation()
+    slide = presentation.slides.add_slide(presentation.slide_layouts[6])
+    label = slide.shapes.add_textbox(Inches(1), Inches(1), Inches(3), Inches(0.5))
+    label.text = "解读"
+    label.text_frame.paragraphs[0].font.size = Pt(12)
+    pptx = tmp_path / "generic-label.pptx"
+    presentation.save(pptx)
+    label_hash = hashlib.sha256("解读".encode("utf-8")).hexdigest()
+    specification = {
+        "pages": [{
+            "page_id": "T01_P01",
+            "semantic_modules": [{
+                "module_id": "T01_P01_M01",
+                "ownership_group": {
+                    "shape_ids": [label.shape_id],
+                    "complete_delete_shape_ids": [label.shape_id],
+                },
+                "render_contract": {"allowed_modes": ["native_reuse"]},
+                "child_slots": [{
+                    "slot_id": "T01_P01_M01_EXPLANATION",
+                    "role": "explanation",
+                    "required": True,
+                    "typography": {"min_pt": 11, "max_pt": 13},
+                    "source_sample_fingerprints": [{"shape_id": label.shape_id, "sha256": label_hash}],
+                }],
+            }],
+            "identity_regions": [],
+        }],
+    }
+    manifest = {
+        "pages": [{
+            "slide_number": 1,
+            "template_page_id": "T01_P01",
+            "regions": [{
+                "module_id": "T01_P01_M01",
+                "render_mode": "native_reuse",
+                "slot_bindings": [{
+                    "slot_id": "T01_P01_M01_EXPLANATION",
+                    "shape_ids": [label.shape_id],
+                }],
+            }],
+        }],
+    }
+
+    result = ObjectLevelQualityGate().inspect(
+        pptx, specification, render_manifest=manifest, asset_root=tmp_path
+    )
+
+    assert result.passed, result.errors
+
+
 def test_object_gate_rejects_picture_that_does_not_match_declared_asset(tmp_path: Path):
     actual_asset = tmp_path / "actual.png"
     declared_asset = tmp_path / "declared.png"

@@ -576,7 +576,12 @@ class ObjectLevelQualityGate:
         fingerprints = {item["sha256"] for item in slot.get("source_sample_fingerprints", ())}
         for shape in shapes:
             text = _normalized_text(shape)
-            if text and hashlib.sha256(text.encode("utf-8")).hexdigest() in fingerprints:
+            # Generic template labels such as "解读" are valid authored labels too.
+            # Only a distinguishable sample phrase can establish template residue.
+            if (
+                len(text) >= 6
+                and hashlib.sha256(text.encode("utf-8")).hexdigest() in fingerprints
+            ):
                 categories["template_residue"].append(
                     f"slide {slide_number}: {slot['slot_id']} still contains source-template sample text"
                 )

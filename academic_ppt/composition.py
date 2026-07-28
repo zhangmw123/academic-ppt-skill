@@ -24,6 +24,7 @@ INTERNAL_LABELS = (
     "读图重点",
 )
 TOKEN_CHARACTER = re.compile(r"[A-Za-z0-9_+#./-]")
+VISIBLE_TRANSITION = re.compile(r"(?:下一页|下页|next\s+(?:page|slide)|转场)", re.I)
 
 
 def text_units(value: str) -> float:
@@ -62,6 +63,34 @@ def _sentences(*values: str, limit: int = 5) -> list[str]:
     return items
 
 
+def _source_clauses(*values: str, limit: int = 6) -> list[str]:
+    """Recover complete source-grounded route nodes from comma-separated prose."""
+    clauses: list[str] = []
+    for value in values:
+        cleaned = _clean(value)
+        for prefix in ("图示解读：", "解读：", "边界："):
+            cleaned = cleaned.removeprefix(prefix)
+        if not cleaned or VISIBLE_TRANSITION.search(cleaned):
+            continue
+        pending = ""
+        for fragment in re.split(r"[。！？；;，,]+", cleaned):
+            fragment = fragment.strip(" ，、:：")
+            if text_units(fragment) < 6:
+                continue
+            pending = f"{pending}，{fragment}" if pending else fragment
+            if text_units(pending) >= 16:
+                if pending not in clauses:
+                    clauses.append(pending)
+                pending = ""
+                if len(clauses) >= limit:
+                    return clauses
+        if text_units(pending) >= 12 and pending not in clauses:
+            clauses.append(pending)
+            if len(clauses) >= limit:
+                return clauses
+    return clauses
+
+
 def _headline_detail(value: str, *, fallback: str = "要点") -> dict[str, str]:
     """Split authored evidence into a compact heading and its explanation."""
     cleaned = _clean(value)
@@ -78,6 +107,24 @@ def _headline_detail(value: str, *, fallback: str = "要点") -> dict[str, str]:
     headline = _safe_headline(cleaned, 28) or fallback
     detail = cleaned[len(headline):].lstrip(" ，,。；;:：")
     return {"title": headline, "body": detail or cleaned}
+
+
+def _process_heading(content: dict[str, str], index: int) -> str:
+    """Use a concise semantic heading when raw source prose has no usable label."""
+    text = f"{content['title']} {content['body']}".casefold()
+    for needles, label in (
+        (("bert", "向量", "编码"), "语义编码"),
+        (("注意力", "上下文"), "上下文建模"),
+        (("关系", "推断", "图谱"), "关系推断"),
+        (("验证", "实验", "评估"), "结果验证"),
+        (("输入", "划分", "预处理"), "输入准备"),
+    ):
+        if any(needle in text for needle in needles):
+            return label
+    title = content["title"]
+    if title == content["body"] or title in {"然后", "因此", "同时", "解读"}:
+        return f"步骤 {index:02d}"
+    return title
 
 
 def _panel_boxes(archetype: dict) -> list[dict]:
@@ -442,8 +489,11 @@ class DynamicCompositionCompiler:
         if count not in {1, 2, 3, 4, 5, 6}:
             raise ValueError(f"{page.page_id}: module media supports 1, 2, 3, 4, 5, or 6 modules")
         statements = _sentences(*values[1:], page.claim_text, page.interpretation, limit=count)
-        while len(statements) < count:
-            statements.append((page.claim_text, page.interpretation, page.next_link)[len(statements) % 3])
+        if len(statements) < count:
+            raise ValueError(
+                f"{page.page_id}: module media requires {count} source-grounded statements; "
+                "transitions cannot fill visible modules"
+            )
         modules = []
         for index, (statement, media) in enumerate(zip(statements, media_items), 1):
             content = _headline_detail(statement, fallback=f"要点 {index}")
@@ -468,37 +518,72 @@ class DynamicCompositionCompiler:
     def _process(page: PlannedPage, values: list[str]) -> dict:
         steps = _sentences(*values[1:], limit=5)
         if len(steps) < 3:
-            steps = _sentences(page.claim_text, page.interpretation, page.next_link, limit=5)
+            steps = _sentences(*values[1:], page.claim_text, page.interpretation, limit=5)
+        if len(steps) < 3:
+            raise ValueError(
+                f"{page.page_id}: process requires three source-grounded steps; "
+                "transitions cannot fill visible steps"
+            )
+        process_steps = []
+        for index, step in enumerate(steps[:5], 1):
+            content = _headline_detail(step, fallback=f"步骤 {index}")
+            content["title"] = _process_heading(content, index)
+            process_steps.append(content)
         return {
             "layout": "process",
             "title": page.title,
-            "steps": [_headline_detail(step, fallback=f"步骤 {index + 1}") for index, step in enumerate(steps[:5])],
+            "steps": process_steps,
             "page_conclusion": page.interpretation,
         }
 
     @staticmethod
     def _architecture(page: PlannedPage, values: list[str]) -> dict:
-        node_values = _sentences(*values[1:], page.claim_text, page.interpretation, limit=6)
-        while len(node_values) < 4:
-            node_values.extend(_sentences(page.next_link, page.interpretation, limit=4))
-            node_values = list(dict.fromkeys(node_values))
-            if len(node_values) < 4:
-                node_values.append(f"验证环节 {len(node_values) + 1}")
+        source_values = []
+        for value in (*values[1:], page.claim_text, page.interpretation):
+            cleaned = _clean(value)
+            for prefix in ("图示解读：", "解读：", "边界："):
+                cleaned = cleaned.removeprefix(prefix)
+            if cleaned and not VISIBLE_TRANSITION.search(cleaned) and cleaned not in source_values:
+                source_values.append(cleaned)
+        node_values = [
+            value for value in _sentences(*source_values, limit=6)
+            if text_units(value) <= 45 or not re.search(r"[，,]", value)
+        ]
+        for clause in _source_clauses(*source_values, limit=6):
+            if clause not in node_values:
+                node_values.append(clause)
+            if len(node_values) >= 6:
+                break
+        if len(node_values) < 4:
+            raise ValueError(
+                f"{page.page_id}: architecture requires four source-grounded nodes; "
+                "transitions cannot fill visible nodes"
+            )
         modules = [_headline_detail(value) for value in node_values]
         column_count = 3 if len(modules) >= 4 else 2
         columns = []
         node_ids = []
+        header_sets = {
+            2: ("研究输入", "验证输出"),
+            3: ("输入与目标", "核心过程", "验证输出"),
+        }
+        header_set = header_sets[column_count]
+        base, remainder = divmod(len(modules), column_count)
+        offset = 0
         for column_index in range(column_count):
-            selected = modules[column_index::column_count]
+            size = base + int(column_index < remainder)
+            selected = modules[offset:offset + size]
+            offset += size
             column_nodes = []
             for node_index, module in enumerate(selected):
                 node_id = f"N{column_index + 1}_{node_index + 1}"
                 node_ids.append(node_id)
                 column_nodes.append({
                     "id": node_id,
-                    "label": module["body"],
+                    "label": module["title"],
+                    "detail": "" if module["body"] == module["title"] else module["body"],
                 })
-            columns.append({"title": selected[0]["title"], "nodes": column_nodes})
+            columns.append({"title": header_set[column_index], "nodes": column_nodes})
         edges = [
             {"source": source, "target": target}
             for source, target in zip(node_ids, node_ids[1:])
@@ -661,6 +746,8 @@ class CompositionQualityGate:
             leaked = sorted({label for label in INTERNAL_LABELS for value in modules if label in value})
             if leaked:
                 errors.append(f"{page_id}: internal composition labels leaked into visible content: {leaked}")
+            if any(VISIBLE_TRANSITION.search(value) for value in modules):
+                errors.append(f"{page_id}: transition text leaked into visible content")
             density_exception = page.get("density_exception") == "multi_panel_evidence"
             if len(modules) < 3 and not density_exception:
                 errors.append(f"{page_id}: content page has only {len(modules)} visible modules")

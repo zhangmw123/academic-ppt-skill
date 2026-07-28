@@ -90,6 +90,13 @@ This context defines how source evidence, presentation arguments, template ident
 - The fallback contact sheet plus P007/P013/P016 were inspected. The T05 red top navigation, fixed canvas identity, source figures, and reconstructed comparison panels remain coherent, with no obvious clipping, overlap, or content-association defect. This remains non-authoritative fallback evidence: `find_powerpoint() == False`, visual tasks remain `bound_to_slide`, and the candidate has no Windows PowerPoint export, explicit full-resolution review, or user confirmation. Keep T05 `semantic_compilation_in_progress`, `compiled_not_release_accepted`, and `product_accepted=false`.
 - Current verification after the T05 change: semantic-spec validator passes; full suite passes with `135 passed`; the canonical Skill validator reports `Skill is valid!` (pytest's cache warning is a harmless mounted-drive metadata permission limitation).
 
+## T04 Real-Source Continuation (2026-07-29)
+
+- T04 P04 now carries the explicit 2/4/5-module complete-reconstruction declaration already present in its reusable prototype. Its standard semantic specification validates successfully.
+- The final real-source project-application candidate is `/tmp/academic-ppt-t04-current-v9`: 18 pages built from `基于知识图谱的云南植物知识问答系统的研究与构建_刘金平.pdf` with scene `科研项目申报`. Structural, scientific-semantic, composition, editable-manifest, and bound object QA pass. Fallback inspection of the full contact sheet and P008/P013/P014/P016/P017 found no obvious clipping, overlap, template residue, or source-association defect.
+- The T04 regression exposed and fixed two generalized quality defects. Object QA no longer treats a short generic source label such as `解读` as sample residue, while retaining the blocking check for distinguishable source-template phrases. Automatic process, architecture, and module-media composition no longer use presenter transitions to fill visible content; the composition gate rejects leaked `下一页`/`next slide` text. Architecture nodes derive from complete source clauses when PDF extraction has long comma-separated prose, and process cards use concise semantic headings rather than repeated raw fragments.
+- Keep T04 `semantic_compilation_in_progress`, `compiled_not_release_accepted`, and `product_accepted=false`: the candidate still lacks authoritative Windows PowerPoint export, explicit full-resolution visual review, and user confirmation. The WSL fallback preview is inspection evidence only.
+
 ## Language
 
 **Scientific Page Contract**:

@@ -809,7 +809,19 @@ class CompleteContentCompiler:
         interpretation: str,
         transition: str,
     ) -> list[str]:
+        # Transitions belong in speaker notes, never in visible process cards.
+        _ = transition
         candidates = []
+
+        def add_candidate(value: str) -> None:
+            nonlocal candidates
+            if not value:
+                return
+            if any(value in existing for existing in candidates):
+                return
+            candidates = [existing for existing in candidates if existing not in value]
+            candidates.append(value)
+
         for sentence in CompleteContentCompiler._sentences(
             CompleteContentCompiler._role_excerpt(text, focus)
         ):
@@ -830,15 +842,14 @@ class CompleteContentCompiler:
                     flags=re.I,
                 )[0].rstrip(" ，,。.;；:：")
             meaningful = sum(character.isalnum() or "\u4e00" <= character <= "\u9fff" for character in cleaned)
-            if meaningful >= 12 and cleaned not in candidates:
-                candidates.append(CompleteContentCompiler._clip_text(cleaned, 120))
+            if meaningful >= 12:
+                add_candidate(CompleteContentCompiler._clip_text(cleaned, 120))
             if len(candidates) == 5:
                 break
-        fallbacks = [claim, interpretation.removeprefix("解读：").removeprefix("边界："), transition]
+        fallbacks = [claim]
         for value in fallbacks:
             cleaned = value.strip(" ，,。.;；:：")
-            if cleaned and cleaned not in candidates:
-                candidates.append(cleaned)
+            add_candidate(cleaned)
             if len(candidates) >= 3:
                 break
         return candidates[:5]

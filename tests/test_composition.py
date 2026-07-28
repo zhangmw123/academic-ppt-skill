@@ -369,6 +369,73 @@ def test_text_figure_never_renders_transition_or_question_as_evidence_bullets():
     assert len(composed["bullets"]) >= 3
 
 
+def test_process_never_renders_transition_as_a_visible_step():
+    page = _page("P007", "研究路线", "native_diagram", 5)
+    composed = DynamicCompositionCompiler._process(
+        page,
+        [
+            "研究路线",
+            "输入数据经过标准化和实体对齐。",
+            "模型结合上下文编码与关系推断。",
+            "结果使用定量指标和案例进行验证。",
+        ],
+    )
+
+    visible = " ".join(
+        f"{step['title']} {step['body']}" for step in composed["steps"]
+    )
+    assert page.next_link not in visible
+    assert "下一页" not in visible
+    assert composed["steps"][0]["title"] == "输入准备"
+    assert composed["steps"][1]["title"] == "语义编码"
+
+
+def test_architecture_recovers_source_grounded_nodes_without_transition_fallback():
+    page = _page("P008", "系统评估架构", "native_diagram", 5)
+    composed = DynamicCompositionCompiler._architecture(
+        page,
+        [
+            "系统评估架构",
+            "人工评估答案查询效果。验证集问题随机抽取100条，然后重复4次实验，根据实验结果形成可复核判断。",
+            page.next_link,
+        ],
+    )
+
+    visible = " ".join(
+        f"{node['label']} {node.get('detail', '')}"
+        for column in composed["architecture"]["columns"]
+        for node in column["nodes"]
+    )
+    assert sum(len(column["nodes"]) for column in composed["architecture"]["columns"]) >= 4
+    assert page.next_link not in visible
+    assert "下一页" not in visible
+    assert [column["title"] for column in composed["architecture"]["columns"]] == [
+        "输入与目标", "核心过程", "验证输出"
+    ]
+    assert all(node["label"] != "解读" for column in composed["architecture"]["columns"] for node in column["nodes"])
+
+
+def test_composition_gate_rejects_transition_text_in_visible_content():
+    result = CompositionQualityGate().inspect({
+        "pages": [{
+            "page_id": "P006",
+            "layout": "process",
+            "title": "研究路线",
+            "template_reference": {"source_slide_index": 3, "layout_signature": "three_columns"},
+            "use_template_scaffold": "identity",
+            "steps": [
+                {"title": "输入", "body": "来源数据经过清洗和结构化。"},
+                {"title": "建模", "body": "模型完成关系推断和结果生成。"},
+                {"title": "下一页", "body": "下一页转向实验结果。"},
+            ],
+            "page_conclusion": "当前路线可形成可验证输出。",
+        }],
+    })
+
+    assert not result.passed
+    assert any("transition text leaked" in error for error in result.errors)
+
+
 def test_automatic_figure_page_content_satisfies_the_three_bullet_contract():
     page = _page("P008", "实验结果", "source_figure", 4)
     composed = DynamicCompositionCompiler._text_figure(

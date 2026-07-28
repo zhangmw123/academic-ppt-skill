@@ -198,6 +198,35 @@ def test_native_process_steps_are_complete_semantic_sentences():
     assert any(step.endswith("retrieval methods") for step in result_steps)
 
 
+def test_native_process_steps_never_use_transition_as_visible_fallback():
+    steps = CompleteContentCompiler._process_steps(
+        "来源材料只提供一项明确的过程证据。",
+        "method",
+        "核心方法形成可验证的研究链路。",
+        "解读：当前证据支持方法选择。",
+        "下一页转向实验结果。",
+    )
+
+    assert all("下一页" not in step for step in steps)
+
+
+def test_native_process_steps_do_not_repeat_the_interpretation_as_a_visible_step():
+    text = (
+        "输入句子先按单字划分。BERT 为每个字建立字符、句子和位置向量。"
+        "多层自注意力输出上下文和全局信息。"
+    )
+    steps = CompleteContentCompiler._process_steps(
+        text,
+        "method",
+        "输入句子先按单字划分",
+        "解读：输入句子先按单字划分。",
+        "下一页转向实验结果。",
+    )
+
+    assert all(not step.startswith("解读：") for step in steps)
+    assert len(set(steps)) == len(steps)
+
+
 def test_interpretation_prefers_complete_sentence_and_labels_metric_continuation():
     truncated_block = EvidencePassage(
         (),
