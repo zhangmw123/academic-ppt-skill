@@ -64,6 +64,12 @@ This context defines how source evidence, presentation arguments, template ident
 - All eight standard PPTX packages now pass clone/save and grammar/identity extraction in `/tmp/academic-ppt-template-package-check.json`: T01/T02/T03 expose top navigation (T02/T03 use image scaffolds), T04/T05 use top navigation/native shapes, and T06/T07/T08 use sidebar/native shapes. This is a package/grammar baseline only, not semantic-template or release acceptance.
 - A bulk real-source template/scene matrix was attempted under `/tmp/academic-ppt-template-scene-matrix`, but its supervising process ended before it emitted the required final report. T02, T04, T05, and T06 individual candidate directories were created before termination; do not report that matrix as passed. Continue validation per template or repair the matrix runner to preserve partial results and a final report.
 
+## Semantic Compilation Continuation (2026-07-28)
+
+- T04 (`项目申报`) has been semantically compiled from its five-page standard editable PPTX. `assets/template_specs/T04_project_application.semantic.json` records 10 semantic modules and 27 child slots, including project-necessity evidence, a three-work-package route, a result/indicator carrier, and the project ending. The spec validator and focused semantic/composition suite pass.
+- Object QA now applies duplicate nested-frame-layer checks only when a bound render manifest is present. Standard templates legitimately contain nested native layers; completed deck deliveries still run the stricter bound-manifest check. T04's unbound standard-template Object QA passes with the expected observation that media, replacement-font, provenance, and residue checks require a render binding.
+- T04 remains `semantic_compilation_in_progress`, `compiled_not_release_accepted`, and `product_accepted=false`. It still requires real-source deck regression, bound object QA, authoritative Windows PowerPoint export, and full-resolution visual review. T05-T08 remain pending semantic compilation; the release is not ready.
+
 ## Language
 
 **Scientific Page Contract**:

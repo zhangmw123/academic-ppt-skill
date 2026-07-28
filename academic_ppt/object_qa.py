@@ -266,13 +266,16 @@ class ObjectLevelQualityGate:
                                 f"slide {slide_number}: content-sized identity picture {shape_id} "
                                 f"occupies {area_ratio:.0%} of the slide"
                             )
-            self._check_frame_layers(
-                slide_number,
-                shapes,
-                module_map,
-                identity_shape_ids,
-                categories,
-            )
+            # Native standard templates can intentionally nest empty frame layers.
+            # Only a bound delivery manifest establishes which layers remain content.
+            if manifest_page:
+                self._check_frame_layers(
+                    slide_number,
+                    shapes,
+                    module_map,
+                    identity_shape_ids,
+                    categories,
+                )
             self._check_overlaps(
                 slide_number,
                 shapes,

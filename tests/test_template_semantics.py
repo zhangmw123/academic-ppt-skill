@@ -23,6 +23,8 @@ SPEC_PATHS = {
     "T03": ROOT / "assets" / "template_specs" / "T03_blue_defense.semantic.json",
 }
 
+T04_SPEC_PATH = ROOT / "assets" / "template_specs" / "T04_project_application.semantic.json"
+
 
 def _load(template_id: str) -> dict:
     return json.loads(SPEC_PATHS[template_id].read_text(encoding="utf-8"))
@@ -446,6 +448,19 @@ def test_catalog_discloses_semantic_compile_status_without_claiming_all_template
     assert t01.standardization_status == "semantic_compiled_powerpoint_review_passed"
     assert Path(t02.semantic_spec_path).is_file()
     assert t02.standardization_status == "semantic_compilation_in_progress"
+
+
+def test_t04_semantic_spec_is_valid_but_stays_pending_powerpoint_review():
+    specification = json.loads(T04_SPEC_PATH.read_text(encoding="utf-8"))
+    result = StandardTemplateSpecValidator().validate(specification)
+    selection = TemplateCatalog.load().select("科研项目申报", "T04")
+
+    assert result.passed, result.errors
+    assert specification["acceptance"]["semantic_compile_passed"] is True
+    assert specification["acceptance"]["powerpoint_visual_review"] == "pending"
+    assert specification["acceptance"]["product_accepted"] is False
+    assert selection.standardization_status == "semantic_compilation_in_progress"
+    assert selection.support_level == "bundled_development"
 
 
 def test_validate_pptx_cli_runs_object_qa_when_semantic_spec_is_supplied(tmp_path: Path):
