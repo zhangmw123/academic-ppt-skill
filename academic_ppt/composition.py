@@ -518,6 +518,12 @@ class DynamicCompositionCompiler:
     def _process(page: PlannedPage, values: list[str]) -> dict:
         steps = _sentences(*values[1:], limit=5)
         if len(steps) < 3:
+            for clause in _source_clauses(*values[1:], page.claim_text, page.interpretation, limit=5):
+                if clause not in steps:
+                    steps.append(clause)
+                if len(steps) >= 3:
+                    break
+        if len(steps) < 3:
             steps = _sentences(*values[1:], page.claim_text, page.interpretation, limit=5)
         if len(steps) < 3:
             raise ValueError(

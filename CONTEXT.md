@@ -97,6 +97,11 @@ This context defines how source evidence, presentation arguments, template ident
 - The T04 regression exposed and fixed two generalized quality defects. Object QA no longer treats a short generic source label such as `解读` as sample residue, while retaining the blocking check for distinguishable source-template phrases. Automatic process, architecture, and module-media composition no longer use presenter transitions to fill visible content; the composition gate rejects leaked `下一页`/`next slide` text. Architecture nodes derive from complete source clauses when PDF extraction has long comma-separated prose, and process cards use concise semantic headings rather than repeated raw fragments.
 - Keep T04 `semantic_compilation_in_progress`, `compiled_not_release_accepted`, and `product_accepted=false`: the candidate still lacks authoritative Windows PowerPoint export, explicit full-resolution visual review, and user confirmation. The WSL fallback preview is inspection evidence only.
 
+## Release Matrix Continuation (2026-07-29)
+
+- `scripts/run_template_scenario_matrix.py` now writes an atomic partial report after every completed case and supports `--resume`; successful cases are reused and failed temporary case directories are regenerated. It explicitly uses a selected runtime and never claims product acceptance. The T01/T07 matrix page counts now meet their scene lower bounds (10 and 8 pages).
+- The current portable report at `/tmp/academic-ppt-template-scene-matrix-v2/report.json` safely records progress. T01 and T02 pass; T03 is the next actual content failure, where an automatically extracted architecture page still cannot provide four source-grounded nodes. Continue with `--resume`; do not treat the incomplete matrix as passed.
+
 ## Language
 
 **Scientific Page Contract**:
