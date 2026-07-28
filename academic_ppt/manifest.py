@@ -449,7 +449,14 @@ class RenderedObjectBindingManifestBuilder:
             if int(shape.shape_id) not in used_text_ids
         ]
         for slot_index, slot in enumerate(explanation_slots):
-            selected = remaining[slot_index::max(1, len(explanation_slots))]
+            typography = slot.get("typography", {})
+            minimum = float(typography.get("min_pt", 0))
+            maximum = float(typography.get("max_pt", float("inf")))
+            eligible = [
+                shape for shape in remaining
+                if minimum - 0.05 <= self._font_size(shape) <= maximum + 0.05
+            ]
+            selected = eligible[slot_index::max(1, len(explanation_slots))]
             if selected:
                 bindings.append({
                     "slot_id": slot["slot_id"],
