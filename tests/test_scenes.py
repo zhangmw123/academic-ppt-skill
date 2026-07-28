@@ -7,6 +7,22 @@ from scripts.validate_scene_plan import validate_plan
 
 
 class SceneCatalogTests(unittest.TestCase):
+    def test_classifies_a_natural_language_request_and_keeps_the_match_auditable(self):
+        resolution = SceneCatalog.load().classify("面向答辩委员会的毕业答辩汇报，重点证明结果可信")
+
+        self.assertEqual(resolution.profile.name, "毕业答辩")
+        self.assertEqual(resolution.match_type, "inferred_supported")
+        self.assertEqual(resolution.support_level, "verified_supported")
+        self.assertIn("毕业答辩", resolution.matched_signals)
+        self.assertEqual(resolution.audience, "评审或答辩委员")
+        self.assertEqual(resolution.decision_goal, "证明论证或成果可信")
+
+    def test_keeps_an_unmatched_user_goal_as_a_custom_unverified_scene(self):
+        resolution = SceneCatalog.load().classify("面向医院运营委员会的科室服务复盘")
+
+        self.assertEqual(resolution.profile.name, "自定义场景")
+        self.assertEqual(resolution.match_type, "custom_scene")
+        self.assertEqual(resolution.support_level, "custom_unverified")
     def test_resolves_aliases_and_accepts_a_complete_scene_contract(self):
         catalog = SceneCatalog.load()
         profile = catalog.resolve("开题")

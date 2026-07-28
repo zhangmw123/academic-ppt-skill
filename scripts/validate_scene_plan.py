@@ -18,14 +18,19 @@ from academic_ppt.scenes import SceneCatalog, ScenePlanContract
 def validate_plan(plan, profiles):
     scene_raw = plan.get("scene")
     errors, warnings = [], []
-    try:
-        profile = SceneCatalog.from_payload(profiles).resolve(scene_raw or "")
-    except ValueError:
+    if not scene_raw:
+        errors.append("scene is required")
         profile = None
-    scene = profile.name if profile else scene_raw
-    if profile is None:
-        errors.append(f"unknown scene profile: {scene_raw}")
+        scene = scene_raw
     else:
+        resolution = SceneCatalog.from_payload(profiles).classify(scene_raw)
+        profile = resolution.profile
+        scene = profile.name
+        if resolution.support_level != "verified_supported":
+            warnings.append(
+                f"custom scene contract: {scene_raw}; formal supported-scene acceptance does not apply"
+            )
+    if profile is not None:
         tags = set(plan.get("coverage_tags", []))
         argument_units = set(plan.get("argument_units", []))
         total_seconds = 0

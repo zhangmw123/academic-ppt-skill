@@ -120,18 +120,12 @@ Infer output language from the request and materials. Formally support Simplifie
 Chinese, English, and mixed Chinese-English decks; disclose that other languages are
 best-effort unless their typography and render coverage has been added.
 
-When no user template is supplied, select one compatible bundled template from T01
-to T08 and state its ID and short name in the summary. Show alternatives or previews
-only when confidence is low, the request materially conflicts with the selection, or
-the user asks to compare styles.
+Use a supplied `.pptx` first and report admission status; do not replace it with a bundled style.
+Otherwise resolve audience and goal to a supported scene, select a compatible reviewed template,
+and state its ID and short name. For a custom scene, disclose its unverified status and use the
+nearest compatible or neutral reviewed visual system. Show alternatives only for low confidence, conflict, or comparison.
 
-When the user names one of the cataloged source templates under `assets/templates`,
-resolve it to the matching repaired catalog copy and disclose the source path,
-catalog ID, and package-recompile reason in the task summary. T01 and T03 retain the
-complete 10/11-slide source structure, geometry, fonts, sizes, positions, and layout
-archetypes; their media packages are normalized for compatibility. Do not replace
-either with a merely color-similar five-page template. Admit any other user PPTX only after
-editable-component, grammar-extraction, clone/save, and Authoritative Runtime checks pass.
+When the user names a cataloged source template under `assets/templates`, resolve it to the matching repaired catalog copy and disclose the source path, ID, and package-recompile reason. T01 and T03 retain their complete 10/11-slide structures; their media packages are normalized for compatibility. Do not replace either with a merely color-similar five-page template. Admit any other user PPTX only after editable-component, grammar-extraction, clone/save, and Authoritative Runtime checks pass.
 
 ## Portable Skill scripts
 
@@ -142,7 +136,7 @@ Skill repository.
 For an explicitly requested autonomous candidate, use the single task entry point:
 
 ```powershell
-python "<skill-root>/scripts/build_complete_deck.py" "<source.pdf>" --scene "毕业答辩" --template "<template.pptx>" --output "<output-dir>"
+python "<skill-root>/scripts/build_complete_deck.py" "<source.pdf>" --scene "毕业答辩" --output "<output-dir>"
 ```
 
 The script self-locates bundled modules and assets from any working directory. Its
@@ -172,7 +166,7 @@ Write `ppt_output/config.json`. Do not analyze the full paper or render the deck
 before the user confirms the source, scene, template, duration, and language.
 Template preview images are allowed to support selection.
 
-Resolve the scene and subtype through [scene-profiles.json](references/scene-profiles.json).
+Resolve the scene and subtype through [scene-profiles.json](references/scene-profiles.json). Record requested text, signals, confidence, nearest scenes, audience, and goal. Treat exact/inferred matches as verified; retain other valid requests as `自定义场景`, not an invented supported or release-accepted scene.
 Do not treat opening, mid-term, graduation, station-entry, project-application,
 lab-meeting, and paper-sharing decks as one generic academic outline. Record
 `scene`, `section_variant`, user-visible `sections`, `deck_scope`,
@@ -390,7 +384,7 @@ dense text page, and ending when relevant.
 Default template-guided editable renderer:
 
 ```powershell
-python scripts/build_complete_deck.py "<source>" --scene "<scene>" --template "<template>" --content-plan ppt_output/authored_content.json --output ppt_output/candidate
+python scripts/build_complete_deck.py "<source>" --scene "<scene>" --content-plan ppt_output/authored_content.json --output ppt_output/candidate
 python scripts/validate_pptx.py ppt_output/candidate/working/sample.pptx --layout-plan ppt_output/candidate/audit/sample_layout_plan.json --render-check required --output ppt_output/candidate/audit/sample_report.json
 ```
 

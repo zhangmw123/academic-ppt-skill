@@ -7,7 +7,7 @@ import subprocess
 import sys
 import tempfile
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 
@@ -28,6 +28,7 @@ class TemplateSelection:
     source_limitations: str | None = None
     semantic_spec_path: str | None = None
     standardization_status: str | None = None
+    selection_mode: str = "bundled_requested"
 
     def to_dict(self) -> dict:
         return {
@@ -42,6 +43,7 @@ class TemplateSelection:
             "source_limitations": self.source_limitations,
             "semantic_spec_path": self.semantic_spec_path,
             "standardization_status": self.standardization_status,
+            "selection_mode": self.selection_mode,
         }
 
 
@@ -58,15 +60,49 @@ class TemplateCatalog:
         payload = json.loads(catalog_path.read_text(encoding="utf-8"))
         return cls(catalog_path.resolve().parents[1], payload["templates"])
 
-    def select(self, scene: str, selection: Path | str | None = None) -> TemplateSelection:
+    def select(
+        self,
+        scene: str,
+        selection: Path | str | None = None,
+        *,
+        fallback_scenes: tuple[str, ...] = (),
+    ) -> TemplateSelection:
         if selection is None:
-            item = next(
-                (value for value in self.templates if scene in value.get("recommended_scenes", ())),
-                None,
-            )
+            recommendations = (scene, *fallback_scenes)
+            item = next((
+                value
+                for recommended_scene in recommendations
+                for value in self.templates
+                if recommended_scene in value.get("recommended_scenes", ())
+                and self._is_formally_reviewed(value)
+            ), None)
+            fallback_reason = None
+            if item is None:
+                item = next(
+                    (
+                        value for value in self.templates
+                        if self._is_formally_reviewed(value)
+                    ),
+                    None,
+                )
+                fallback_reason = (
+                    "No formally reviewed bundled template is cataloged for this scene; selected the first "
+                    "formally reviewed semantic template as a neutral starting visual system."
+                )
             if item is None:
                 raise ValueError(f"no bundled template recommendation for scene: {scene}")
-            return self._bundled(item, requested=None, source_requested=False)
+            result = self._bundled(item, requested=None, source_requested=False)
+            result = replace(result, selection_mode="bundled_recommended")
+            if fallback_reason:
+                return replace(result, substitution_reason=fallback_reason)
+            if scene not in item.get("recommended_scenes", ()):
+                return replace(
+                    result,
+                    substitution_reason=(
+                        f"The custom scene is nearest to {fallback_scenes[0]}; selected its compatible bundled template."
+                    ),
+                )
+            return result
 
         raw = str(selection)
         wanted = _normalize_selection(raw)
@@ -106,6 +142,7 @@ class TemplateCatalog:
                 support_level="conditional_user",
                 requested=raw,
                 source_path=str(resolved_input),
+                selection_mode="user_supplied",
             )
         raise ValueError(f"template selection does not match a bundled template or existing PPTX: {selection}")
 
@@ -118,7 +155,11 @@ class TemplateCatalog:
             template_id=item["id"],
             short_name=item["short_name"],
             path=str(compiled_path),
-            support_level="bundled_recompiled_source" if source_requested else "bundled_formal",
+            support_level=(
+                "bundled_recompiled_source" if source_requested else "bundled_formal"
+            ) if self._is_formally_reviewed(item) else (
+                "bundled_development_source" if source_requested else "bundled_development"
+            ),
             requested=requested,
             source_path=str(source_path) if source_path else None,
             substitution_reason=(
@@ -133,6 +174,12 @@ class TemplateCatalog:
                 if item.get("semantic_spec_path") else None
             ),
             standardization_status=item.get("standardization_status"),
+        )
+
+    @staticmethod
+    def _is_formally_reviewed(item: dict) -> bool:
+        return bool(item.get("semantic_spec_path")) and (
+            item.get("standardization_status") == "semantic_compiled_powerpoint_review_passed"
         )
 
 

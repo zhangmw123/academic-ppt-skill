@@ -49,9 +49,24 @@ class TemplateCapabilityGraphTests(unittest.TestCase):
     def test_formal_bundled_selection_retains_source_fidelity_provenance(self):
         selection = TemplateCatalog.load().select("学术会议报告", "T02")
 
-        self.assertEqual(selection.support_level, "bundled_formal")
+        self.assertEqual(selection.support_level, "bundled_development")
         self.assertEqual(selection.source_fidelity, "complete_structure_recompile")
         self.assertIn("all 9 source slides", selection.source_limitations)
+
+    def test_omitted_template_uses_a_bundled_recommendation_for_the_scene(self):
+        selection = TemplateCatalog.load().select("科研项目申报")
+
+        self.assertEqual(selection.template_id, "T01")
+        self.assertEqual(selection.selection_mode, "bundled_recommended")
+        self.assertEqual(selection.support_level, "bundled_formal")
+        self.assertIn("No formally reviewed", selection.substitution_reason)
+
+    def test_custom_scene_uses_nearest_or_reviewed_bundled_template_with_disclosure(self):
+        selection = TemplateCatalog.load().select("自定义场景", fallback_scenes=("毕业答辩",))
+
+        self.assertEqual(selection.template_id, "T03")
+        self.assertEqual(selection.selection_mode, "bundled_recommended")
+        self.assertIn("nearest to 毕业答辩", selection.substitution_reason)
 
     def test_accepts_an_existing_unregistered_template_as_conditional(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -64,6 +79,7 @@ class TemplateCapabilityGraphTests(unittest.TestCase):
 
             self.assertIsNone(selection.template_id)
             self.assertEqual(selection.support_level, "conditional_user")
+            self.assertEqual(selection.selection_mode, "user_supplied")
             self.assertEqual(Path(selection.path), template_path.resolve())
 
     def test_user_template_admission_requires_editable_components_and_grammar(self):

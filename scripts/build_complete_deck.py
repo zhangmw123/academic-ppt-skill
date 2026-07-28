@@ -359,8 +359,11 @@ def _render_dynamic_candidate(
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("sources", nargs="+")
-    parser.add_argument("--scene", required=True)
-    parser.add_argument("--template", required=True)
+    parser.add_argument("--scene", required=True, help="Supported scene name or a concise audience/goal description")
+    parser.add_argument(
+        "--template",
+        help="User PPTX or bundled template ID/alias; omit to use the bundled recommendation for the resolved scene",
+    )
     parser.add_argument("--output", required=True)
     parser.add_argument("--pages", type=int)
     parser.add_argument("--formal", action="store_true")
@@ -387,8 +390,13 @@ def main() -> None:
 
     source_paths = [Path(value).resolve() for value in args.sources]
     source_documents = [SourceIngestor().ingest(path) for path in source_paths]
-    scene = SceneCatalog.load().resolve(args.scene)
-    selection = TemplateCatalog.load().select(scene.name, args.template)
+    scene_resolution = SceneCatalog.load().classify(args.scene)
+    scene = scene_resolution.profile
+    selection = TemplateCatalog.load().select(
+        scene.name,
+        args.template,
+        fallback_scenes=scene_resolution.nearest_scenes,
+    )
     selected_template = selection.to_dict()
     if selection.support_level == "conditional_user":
         admission = TemplateAdmissionGate().inspect(
@@ -399,7 +407,8 @@ def main() -> None:
         if not admission.passed:
             raise SystemExit("template admission failed: " + "; ".join(admission.errors))
         snapshot = working / "user_template.pptx"
-        shutil.copy2(selection.path, snapshot)
+        # WSL-mounted user folders may reject metadata updates even though byte copies work.
+        shutil.copyfile(selection.path, snapshot)
         selected_template["path"] = str(snapshot)
         selected_template["admission"] = admission.to_dict()
 
@@ -407,6 +416,7 @@ def main() -> None:
     graph = EvidenceGraph.from_sources(source_documents)
     summary = {
         "scene": scene.name,
+        "scene_resolution": scene_resolution.to_dict(),
         "sources": [source.to_dict() for source in source_documents],
         "method_profiles": {
             "primary": profiles.primary,
@@ -420,7 +430,7 @@ def main() -> None:
         "evidence": [node.to_dict() for node in graph.all()],
         "conflicts": [conflict.to_dict() for conflict in graph.conflicts()],
     })
-    options, recommended = StorylinePlanner().propose(scene.name, graph)
+    options, recommended = StorylinePlanner().propose(args.scene, graph)
     _write_json(audit / "storyline_options.json", {
         "options": [option.to_dict() for option in options],
         "recommended": recommended.to_dict(),
@@ -470,6 +480,7 @@ def main() -> None:
         source_paths=source_paths,
         working_dir=working,
         target_pages=args.pages,
+        scene_profile=scene,
     )
     if args.renderer == "native":
         native_text_capacity = max(
@@ -519,6 +530,7 @@ def main() -> None:
         page_drafts,
         graph,
         scene_contract=content.scene_contract,
+        scene_resolution=scene_resolution,
     )
     plan.write(audit)
     text_path = _write_json(audit / "complete_text_content.json", content.text_content)

@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import json
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Iterable
 
 from .evidence import EvidenceGraph
 from .layout import ScientificPageContract
-from .scenes import SceneCatalog, ScenePlanContract
+from .scenes import SceneCatalog, ScenePlanContract, SceneResolution
 
 
 @dataclass(frozen=True)
@@ -68,6 +68,7 @@ class PagePlan:
     section_variant: str | None = None
     duration_minutes: float | None = None
     scene_warnings: tuple[str, ...] = ()
+    scene_resolution: dict = field(default_factory=dict)
 
     def to_dict(self) -> dict:
         return {
@@ -80,6 +81,7 @@ class PagePlan:
             "section_variant": self.section_variant,
             "duration_minutes": self.duration_minutes,
             "scene_warnings": list(self.scene_warnings),
+            "scene_resolution": self.scene_resolution,
             "pages": [page.to_dict() for page in self.pages],
         }
 
@@ -153,6 +155,7 @@ class PagePlan:
             section_variant=payload.get("section_variant"),
             duration_minutes=payload.get("duration_minutes"),
             scene_warnings=tuple(payload.get("scene_warnings", ())),
+            scene_resolution=dict(payload.get("scene_resolution", {})),
         )
 
 
@@ -167,9 +170,11 @@ class PagePlanner:
         evidence_graph: EvidenceGraph,
         *,
         scene_contract: ScenePlanContract | None = None,
+        scene_resolution: SceneResolution | None = None,
     ) -> PagePlan:
         catalog = SceneCatalog.load()
-        profile = catalog.resolve(scene)
+        resolution = scene_resolution or catalog.classify(scene)
+        profile = resolution.profile
         resolved_scene = profile.name
         resolved_sections = tuple(section.strip() for section in sections if section.strip())
         resolved_drafts = tuple(drafts)
@@ -268,6 +273,7 @@ class PagePlanner:
             section_variant=effective_contract.section_variant,
             duration_minutes=effective_contract.duration_minutes,
             scene_warnings=validation.warnings,
+            scene_resolution=resolution.to_dict(),
         )
 
     @staticmethod

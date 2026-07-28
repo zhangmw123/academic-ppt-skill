@@ -45,6 +45,15 @@ This context defines how source evidence, presentation arguments, template ident
 - The fallback renderer now finds Microsoft YaHei through the WSL-mounted Windows font directory, so its Chinese preview supports content and geometric inspection. P013 was reflowed from five cards to the exact four-module T03 archetype: the GlobalPointer and final-model metrics form one complete comparison module, preserving all five source model results without shrinking type or exceeding semantic ownership bounds.
 - Keep T03 unaccepted: the non-authoritative fallback preview cannot replace Windows PowerPoint. Windows PowerPoint authoritative rendering and an explicit full-resolution visual review remain required. The regenerated acceptance record correctly reports `product_accepted=false`.
 
+## Development Continuation (2026-07-28)
+
+- Template selection is now user-first and auditable. A user-provided `.pptx` is admitted as `conditional_user`, copied byte-for-byte into the working bundle, and is never replaced by a bundled style. Omitting `--template` makes `scripts/build_complete_deck.py` choose a bundled recommendation; its `template` audit record carries `selection_mode` as `user_supplied`, `bundled_requested`, or `bundled_recommended`.
+- Automatic bundled selection uses only templates with both a semantic specification and `semantic_compiled_powerpoint_review_passed`: currently T01 and T03. A compatible reviewed scene template is preferred; a custom or unsupported scene falls back to a nearest reviewed template or the first neutral reviewed template, with the substitution reason recorded. Explicit requests for T02 or T04-T08 remain possible, but the audit classifies them as `bundled_development` rather than formal templates.
+- Scene classification accepts a canonical scene name, known alias, or natural-language audience/goal description. It records requested text, match type, confidence, signals, nearby scenes, inferred audience, and decision goal. Requests without enough support resolve to `自定义场景` and `custom_unverified`, preserving a bounded generic contract without claiming formal supported-scene acceptance.
+- `build_complete_deck.py` now carries scene resolution through task summary, content compilation, page plan, and acceptance. The scene-plan validator accepts custom contracts with an explicit warning instead of failing as an unknown scene. The content compiler can receive an already resolved scene profile, so a custom-scene build does not silently re-resolve or lose the original request.
+- Regression coverage includes natural-language and custom-scene classification, automatic template recommendation, nearest-template disclosure, user-template precedence, and development-template status. Full suite: `128 passed`; official Skill validator: `Skill is valid!`.
+- No new real deck or authoritative Windows PowerPoint visual review was produced in this continuation. Keep T02 and T03 real-content candidates unaccepted until their existing Windows PowerPoint and full-resolution human-review gates are complete.
+
 ## Language
 
 **Scientific Page Contract**:

@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from .evidence import EvidenceNode
-from .scenes import SceneCatalog, ScenePlanContract
+from .scenes import SceneCatalog, ScenePlanContract, SceneProfile
 
 
 @dataclass(frozen=True)
@@ -165,8 +165,9 @@ class CompleteContentCompiler:
         source_paths: list[Path],
         working_dir: Path,
         target_pages: int | None = None,
+        scene_profile: SceneProfile | None = None,
     ) -> CompleteContentPackage:
-        profile = SceneCatalog.load().resolve(scene)
+        profile = scene_profile or SceneCatalog.load().classify(scene).profile
         page_count = target_pages or profile.complete_min
         if not profile.complete_min <= page_count <= profile.complete_max:
             raise ValueError(

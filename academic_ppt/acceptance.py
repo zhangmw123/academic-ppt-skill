@@ -49,7 +49,7 @@ class ProductAcceptanceEvaluator:
         final = Path(final_pptx).resolve()
         layout = Path(final_layout_plan).resolve()
         preview = Path(preview_dir).resolve()
-        profile = SceneCatalog.load().resolve(plan.scene)
+        profile = SceneCatalog.load().classify(plan.scene).profile
         claims = [page.claim_id for page in plan.pages]
         evidence_sets = [tuple(page.evidence_ids) for page in plan.pages]
         preview_images = sorted({path.resolve() for pattern in ("*.png", "*.PNG") for path in preview.glob(pattern)}) if preview.is_dir() else []
