@@ -415,6 +415,7 @@ class StandardTemplateCompiler:
                 "relationship": override.get("relationship", "claim_support_interpretation"),
                 "recommended_argument_units": list(override.get("recommended_argument_units", ())),
                 "content_module_count": expected_count,
+                "reconstructive_module_counts": list(override.get("reconstructive_module_counts", ())),
                 "media_scope": media_scope,
             },
             "media_layout": {

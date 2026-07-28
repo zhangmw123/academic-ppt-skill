@@ -74,6 +74,12 @@ This context defines how source evidence, presentation arguments, template ident
 - T06/T07/T08 (the purple, red, and blue Yunnan University sidebar variants) are now semantically compiled. Each five-page specification records 10 semantic modules and 27 child slots: defense cover, problem evidence, three-stage defense route, result/interpretation carrier, and ending. Package grammar is identical across the three variants while the specifications separately preserve their purple, crimson, and blue sidebar identities.
 - All three remain `semantic_compilation_in_progress`, `compiled_not_release_accepted`, and `product_accepted=false`. They require the same real-source regression, bound object QA, authoritative Windows PowerPoint export, and full-resolution review. All eight bundled templates now have semantic specifications, but only T01/T03 have completed formal acceptance; release remains blocked.
 
+## T06 Real-Source Continuation (2026-07-29)
+
+- A long-form real defense build exposed that five-page sidebar templates could not map the 2/4/5-module pages of an 18-page thesis defense to their physical source-page modules. The compiler now supports an explicit `reconstructive_module_counts` contract: an exact module match remains mandatory by default; only a named, single complete semantic container can authorize a full reconstruction with a stated visible-module count. Unauthorised mismatches continue to fail one-to-one mapping QA.
+- T06 P04 explicitly authorizes complete-container reconstruction for 2, 4, or 5 visible modules. The current real candidate at `/tmp/academic-ppt-t06-current-v2` builds all 18 pages from `基于知识图谱的云南植物知识问答系统的研究与构建_刘金平.pdf` and `benchmarks/real_products/liujinping_defense.content.json`. Its structural, scientific-semantic, composition, and editable-manifest checks pass; eight pages record the authorized reconstruction observation.
+- Do not accept the T06 candidate. Bound object QA currently fails because the generic manifest slot assigner classifies 10pt labels and 14pt headings as the P04 explanation slot, whose normal text range is 11-13pt. Repair the role-aware slot assignment or explicitly model reconstructed child slots before claiming object QA. It also still lacks authoritative Windows PowerPoint export, full-resolution visual review, and user confirmation.
+
 ## Language
 
 **Scientific Page Contract**:

@@ -284,7 +284,7 @@ def test_composition_gate_rejects_semantic_template_module_mismatch():
             "page_id": "P002",
             "layout": "points",
             "points": [
-                {"title": f"要点 {index}", "body": "完整可复核的证据说明"}
+                {"title": f"要点 {index}", "body": "完整可复核的证据说明，并明确给出研究条件、过程说明与适用范围。"}
                 for index in range(1, 4)
             ],
             "template_reference": {
@@ -301,6 +301,32 @@ def test_composition_gate_rejects_semantic_template_module_mismatch():
     assert not result.passed
     assert any("wrong module count" in error for error in result.errors)
     assert any("one-to-one" in error for error in result.errors)
+
+
+def test_composition_gate_allows_explicit_single_container_reconstruction():
+    result = CompositionQualityGate().inspect({
+        "pages": [{
+            "page_id": "P002",
+            "layout": "points",
+            "points": [
+                {"title": f"要点 {index}", "body": "完整可复核的证据说明，并明确给出研究条件、过程说明与适用范围。"}
+                for index in range(1, 5)
+            ],
+            "template_reference": {
+                "source_slide_index": 4,
+                "layout_signature": "title_body",
+                "selection_source": "standard_template_specification",
+                "module_count_exact": False,
+                "reconstruction_authorized": True,
+                "reconstructive_module_count": 4,
+                "semantic_module_bindings": [{"module_id": "T06_P04_M01", "slot_ids": ["heading"]}],
+            },
+            "use_template_scaffold": "identity",
+        }],
+    })
+
+    assert result.passed, result.errors
+    assert any("authorized complete reconstruction" in item for item in result.observations)
 
 
 def test_points_never_render_transition_or_question_as_evidence_cards():

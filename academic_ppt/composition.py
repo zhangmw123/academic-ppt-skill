@@ -321,7 +321,18 @@ class DynamicCompositionCompiler:
             if int(candidate.get("prototype", {}).get("content_module_count", 1))
             == max(desired_modules, 1)
         ]
-        selected = max(exact_module_candidates or candidates, key=score, default=None)
+        reconstructive_candidates = [
+            candidate
+            for candidate in candidates
+            if max(desired_modules, 1) in candidate.get("prototype", {}).get(
+                "reconstructive_module_counts", ()
+            )
+        ]
+        selected = max(
+            exact_module_candidates or reconstructive_candidates or candidates,
+            key=score,
+            default=None,
+        )
         if not selected or score(selected)[0] < 0:
             return None
         prototype = selected.get("prototype", {})
@@ -342,6 +353,11 @@ class DynamicCompositionCompiler:
             "media_scope": media.get("scope", "none"),
             "media_slot_count": int(media.get("slot_count", 0)),
             "module_count_exact": len(content_modules) == max(desired_modules, 1),
+            "reconstruction_authorized": bool(
+                not exact_module_candidates
+                and selected in reconstructive_candidates
+            ),
+            "reconstructive_module_count": max(desired_modules, 1),
             "semantic_module_bindings": [
                 {
                     "module_id": module["module_id"],
@@ -619,8 +635,23 @@ class CompositionQualityGate:
             if reference and reference.get("selection_source") == "standard_template_specification":
                 bindings = reference.get("semantic_module_bindings", ())
                 if not reference.get("module_count_exact"):
-                    errors.append(f"{page_id}: selected template archetype has the wrong module count")
-                if len(bindings) != self._semantic_module_count(page):
+                    if not reference.get("reconstruction_authorized"):
+                        errors.append(f"{page_id}: selected template archetype has the wrong module count")
+                        errors.append(
+                            f"{page_id}: visible modules do not map one-to-one to semantic template modules"
+                        )
+                    elif int(reference.get("reconstructive_module_count", 0)) != self._semantic_module_count(page):
+                        errors.append(f"{page_id}: reconstruction module count is not explicitly authorized")
+                    elif len(bindings) != 1:
+                        errors.append(f"{page_id}: reconstruction must use exactly one complete semantic container")
+                    else:
+                        observations.append(
+                            f"{page_id}: {self._semantic_module_count(page)} visible modules use an authorized complete reconstruction container"
+                        )
+                if (
+                    reference.get("module_count_exact")
+                    and len(bindings) != self._semantic_module_count(page)
+                ):
                     errors.append(
                         f"{page_id}: visible modules do not map one-to-one to semantic template modules"
                     )
