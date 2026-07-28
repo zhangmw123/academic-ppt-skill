@@ -235,3 +235,12 @@ def test_authored_content_can_bind_one_source_figure_per_semantic_module(tmp_pat
     assert result.drafts[0].media_layout == "one_per_module"
     assert result.drafts[0].visual_strategy == "module_media"
     assert result.drafts[0].component_requirements["picture"] == 5
+
+
+def test_liujinping_comparison_title_describes_models_not_visible_module_count():
+    path = Path(__file__).resolve().parents[1] / "benchmarks/real_products/liujinping_defense.content.json"
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    page = next(item for item in payload["pages"] if item["page_id"] == "P013")
+
+    assert page["title"] == "五个模型对比显示每项结构改进都带来增益"
+    assert len(page["text"]) == 5
