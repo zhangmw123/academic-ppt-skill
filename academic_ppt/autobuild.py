@@ -114,6 +114,25 @@ ROLE_ALIASES = {
     "key_results": "results",
     "contribution": "contributions",
     "takeaway": "ending",
+    # Scene contracts use audience-facing labels; map them to the evidence
+    # roles used by the automatic source selector before ranking passages.
+    "period_focus": "research_background",
+    "completed_tasks": "contributions",
+    "learning_and_reading": "related_work",
+    "experiment_progress": "experiments",
+    "evidence": "results",
+    "failed_attempts": "limitations",
+    "issues": "limitations",
+    "discussion": "objectives",
+    "next_actions": "next_action",
+    "user_or_scenario": "research_background",
+    "solution": "methods",
+    "core_technology": "methods",
+    "validation": "results",
+    "comparative_advantage": "results",
+    "application_value": "contributions",
+    "team": "contributions",
+    "roadmap": "next_action",
 }
 
 SCENE_FOCUS = {

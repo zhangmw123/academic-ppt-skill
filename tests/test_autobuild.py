@@ -99,6 +99,31 @@ def test_scene_contract_aliases_select_role_specific_result_sentence():
     assert "By sequentially posing" not in evidence_line
 
 
+def test_project_competition_roles_use_specific_evidence_categories():
+    result = EvidencePassage(
+        (_evidence_node("E1", "result", "模型在对比实验中取得更高的准确率和召回率。", 10),),
+        "模型在对比实验中取得更高的准确率和召回率。",
+        10,
+    )
+    method = EvidencePassage(
+        (_evidence_node("E2", "method", "系统使用 BERT 编码问题文本并完成意图识别。", 6),),
+        "系统使用 BERT 编码问题文本并完成意图识别。",
+        6,
+    )
+
+    selected = CompleteContentCompiler._select_for_focus(
+        [method, result],
+        ("comparative_advantage", "core_technology"),
+    )
+
+    assert selected == [result, method]
+
+
+def test_weekly_scene_roles_map_failures_and_actions_to_evidence_roles():
+    assert CompleteContentCompiler._canonical_role("failed_attempts") == "limitations"
+    assert CompleteContentCompiler._canonical_role("next_actions") == "next_action"
+
+
 def test_limitation_role_prefers_explicit_constraint_sentence():
     text = (
         "Local query is an entity-centric retrieval strategy. "
