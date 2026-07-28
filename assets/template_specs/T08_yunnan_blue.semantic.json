@@ -1928,6 +1928,11 @@
           "applicability_boundary"
         ],
         "content_module_count": 1,
+        "reconstructive_module_counts": [
+          2,
+          4,
+          5
+        ],
         "media_scope": "page"
       },
       "media_layout": {
