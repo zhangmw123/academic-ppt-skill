@@ -124,6 +124,22 @@ def test_weekly_scene_roles_map_failures_and_actions_to_evidence_roles():
     assert CompleteContentCompiler._canonical_role("next_actions") == "next_action"
 
 
+def test_weekly_progress_requires_cadence_status_blocker_and_next_action_evidence():
+    thesis_like = [EvidencePassage(
+        (_evidence_node("E1", "method", "系统使用 BERT 模型完成问题意图识别和实体抽取。", 6),),
+        "系统使用 BERT 模型完成问题意图识别和实体抽取。",
+        6,
+    )]
+    weekly = [EvidencePassage(
+        (_evidence_node("E2", "result", "本周已完成对照实验；温度波动导致一次失败，待讨论。下周计划复现。", 2),),
+        "本周已完成对照实验；温度波动导致一次失败，待讨论。下周计划复现。",
+        2,
+    )]
+
+    assert CompleteContentCompiler._scene_fitness_errors("组会-周报进展", thesis_like)
+    assert not CompleteContentCompiler._scene_fitness_errors("组会-周报进展", weekly)
+
+
 def test_limitation_role_prefers_explicit_constraint_sentence():
     text = (
         "Local query is an entity-centric retrieval strategy. "

@@ -45,6 +45,15 @@ TRAILING_CONNECTORS = {
 EVIDENCE_CLAIM_LIMIT = 128
 EVIDENCE_LINE_LIMIT = 64
 
+# A thesis can provide useful technical evidence, but it cannot honestly be
+# presented as a weekly report without source-grounded reporting cadence.
+WEEKLY_FITNESS_SIGNALS = {
+    "weekly cadence": (r"本周", r"上周", r"周报", r"周进展", r"第\s*\d+\s*周", r"\bweekly\b", r"\bweek\s*\d+\b"),
+    "current work state": (r"已完成", r"进行中", r"完成了", r"实验进展", r"复现", r"当前进展"),
+    "blocker or decision": (r"失败", r"阻碍", r"待讨论", r"需要支持", r"待确认", r"问题"),
+    "next action": (r"下周", r"下一步", r"计划", r"待完成", r"待验证", r"后续行动"),
+}
+
 ROLE_LABELS = {
     "cover": "汇报主题",
     "ending": "结论",
@@ -197,6 +206,9 @@ class CompleteContentCompiler:
             raise ValueError(
                 f"complete deck requires {page_count} distinct textual evidence blocks; found {len(candidates)}"
             )
+        fitness_errors = self._scene_fitness_errors(profile.name, candidates)
+        if fitness_errors:
+            raise ValueError("source does not support the requested scene: " + "; ".join(fitness_errors))
         variant_name, sections = next(iter(profile.default_variants.items()))
         focus_sequence = self._focus_sequence(profile.name, page_count, profile.required_tags)
         selected = self._select_for_focus(candidates, focus_sequence)
@@ -344,6 +356,21 @@ class CompleteContentCompiler:
             if current:
                 passages.append(EvidencePassage(tuple(current), " ".join(text_parts), page))
         return [passage for passage in passages if CompleteContentCompiler._passage_is_usable(passage)]
+
+    @staticmethod
+    def _scene_fitness_errors(scene: str, passages: list[EvidencePassage]) -> list[str]:
+        """Reject scene claims whose required reporting evidence is absent."""
+        if scene != "组会-周报进展":
+            return []
+        source_text = "\n".join(passage.text for passage in passages).casefold()
+        missing = [
+            label
+            for label, patterns in WEEKLY_FITNESS_SIGNALS.items()
+            if not any(re.search(pattern, source_text, flags=re.I) for pattern in patterns)
+        ]
+        if not missing:
+            return []
+        return ["weekly-progress source lacks " + ", ".join(missing) + " evidence"]
 
     @staticmethod
     def _passage_is_usable(passage: EvidencePassage) -> bool:
