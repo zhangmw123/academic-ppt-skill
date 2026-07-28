@@ -57,6 +57,30 @@ def shape_kind(shape):
     return str(shape.shape_type).lower().replace(" ", "_")
 
 
+def solid_fill_color(shape):
+    """Return an RGB fill when a native shape can act as fixed template background."""
+    try:
+        value = shape.fill.fore_color.rgb
+    except (AttributeError, TypeError, ValueError):
+        return None
+    if value is None:
+        return None
+    text = str(value)
+    return f"#{text}" if len(text) == 6 else None
+
+
+def is_fixed_background_layer(shape, box):
+    if getattr(shape, "has_text_frame", False) and shape.text.strip():
+        return False
+    if shape_kind(shape) not in {"autoshape", "placeholder"} or not solid_fill_color(shape):
+        return False
+    area = float(box["width"]) * float(box["height"])
+    full_canvas = area >= 0.55
+    edge_band = float(box["top"]) < 0.03 and float(box["width"]) >= 0.65 and area >= 0.045
+    sidebar = float(box["left"]) < 0.03 and float(box["width"]) <= 0.28 and float(box["height"]) >= 0.50
+    return full_canvas or edge_band or sidebar
+
+
 def iter_shape_records(shapes, parent_group_shape_id=None):
     for shape in shapes:
         yield shape, parent_group_shape_id
@@ -407,6 +431,16 @@ def extract(template: Path, output: Path, asset_dir: Path):
         for shape, parent_group_shape_id in record["shape_records"]:
             box = norm_box(shape, width, height)
             component_boxes.append((shape, parent_group_shape_id, box))
+        fixed_background_layers = [
+            {
+                "shape_id": int(shape.shape_id),
+                "box": box,
+                "fill": solid_fill_color(shape),
+            }
+            for shape, _, box in component_boxes
+            if is_fixed_background_layer(shape, box)
+        ]
+        fixed_background_ids = {item["shape_id"] for item in fixed_background_layers}
         for shape, parent_group_shape_id, box in component_boxes:
             area = box["width"] * box["height"]
             containers = []
@@ -427,6 +461,8 @@ def extract(template: Path, output: Path, asset_dir: Path):
             kind = shape_kind(shape)
             has_text = bool(getattr(shape, "has_text_frame", False) and shape.text.strip())
             role = "navigation" if shape.shape_id in navigation_shape_ids_by_slide[record["slide_index"] - 1] else kind
+            if shape.shape_id in fixed_background_ids:
+                role = "fixed_background"
             if kind == "picture" and geometric_parent is not None:
                 role = "nested_picture_placeholder"
             components.append({
@@ -494,6 +530,7 @@ def extract(template: Path, output: Path, asset_dir: Path):
             "editable_text_count": len(slots),
             "logo_candidates": [slot for slot in picture_slots if slot["logo_candidate"]],
             "decorative_assets": assets,
+            "fixed_background_layers": fixed_background_layers,
         })
 
         if nav_components:

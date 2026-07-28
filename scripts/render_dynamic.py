@@ -386,6 +386,24 @@ def add_template_scaffold(slide, scaffold, base_dir=None, *, mode="full", allow_
     if not scaffold:
         return False
     added = False
+    # Native background color blocks are visual identity, not content modules.
+    # Recreate them before images and editable content so they remain fixed layers.
+    for layer in scaffold.get("fixed_background_layers", ()):
+        box = layer.get("box", {})
+        fill = layer.get("fill")
+        if not fill or not all(name in box for name in ("left", "top", "width", "height")):
+            continue
+        add_box(
+            slide,
+            float(box["left"]) * 13.333,
+            float(box["top"]) * 7.5,
+            float(box["width"]) * 13.333,
+            float(box["height"]) * 7.5,
+            fill,
+            fill,
+            radius=False,
+        )
+        added = True
     for asset in scaffold.get("decorative_assets", []):
         path = Path(asset["path"])
         if not path.is_absolute() and base_dir:

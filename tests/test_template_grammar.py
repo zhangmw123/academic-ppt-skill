@@ -4,6 +4,8 @@ from pathlib import Path
 
 from PIL import Image
 from pptx import Presentation
+from pptx.enum.shapes import MSO_SHAPE
+from pptx.dml.color import RGBColor
 from pptx.util import Inches
 
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
@@ -62,3 +64,31 @@ def test_navigation_picture_backings_are_not_classified_as_logos(tmp_path: Path)
         if region["role"] == "navigation"
     )
     assert {2, 3} <= set(navigation_region["ownership_group"]["shape_ids"])
+
+
+def test_edge_fill_is_extracted_as_fixed_background_not_content_component(tmp_path: Path):
+    presentation = Presentation()
+    for _ in range(3):
+        slide = presentation.slides.add_slide(presentation.slide_layouts[6])
+        sidebar = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(1.2), Inches(7.5))
+        sidebar.fill.solid()
+        sidebar.fill.fore_color.rgb = RGBColor(112, 48, 160)
+        sidebar.line.fill.background()
+        title = slide.shapes.add_textbox(Inches(1.6), Inches(0.8), Inches(8), Inches(0.5))
+        title.text = "Research title"
+    source = tmp_path / "fixed-background-template.pptx"
+    presentation.save(source)
+    output = tmp_path / "grammar.json"
+
+    extract(source, output, tmp_path / "assets")
+
+    grammar = json.loads(output.read_text(encoding="utf-8"))
+    first = grammar["archetypes"][0]
+    assert first["fixed_background_layers"] == [{
+        "shape_id": 2,
+        "box": {"left": 0.0, "top": 0.0, "width": 0.12, "height": 1.0},
+        "fill": "#7030A0",
+    }]
+    component = next(item for item in first["components"] if item["shape_ids"] == [2])
+    assert component["component_role"] == "fixed_background"
+    assert 2 in StandardTemplateCompiler._identity_shape_ids(first, first["text_slots"])

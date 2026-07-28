@@ -450,7 +450,7 @@ class StandardTemplateCompiler:
             if item.get("role") in {"navigation_or_footer", "page_number_or_footer"}
         }
         for item in archetype.get("components", ()):
-            if item.get("component_role") == "navigation":
+            if item.get("component_role") in {"navigation", "fixed_background"}:
                 values.update(int(shape_id) for shape_id in item.get("shape_ids", ()))
         for item in archetype.get("picture_slots", ()):
             box = item.get("box", {})
@@ -769,6 +769,8 @@ class StandardTemplateCompiler:
                 role = "logo"
             elif component.get("component_role") in {"textbox", "autoshape"}:
                 role = "footer_or_navigation_label"
+            elif component.get("component_role") == "fixed_background":
+                role = "fixed_background"
             else:
                 role = "decoration"
             grouped.setdefault(role, []).append(component)
