@@ -100,7 +100,7 @@ This context defines how source evidence, presentation arguments, template ident
 ## Release Matrix Continuation (2026-07-29)
 
 - `scripts/run_template_scenario_matrix.py` now writes an atomic partial report after every completed case and supports `--resume`; successful cases are reused and failed temporary case directories are regenerated. It explicitly uses a selected runtime and never claims product acceptance. The T01/T07 matrix page counts now meet their scene lower bounds (10 and 8 pages).
-- The current portable report at `/tmp/academic-ppt-template-scene-matrix-v2/report.json` safely records progress. T01 and T02 pass; T03 is the next actual content failure, where an automatically extracted architecture page still cannot provide four source-grounded nodes. Continue with `--resume`; do not treat the incomplete matrix as passed.
+- The portable matrix at `/tmp/academic-ppt-template-scene-matrix-v2/report.json` now passes all 8 cases: T01 through T08 generate their selected template, declared page budget, and complete fallback preview. The runner fixed automatic long-clause architecture routing, allowed a three-node route when the source supports only three complete work packages, and preserves parameter lines such as `batch_size 64 seq_max_len 128` as one editable explanation. This is an automated portable compatibility baseline only; it does not provide authoritative PowerPoint render, full-resolution human visual review, user confirmation, or formal product acceptance.
 
 ## Language
 

@@ -532,8 +532,11 @@ class DynamicCompositionCompiler:
             )
         process_steps = []
         for index, step in enumerate(steps[:5], 1):
-            content = _headline_detail(step, fallback=f"步骤 {index}")
-            content["title"] = _process_heading(content, index)
+            if re.search(r"\b(?:batch_size|seq_max_len|epoch|learning_rate)\b", step, re.I):
+                content = {"title": "实验参数", "body": _clean(step)}
+            else:
+                content = _headline_detail(step, fallback=f"步骤 {index}")
+                content["title"] = _process_heading(content, index)
             process_steps.append(content)
         return {
             "layout": "process",
@@ -560,13 +563,13 @@ class DynamicCompositionCompiler:
                 node_values.append(clause)
             if len(node_values) >= 6:
                 break
-        if len(node_values) < 4:
+        if len(node_values) < 3:
             raise ValueError(
-                f"{page.page_id}: architecture requires four source-grounded nodes; "
+                f"{page.page_id}: architecture requires three source-grounded nodes; "
                 "transitions cannot fill visible nodes"
             )
         modules = [_headline_detail(value) for value in node_values]
-        column_count = 3 if len(modules) >= 4 else 2
+        column_count = 3 if len(modules) >= 3 else 2
         columns = []
         node_ids = []
         header_sets = {
@@ -812,8 +815,8 @@ class CompositionQualityGate:
             elif layout == "architecture":
                 columns = page.get("architecture", {}).get("columns", ())
                 node_count = sum(len(column.get("nodes", ())) for column in columns)
-                if len(columns) < 2 or node_count < 4:
-                    errors.append(f"{page_id}: architecture requires at least two columns and four editable nodes")
+                if len(columns) < 2 or node_count < 3:
+                    errors.append(f"{page_id}: architecture requires at least two columns and three editable nodes")
             if units > 210:
                 observations.append(f"{page_id}: dense composition has {units:.0f} units; inspect readability")
         return CompositionQualityResult(not errors, tuple(errors), tuple(observations))

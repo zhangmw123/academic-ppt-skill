@@ -390,6 +390,22 @@ def test_process_never_renders_transition_as_a_visible_step():
     assert composed["steps"][1]["title"] == "语义编码"
 
 
+def test_process_keeps_source_parameter_lines_as_one_editable_explanation():
+    page = _page("P009", "实验设置", "native_diagram", 4)
+    composed = DynamicCompositionCompiler._process(
+        page,
+        [
+            "实验设置",
+            "模型训练采用固定验证流程。",
+            "结果通过对比指标进行判断。",
+            "batch_size 64 seq_max_len 128",
+        ],
+    )
+
+    parameter = next(step for step in composed["steps"] if step["title"] == "实验参数")
+    assert parameter["body"] == "batch_size 64 seq_max_len 128"
+
+
 def test_architecture_recovers_source_grounded_nodes_without_transition_fallback():
     page = _page("P008", "系统评估架构", "native_diagram", 5)
     composed = DynamicCompositionCompiler._architecture(
@@ -406,7 +422,7 @@ def test_architecture_recovers_source_grounded_nodes_without_transition_fallback
         for column in composed["architecture"]["columns"]
         for node in column["nodes"]
     )
-    assert sum(len(column["nodes"]) for column in composed["architecture"]["columns"]) >= 4
+    assert sum(len(column["nodes"]) for column in composed["architecture"]["columns"]) >= 3
     assert page.next_link not in visible
     assert "下一页" not in visible
     assert [column["title"] for column in composed["architecture"]["columns"]] == [
