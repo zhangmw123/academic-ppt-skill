@@ -488,6 +488,64 @@ def test_process_preserves_authored_model_identifiers_in_comparison_steps():
     ]
 
 
+def test_adjacent_diagrams_are_recomposed_as_distinct_point_layouts():
+    page = _page("P005", "系统分层架构", "native_diagram", 4)
+    composed = DynamicCompositionCompiler._diversify_adjacent_layout(
+        page,
+        [
+            "系统分层架构",
+            "数据层：Neo4j 保存可查询实体关系",
+            "算法层：意图分类与实体识别独立替换",
+            "应用层：接口与移动端共同完成问答闭环",
+        ],
+        {"layout": "architecture"},
+        {"layout": "architecture", "page_id": "P004"},
+    )
+
+    assert composed["layout"] == "points"
+    assert composed["layout_diversification"] == "adjacent_diagram_to_points"
+
+
+def test_composition_gate_rejects_adjacent_duplicate_visual_archetypes():
+    result = CompositionQualityGate().inspect({
+        "pages": [
+            {
+                "page_id": "P004",
+                "layout": "architecture",
+                "title": "链路",
+                "template_reference": {
+                    "source_slide_index": 3,
+                    "layout_signature": "three_columns",
+                    "semantic_spec_page_id": "T03_P05",
+                },
+                "use_template_scaffold": "structure",
+                "architecture": {
+                    "columns": [{"nodes": [{"label": "输入", "detail": "问题"}]}] * 3,
+                },
+                "page_conclusion": "形成查询结果。",
+            },
+            {
+                "page_id": "P005",
+                "layout": "architecture",
+                "title": "架构",
+                "template_reference": {
+                    "source_slide_index": 3,
+                    "layout_signature": "three_columns",
+                    "semantic_spec_page_id": "T03_P05",
+                },
+                "use_template_scaffold": "structure",
+                "architecture": {
+                    "columns": [{"nodes": [{"label": "数据", "detail": "服务"}]}] * 3,
+                },
+                "page_conclusion": "支持系统运行。",
+            },
+        ],
+    })
+
+    assert not result.passed
+    assert any("adjacent content page repeats" in error for error in result.errors)
+
+
 def test_headline_detail_preserves_hybrid_scientific_identifier_boundary():
     content = DynamicCompositionCompiler._text_figure(
         _page("P007", "实体识别模型", "source_figure", 3),

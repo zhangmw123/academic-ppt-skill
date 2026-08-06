@@ -197,13 +197,29 @@ class DynamicCompositionCompiler:
                 composed = self._process(page, values)
             else:
                 composed = self._points(page, values)
+            composed = self._diversify_adjacent_layout(
+                page,
+                values,
+                composed,
+                pages[-1] if pages else None,
+            )
             composed.update({
                 "page_id": page.page_id,
                 "section": page.section,
                 "speaker_notes": self._speaker_notes(page),
             })
+            previous_reference = (pages[-1].get("template_reference") or {}) if pages else {}
+            avoid_semantic_page_ids = (
+                {previous_reference["semantic_spec_page_id"]}
+                if previous_reference.get("semantic_spec_page_id")
+                else set()
+            )
             template_reference = (
-                self._semantic_template_reference(composed, semantic_spec)
+                self._semantic_template_reference_with_exclusions(
+                    composed,
+                    semantic_spec,
+                    avoid_semantic_page_ids=avoid_semantic_page_ids,
+                )
                 if semantic_spec else None
             ) or self._template_reference(composed, grammar)
             if template_reference:
@@ -285,6 +301,19 @@ class DynamicCompositionCompiler:
 
     @staticmethod
     def _semantic_template_reference(page: dict, specification: dict) -> dict | None:
+        return DynamicCompositionCompiler._semantic_template_reference_with_exclusions(
+            page,
+            specification,
+            avoid_semantic_page_ids=set(),
+        )
+
+    @staticmethod
+    def _semantic_template_reference_with_exclusions(
+        page: dict,
+        specification: dict,
+        *,
+        avoid_semantic_page_ids: set[str],
+    ) -> dict | None:
         layout = page.get("layout")
         if layout in {"cover", "ending", "agenda", "section"}:
             desired_role = layout
@@ -360,6 +389,8 @@ class DynamicCompositionCompiler:
             elif slot_count:
                 value -= 5
             value += sum(6 for hint in hints if hint in archetype)
+            if candidate.get("page_id") in avoid_semantic_page_ids:
+                value -= 80
             return value, -int(candidate.get("source_slide_index", 0))
 
         candidates = specification.get("pages", ())
@@ -419,6 +450,24 @@ class DynamicCompositionCompiler:
             "identity_signature": specification.get("template_identity", {}).get("identity_signature"),
             "selection_source": "standard_template_specification",
         }
+
+    @staticmethod
+    def _diversify_adjacent_layout(
+        page: PlannedPage,
+        values: list[str],
+        composed: dict,
+        previous: dict | None,
+    ) -> dict:
+        """Use a distinct visual grammar for consecutive diagram pages."""
+        if not previous or composed.get("layout") != previous.get("layout"):
+            return composed
+        if composed.get("layout") not in {"architecture", "process"}:
+            return composed
+        alternate = DynamicCompositionCompiler._points(page, values)
+        if len(alternate.get("points", ())) >= 3:
+            alternate["layout_diversification"] = "adjacent_diagram_to_points"
+            return alternate
+        return composed
 
     @staticmethod
     def _cover(page: PlannedPage, values: list[str]) -> dict:
@@ -823,6 +872,24 @@ class CompositionQualityGate:
                     errors.append(f"{page_id}: architecture requires at least two columns and three editable nodes")
             if units > 210:
                 observations.append(f"{page_id}: dense composition has {units:.0f} units; inspect readability")
+            if index:
+                previous = pages[index - 1]
+                repeated_layout = (
+                    layout in {"architecture", "process", "points"}
+                    and layout == previous.get("layout")
+                )
+                reference = page.get("template_reference") or {}
+                previous_reference = previous.get("template_reference") or {}
+                repeated_archetype = (
+                    reference.get("semantic_spec_page_id")
+                    and reference.get("semantic_spec_page_id")
+                    == previous_reference.get("semantic_spec_page_id")
+                )
+                if repeated_layout and repeated_archetype:
+                    errors.append(
+                        f"{page_id}: adjacent content page repeats the same visual grammar "
+                        "and template archetype"
+                    )
         return CompositionQualityResult(not errors, tuple(errors), tuple(observations))
 
     @staticmethod
