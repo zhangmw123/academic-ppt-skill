@@ -9,7 +9,7 @@
       "section_variant": "standard_6",
       "target_pages": 12,
       "duration_minutes": 12,
-      "template_id": "T01",
+      "template_id": "T05",
       "source_claims": [
         "拟研究模型、算法、训练数据集、基线与消融设计，当前已有初步验证结果。",
         "现有方法在跨区域数据上的泛化能力不足，因此需要新的技术路线。",
@@ -21,16 +21,16 @@
     {
       "case_id": "midterm-laboratory",
       "scene": "中期考核",
-      "method_profile": "laboratory_experiment",
+      "method_profile": "computational_modeling",
       "evidence_state": "interim",
       "section_variant": "progress_5",
       "target_pages": 12,
       "duration_minutes": 12,
-      "template_id": "T03",
+      "template_id": "T06",
       "source_claims": [
-        "已完成对照、重复、实验条件和试剂筛选，并形成显微观察记录。",
-        "原计划中的两项任务按期完成，一项因样品批次差异调整了时间表。",
-        "阶段结果支持继续推进，剩余风险将通过增加生物学重复进行控制。"
+        "已完成植物知识数据整理、知识图谱构建和问答基线模型训练，并形成阶段测试记录。",
+        "原计划中的数据与模型任务按期完成，移动端集成因接口联调调整了时间表。",
+        "阶段结果支持继续推进，剩余风险将通过补充对比实验和端到端测试进行控制。"
       ],
       "required_tags": ["research_overview", "original_plan", "completed_work", "progress_measure", "interim_results", "plan_deviation", "issues", "mitigation", "remaining_work", "next_plan"],
       "argument_units": ["what_was_planned", "what_has_been_completed", "what_evidence_exists", "where_the_plan_deviated", "how_risks_are_controlled", "what_remains"]
@@ -38,16 +38,16 @@
     {
       "case_id": "graduation-survey",
       "scene": "毕业答辩",
-      "method_profile": "survey_empirical_analysis",
+      "method_profile": "computational_modeling",
       "evidence_state": "final",
       "section_variant": "classic_5",
       "target_pages": 18,
       "duration_minutes": 18,
-      "template_id": "T02",
+      "template_id": "T03",
       "source_claims": [
-        "研究采用问卷、样本量估计、量表信度与效度检验，并完成回归分析。",
-        "实证结果回答了核心研究问题，同时结论仅适用于当前抽样范围。",
-        "研究贡献在于解释关键影响路径，未来工作需要扩展样本与纵向观察。"
+        "研究完成植物知识图谱、意图分类、实体识别和移动问答系统的设计与实现。",
+        "对比实验与系统测试回答了核心研究问题，同时结论受当前语料和植物数据范围限制。",
+        "研究贡献在于贯通知识抽取、图查询与问答应用，未来工作需要扩展语料和真实用户测试。"
       ],
       "required_tags": ["research_background", "research_problem", "related_work", "research_gap", "objectives", "methods", "data", "experiments", "results", "contributions", "limitations", "future_work"],
       "argument_units": ["problem", "gap", "solution", "validation", "interpretation", "contribution", "boundary"]
@@ -72,16 +72,16 @@
     {
       "case_id": "lab-weekly-progress",
       "scene": "组会-周报进展",
-      "method_profile": "laboratory_experiment",
+      "method_profile": "engineering_system_validation",
       "evidence_state": "interim",
       "section_variant": "weekly_5",
       "target_pages": 8,
       "duration_minutes": 8,
       "template_id": "T01",
       "source_claims": [
-        "本周完成对照、重复和实验条件检查，并补充试剂记录。",
-        "一次失败尝试暴露了温度控制问题，需要导师确认新的验证顺序。",
-        "下周将完成显微观察、整理原始证据并执行预定复现实验。"
+        "本周完成远端基线对齐、150 项回归测试和复杂版式去重，并记录发布证据缺口。",
+        "一次发布审计发现原生渲染路径会自动接受视觉任务，需要先修复验收状态转换。",
+        "下周将生成十场景真实候选、运行原生 PowerPoint 控制并完成逐页审查。"
       ],
       "required_tags": ["period_focus", "completed_tasks", "learning_and_reading", "experiment_progress", "evidence", "failed_attempts", "issues", "discussion", "next_actions"],
       "argument_units": ["what_was_planned", "what_was_done", "what_was_learned", "what_failed_or_blocked", "what_decision_is_needed", "what_happens_next"]
@@ -94,7 +94,7 @@
       "section_variant": "research_5",
       "target_pages": 8,
       "duration_minutes": 8,
-      "template_id": "T01",
+      "template_id": "T07",
       "source_claims": [
         "课题已完成模型、算法、训练数据集和基线实现，并得到阶段性准确率结果。",
         "消融实验显示当前模块仍存在泛化缺口，写作中的方法章节已经形成初稿。",
@@ -145,7 +145,7 @@
       "section_variant": "milestone_6",
       "target_pages": 10,
       "duration_minutes": 10,
-      "template_id": "T04",
+      "template_id": "T08",
       "source_claims": [
         "项目已按任务书完成系统架构、部署和 API 交付，并通过负载与可靠性检查。",
         "延迟和吞吐量指标达到约定目标，未完成事项已形成整改计划。",
@@ -162,7 +162,7 @@
       "section_variant": "conference_5",
       "target_pages": 8,
       "duration_minutes": 8,
-      "template_id": "T01",
+      "template_id": "T02",
       "source_claims": [
         "研究提出新的模型与算法，在公开数据集上完成基线、准确率和消融比较。",
         "核心思路改善了泛化表现，最强结果支持主要贡献但仍受数据范围限制。",

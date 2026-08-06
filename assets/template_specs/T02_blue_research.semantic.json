@@ -932,6 +932,7 @@
           "date"
         ],
         "content_module_count": 1,
+        "reconstructive_module_counts": [],
         "media_scope": "none"
       },
       "media_layout": {
@@ -1199,6 +1200,7 @@
           "core_judgment"
         ],
         "content_module_count": 1,
+        "reconstructive_module_counts": [],
         "media_scope": "page"
       },
       "media_layout": {
@@ -1599,6 +1601,7 @@
           "supporting_visual"
         ],
         "content_module_count": 2,
+        "reconstructive_module_counts": [],
         "media_scope": "module"
       },
       "media_layout": {
@@ -2250,6 +2253,7 @@
           "research_value"
         ],
         "content_module_count": 3,
+        "reconstructive_module_counts": [],
         "media_scope": "none"
       },
       "media_layout": {
@@ -2909,6 +2913,7 @@
           "stage_evidence"
         ],
         "content_module_count": 4,
+        "reconstructive_module_counts": [],
         "media_scope": "module"
       },
       "media_layout": {
@@ -4008,6 +4013,7 @@
           "transition_or_gate"
         ],
         "content_module_count": 5,
+        "reconstructive_module_counts": [],
         "media_scope": "module"
       },
       "media_layout": {
@@ -5292,6 +5298,7 @@
           "cross_panel_interpretation"
         ],
         "content_module_count": 1,
+        "reconstructive_module_counts": [],
         "media_scope": "page"
       },
       "media_layout": {
@@ -6124,6 +6131,7 @@
           "statistical_boundary"
         ],
         "content_module_count": 1,
+        "reconstructive_module_counts": [],
         "media_scope": "page"
       },
       "media_layout": {
@@ -6596,6 +6604,7 @@
           "contact"
         ],
         "content_module_count": 1,
+        "reconstructive_module_counts": [],
         "media_scope": "none"
       },
       "media_layout": {

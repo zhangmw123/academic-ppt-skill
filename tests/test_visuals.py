@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from academic_ppt.visuals import VisualTask
+from academic_ppt.visuals import VisualTask, bind_rendered_visual_task
 
 
 class VisualTaskTests(unittest.TestCase):
@@ -32,6 +32,23 @@ class VisualTaskTests(unittest.TestCase):
                     evidence_ids=["EVD_001"],
                     task_type="chart",
                 ).accept()
+
+    def test_binding_does_not_auto_accept_without_visual_review(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output = Path(temp_dir) / "deck.pptx"
+            output.write_bytes(b"pptx")
+            task = VisualTask.create(
+                task_id="VIS_002",
+                page_id="P002",
+                evidence_ids=("EVD_002",),
+                task_type="native_diagram",
+            )
+
+            bound = bind_rendered_visual_task(task, output, review_passed=False)
+            accepted = bind_rendered_visual_task(task, output, review_passed=True)
+
+            self.assertEqual(bound.status, "bound_to_slide")
+            self.assertEqual(accepted.status, "accepted")
 
 
 if __name__ == "__main__":

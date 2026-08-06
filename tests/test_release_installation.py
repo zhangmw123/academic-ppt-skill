@@ -62,6 +62,7 @@ class InstalledSkillReleaseTests(unittest.TestCase):
                     "scripts/extract_template_grammar.py",
                     "scripts/compile_bundled_source_templates.py",
                     "scripts/check_powerpoint_runtime.py",
+                    "scripts/audit_release_readiness.py",
                     "scripts/repair_rendered_navigation.py",
                     "scripts/validate_template_spec.py",
                     "scripts/render_scientific_visuals.py",
@@ -70,6 +71,7 @@ class InstalledSkillReleaseTests(unittest.TestCase):
                     "references/standard-template-spec.schema.json",
                     "references/object-binding-manifest.schema.json",
                     "references/template-semantic-prototypes.json",
+                    "references/release-evidence.json",
                     "assets/template_specs/T01_green_research.semantic.json",
                     "assets/template_specs/T03_blue_defense.semantic.json",
                 ):

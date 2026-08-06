@@ -495,6 +495,7 @@
           "date"
         ],
         "content_module_count": 1,
+        "reconstructive_module_counts": [],
         "media_scope": "none"
       },
       "media_layout": {
@@ -510,10 +511,10 @@
           "role": "cover_identity",
           "semantic_region": "content",
           "box": {
-            "left": 0.0,
-            "top": 0.0,
-            "width": 1.0,
-            "height": 1.0
+            "left": 0.0525,
+            "top": 0.1133,
+            "width": 0.825,
+            "height": 0.7733
           },
           "render_contract": {
             "allowed_modes": [
@@ -526,21 +527,18 @@
           },
           "ownership_group": {
             "component_ids": [
-              "S01_C2",
               "S01_C3",
               "S01_C4",
               "S01_C5",
               "S01_C6"
             ],
             "shape_ids": [
-              2,
               3,
               4,
               5,
               6
             ],
             "complete_delete_shape_ids": [
-              2,
               3,
               4,
               5,
@@ -565,8 +563,8 @@
               "estimated_cjk_chars": 46
             },
             "explanation": {
-              "estimated_lines": 55,
-              "estimated_cjk_chars": 2463
+              "estimated_lines": 25,
+              "estimated_cjk_chars": 183
             },
             "overflow_action": "shorten_split_or_reflow"
           },
@@ -617,20 +615,19 @@
               ],
               "required": true,
               "native_shape_ids": [
-                2,
                 3,
                 5,
                 6
               ],
               "box": {
-                "left": 0.0,
-                "top": 0.0,
-                "width": 1.0,
-                "height": 1.0
+                "left": 0.0525,
+                "top": 0.1133,
+                "width": 0.6855,
+                "height": 0.7733
               },
               "capacity": {
-                "estimated_lines": 55,
-                "estimated_cjk_chars": 2463
+                "estimated_lines": 25,
+                "estimated_cjk_chars": 183
               },
               "source_sample_fingerprints": [
                 {
@@ -658,11 +655,40 @@
           ]
         }
       ],
-      "identity_regions": [],
+      "identity_regions": [
+        {
+          "region_id": "IDENTITY_FIXED_BACKGROUND",
+          "role": "fixed_background",
+          "preserve_for_template_identity": true,
+          "ownership_group": {
+            "component_ids": [
+              "S01_C2"
+            ],
+            "shape_ids": [
+              2
+            ],
+            "complete_delete_shape_ids": [
+              2
+            ],
+            "removal_policy": "remove_complete_ownership_group",
+            "remove_companions": [
+              "frame",
+              "heading",
+              "explanation",
+              "image",
+              "chart",
+              "icon",
+              "caption",
+              "connector",
+              "placeholder"
+            ]
+          }
+        }
+      ],
       "ownership_audit": {
         "component_count": 5,
-        "semantic_owned_component_count": 5,
-        "identity_owned_component_count": 0,
+        "semantic_owned_component_count": 4,
+        "identity_owned_component_count": 1,
         "unowned_component_ids": [],
         "duplicate_component_ids": []
       }
@@ -682,6 +708,7 @@
           "boundary"
         ],
         "content_module_count": 1,
+        "reconstructive_module_counts": [],
         "media_scope": "page"
       },
       "media_layout": {
@@ -803,11 +830,9 @@
               "S02_C14",
               "S02_C15",
               "S02_C16",
-              "S02_C2",
               "S02_C8"
             ],
             "shape_ids": [
-              2,
               8,
               10,
               11,
@@ -818,7 +843,6 @@
               16
             ],
             "complete_delete_shape_ids": [
-              2,
               8,
               10,
               11,
@@ -847,8 +871,8 @@
               "estimated_cjk_chars": 18
             },
             "explanation": {
-              "estimated_lines": 75,
-              "estimated_cjk_chars": 1502
+              "estimated_lines": 45,
+              "estimated_cjk_chars": 1292
             },
             "overflow_action": "shorten_split_or_reflow"
           },
@@ -899,7 +923,6 @@
               ],
               "required": true,
               "native_shape_ids": [
-                2,
                 8,
                 10,
                 11,
@@ -907,14 +930,14 @@
                 14
               ],
               "box": {
-                "left": 0.0,
+                "left": 0.0938,
                 "top": 0.0,
-                "width": 0.9998,
-                "height": 1.0
+                "width": 0.906,
+                "height": 0.86
               },
               "capacity": {
-                "estimated_lines": 75,
-                "estimated_cjk_chars": 1502
+                "estimated_lines": 45,
+                "estimated_cjk_chars": 1292
               },
               "source_sample_fingerprints": [
                 {
@@ -1017,6 +1040,34 @@
       ],
       "identity_regions": [
         {
+          "region_id": "IDENTITY_FIXED_BACKGROUND",
+          "role": "fixed_background",
+          "preserve_for_template_identity": true,
+          "ownership_group": {
+            "component_ids": [
+              "S02_C2"
+            ],
+            "shape_ids": [
+              2
+            ],
+            "complete_delete_shape_ids": [
+              2
+            ],
+            "removal_policy": "remove_complete_ownership_group",
+            "remove_companions": [
+              "frame",
+              "heading",
+              "explanation",
+              "image",
+              "chart",
+              "icon",
+              "caption",
+              "connector",
+              "placeholder"
+            ]
+          }
+        },
+        {
           "region_id": "IDENTITY_FOOTER_OR_NAVIGATION_LABEL",
           "role": "footer_or_navigation_label",
           "preserve_for_template_identity": true,
@@ -1084,8 +1135,8 @@
       ],
       "ownership_audit": {
         "component_count": 15,
-        "semantic_owned_component_count": 10,
-        "identity_owned_component_count": 5,
+        "semantic_owned_component_count": 9,
+        "identity_owned_component_count": 6,
         "unowned_component_ids": [],
         "duplicate_component_ids": []
       }
@@ -1105,6 +1156,7 @@
           "evidence"
         ],
         "content_module_count": 3,
+        "reconstructive_module_counts": [],
         "media_scope": "module"
       },
       "media_layout": {
@@ -1223,11 +1275,9 @@
               "S03_C11",
               "S03_C12",
               "S03_C13",
-              "S03_C14",
-              "S03_C2"
+              "S03_C14"
             ],
             "shape_ids": [
-              2,
               10,
               11,
               12,
@@ -1235,7 +1285,6 @@
               14
             ],
             "complete_delete_shape_ids": [
-              2,
               10,
               11,
               12,
@@ -1261,8 +1310,8 @@
               "estimated_cjk_chars": 11
             },
             "explanation": {
-              "estimated_lines": 53,
-              "estimated_cjk_chars": 587
+              "estimated_lines": 23,
+              "estimated_cjk_chars": 377
             },
             "overflow_action": "shorten_split_or_reflow"
           },
@@ -1313,21 +1362,20 @@
               ],
               "required": true,
               "native_shape_ids": [
-                2,
                 10,
                 11,
                 12,
                 14
               ],
               "box": {
-                "left": 0.0,
-                "top": 0.0,
-                "width": 0.3601,
-                "height": 1.0
+                "left": 0.1238,
+                "top": 0.224,
+                "width": 0.2363,
+                "height": 0.556
               },
               "capacity": {
-                "estimated_lines": 53,
-                "estimated_cjk_chars": 587
+                "estimated_lines": 23,
+                "estimated_cjk_chars": 377
               },
               "source_sample_fingerprints": [
                 {
@@ -1840,6 +1888,34 @@
       ],
       "identity_regions": [
         {
+          "region_id": "IDENTITY_FIXED_BACKGROUND",
+          "role": "fixed_background",
+          "preserve_for_template_identity": true,
+          "ownership_group": {
+            "component_ids": [
+              "S03_C2"
+            ],
+            "shape_ids": [
+              2
+            ],
+            "complete_delete_shape_ids": [
+              2
+            ],
+            "removal_policy": "remove_complete_ownership_group",
+            "remove_companions": [
+              "frame",
+              "heading",
+              "explanation",
+              "image",
+              "chart",
+              "icon",
+              "caption",
+              "connector",
+              "placeholder"
+            ]
+          }
+        },
+        {
           "region_id": "IDENTITY_FOOTER_OR_NAVIGATION_LABEL",
           "role": "footer_or_navigation_label",
           "preserve_for_template_identity": true,
@@ -1907,8 +1983,8 @@
       ],
       "ownership_audit": {
         "component_count": 21,
-        "semantic_owned_component_count": 16,
-        "identity_owned_component_count": 5,
+        "semantic_owned_component_count": 15,
+        "identity_owned_component_count": 6,
         "unowned_component_ids": [],
         "duplicate_component_ids": []
       }
@@ -2057,11 +2133,9 @@
               "S04_C17",
               "S04_C18",
               "S04_C19",
-              "S04_C2",
               "S04_C8"
             ],
             "shape_ids": [
-              2,
               8,
               10,
               11,
@@ -2075,7 +2149,6 @@
               19
             ],
             "complete_delete_shape_ids": [
-              2,
               8,
               10,
               11,
@@ -2107,8 +2180,8 @@
               "estimated_cjk_chars": 27
             },
             "explanation": {
-              "estimated_lines": 105,
-              "estimated_cjk_chars": 1545
+              "estimated_lines": 75,
+              "estimated_cjk_chars": 1335
             },
             "overflow_action": "shorten_split_or_reflow"
           },
@@ -2159,7 +2232,6 @@
               ],
               "required": true,
               "native_shape_ids": [
-                2,
                 8,
                 10,
                 11,
@@ -2172,14 +2244,14 @@
                 19
               ],
               "box": {
-                "left": 0.0,
+                "left": 0.0938,
                 "top": 0.0,
-                "width": 0.9998,
-                "height": 1.0
+                "width": 0.906,
+                "height": 0.8667
               },
               "capacity": {
-                "estimated_lines": 105,
-                "estimated_cjk_chars": 1545
+                "estimated_lines": 75,
+                "estimated_cjk_chars": 1335
               },
               "source_sample_fingerprints": [
                 {
@@ -2275,6 +2347,34 @@
       ],
       "identity_regions": [
         {
+          "region_id": "IDENTITY_FIXED_BACKGROUND",
+          "role": "fixed_background",
+          "preserve_for_template_identity": true,
+          "ownership_group": {
+            "component_ids": [
+              "S04_C2"
+            ],
+            "shape_ids": [
+              2
+            ],
+            "complete_delete_shape_ids": [
+              2
+            ],
+            "removal_policy": "remove_complete_ownership_group",
+            "remove_companions": [
+              "frame",
+              "heading",
+              "explanation",
+              "image",
+              "chart",
+              "icon",
+              "caption",
+              "connector",
+              "placeholder"
+            ]
+          }
+        },
+        {
           "region_id": "IDENTITY_FOOTER_OR_NAVIGATION_LABEL",
           "role": "footer_or_navigation_label",
           "preserve_for_template_identity": true,
@@ -2342,8 +2442,8 @@
       ],
       "ownership_audit": {
         "component_count": 18,
-        "semantic_owned_component_count": 13,
-        "identity_owned_component_count": 5,
+        "semantic_owned_component_count": 12,
+        "identity_owned_component_count": 6,
         "unowned_component_ids": [],
         "duplicate_component_ids": []
       }
@@ -2363,6 +2463,7 @@
           "next_action"
         ],
         "content_module_count": 1,
+        "reconstructive_module_counts": [],
         "media_scope": "none"
       },
       "media_layout": {
@@ -2378,10 +2479,10 @@
           "role": "ending_summary",
           "semantic_region": "content",
           "box": {
-            "left": 0.0,
+            "left": 0.0938,
             "top": 0.0,
-            "width": 0.9998,
-            "height": 1.0
+            "width": 0.906,
+            "height": 0.78
           },
           "render_contract": {
             "allowed_modes": [
@@ -2398,12 +2499,10 @@
               "S05_C11",
               "S05_C12",
               "S05_C13",
-              "S05_C2",
               "S05_C8",
               "S05_C9"
             ],
             "shape_ids": [
-              2,
               8,
               9,
               10,
@@ -2412,7 +2511,6 @@
               13
             ],
             "complete_delete_shape_ids": [
-              2,
               8,
               9,
               10,
@@ -2439,8 +2537,8 @@
               "estimated_cjk_chars": 31
             },
             "explanation": {
-              "estimated_lines": 50,
-              "estimated_cjk_chars": 1309
+              "estimated_lines": 20,
+              "estimated_cjk_chars": 1099
             },
             "overflow_action": "shorten_split_or_reflow"
           },
@@ -2491,7 +2589,6 @@
               ],
               "required": true,
               "native_shape_ids": [
-                2,
                 8,
                 10,
                 11,
@@ -2499,14 +2596,14 @@
                 13
               ],
               "box": {
-                "left": 0.0,
+                "left": 0.0938,
                 "top": 0.0,
-                "width": 0.9998,
-                "height": 1.0
+                "width": 0.906,
+                "height": 0.78
               },
               "capacity": {
-                "estimated_lines": 50,
-                "estimated_cjk_chars": 1309
+                "estimated_lines": 20,
+                "estimated_cjk_chars": 1099
               },
               "source_sample_fingerprints": [
                 {
@@ -2535,6 +2632,34 @@
         }
       ],
       "identity_regions": [
+        {
+          "region_id": "IDENTITY_FIXED_BACKGROUND",
+          "role": "fixed_background",
+          "preserve_for_template_identity": true,
+          "ownership_group": {
+            "component_ids": [
+              "S05_C2"
+            ],
+            "shape_ids": [
+              2
+            ],
+            "complete_delete_shape_ids": [
+              2
+            ],
+            "removal_policy": "remove_complete_ownership_group",
+            "remove_companions": [
+              "frame",
+              "heading",
+              "explanation",
+              "image",
+              "chart",
+              "icon",
+              "caption",
+              "connector",
+              "placeholder"
+            ]
+          }
+        },
         {
           "region_id": "IDENTITY_FOOTER_OR_NAVIGATION_LABEL",
           "role": "footer_or_navigation_label",
@@ -2603,8 +2728,8 @@
       ],
       "ownership_audit": {
         "component_count": 12,
-        "semantic_owned_component_count": 7,
-        "identity_owned_component_count": 5,
+        "semantic_owned_component_count": 6,
+        "identity_owned_component_count": 6,
         "unowned_component_ids": [],
         "duplicate_component_ids": []
       }

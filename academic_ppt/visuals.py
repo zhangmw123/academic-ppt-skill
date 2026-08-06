@@ -63,3 +63,14 @@ class VisualTask:
         if self.status != expected:
             raise ValueError(f"cannot {next_status} visual task from {self.status}")
         return replace(self, status=next_status)
+
+
+def bind_rendered_visual_task(
+    task: VisualTask,
+    output_path: Path | str,
+    *,
+    review_passed: bool,
+) -> VisualTask:
+    """Bind a rendered task without inventing a visual-review decision."""
+    bound = task.lock_semantics().mark_rendered(output_path).bind_to_slide()
+    return bound.mark_render_inspected().accept() if review_passed else bound

@@ -1555,6 +1555,7 @@
           "date"
         ],
         "content_module_count": 1,
+        "reconstructive_module_counts": [],
         "media_scope": "none"
       },
       "media_layout": {
@@ -1819,6 +1820,7 @@
           "research_value"
         ],
         "content_module_count": 4,
+        "reconstructive_module_counts": [],
         "media_scope": "none"
       },
       "media_layout": {
@@ -2573,6 +2575,7 @@
           "unresolved_gap"
         ],
         "content_module_count": 2,
+        "reconstructive_module_counts": [],
         "media_scope": "module"
       },
       "media_layout": {
@@ -3321,6 +3324,7 @@
           "module_visual"
         ],
         "content_module_count": 3,
+        "reconstructive_module_counts": [],
         "media_scope": "module"
       },
       "media_layout": {
@@ -4428,6 +4432,7 @@
           "transition"
         ],
         "content_module_count": 5,
+        "reconstructive_module_counts": [],
         "media_scope": "none"
       },
       "media_layout": {
@@ -5418,6 +5423,7 @@
           "supporting_visual"
         ],
         "content_module_count": 4,
+        "reconstructive_module_counts": [],
         "media_scope": "module"
       },
       "media_layout": {
@@ -6550,6 +6556,7 @@
           "cross_panel_interpretation"
         ],
         "content_module_count": 1,
+        "reconstructive_module_counts": [],
         "media_scope": "page"
       },
       "media_layout": {
@@ -7459,6 +7466,7 @@
           "boundary"
         ],
         "content_module_count": 1,
+        "reconstructive_module_counts": [],
         "media_scope": "page"
       },
       "media_layout": {
@@ -7897,6 +7905,7 @@
           "risk_boundary"
         ],
         "content_module_count": 1,
+        "reconstructive_module_counts": [],
         "media_scope": "page"
       },
       "media_layout": {
@@ -8275,6 +8284,7 @@
           "acknowledgement"
         ],
         "content_module_count": 1,
+        "reconstructive_module_counts": [],
         "media_scope": "none"
       },
       "media_layout": {

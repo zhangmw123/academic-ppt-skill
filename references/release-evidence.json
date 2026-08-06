@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "release": "1.0",
+  "scene_benchmarks": [
+    {
+      "case_id": "proposal-defense-modeling",
+      "scene": "开题答辩",
+      "template_id": "T05",
+      "source_path": "基于知识图谱的云南植物知识问答系统的研究与构建_刘金平.pdf",
+      "source_sha256": "3f4da70d68493be9af19ca697b1c1145f56ea3e3ffdf4285a466c2b37bcc3f3f",
+      "candidate_pptx": "release_evidence/scenes/proposal-defense-modeling/candidate/working/final/complete_deck.pptx",
+      "build_report": "release_evidence/scenes/proposal-defense-modeling/candidate/audit/complete_build_result.json",
+      "acceptance_report": "release_evidence/scenes/proposal-defense-modeling/candidate/audit/product_acceptance.json",
+      "runtime_report": "release_evidence/scenes/proposal-defense-modeling/powerpoint-runtime/report.json",
+      "visual_review": "release_evidence/scenes/proposal-defense-modeling/visual-review.json"
+    },
+    {
+      "case_id": "midterm-laboratory",
+      "scene": "中期考核",
+      "template_id": "T06",
+      "source_path": "基于知识图谱的云南植物知识问答系统的研究与构建_刘金平.pdf",
+      "source_sha256": "3f4da70d68493be9af19ca697b1c1145f56ea3e3ffdf4285a466c2b37bcc3f3f",
+      "candidate_pptx": "release_evidence/scenes/midterm-laboratory/candidate/working/final/complete_deck.pptx",
+      "build_report": "release_evidence/scenes/midterm-laboratory/candidate/audit/complete_build_result.json",
+      "acceptance_report": "release_evidence/scenes/midterm-laboratory/candidate/audit/product_acceptance.json",
+      "runtime_report": "release_evidence/scenes/midterm-laboratory/powerpoint-runtime/report.json",
+      "visual_review": "release_evidence/scenes/midterm-laboratory/visual-review.json"
+    },
+    {
+      "case_id": "graduation-survey",
+      "scene": "毕业答辩",
+      "template_id": "T03",
+      "source_path": "基于知识图谱的云南植物知识问答系统的研究与构建_刘金平.pdf",
+      "source_sha256": "3f4da70d68493be9af19ca697b1c1145f56ea3e3ffdf4285a466c2b37bcc3f3f",
+      "candidate_pptx": "release_evidence/scenes/graduation-survey/candidate/working/final/complete_deck.pptx",
+      "build_report": "release_evidence/scenes/graduation-survey/candidate/audit/complete_build_result.json",
+      "acceptance_report": "release_evidence/scenes/graduation-survey/candidate/audit/product_acceptance.json",
+      "runtime_report": "release_evidence/scenes/graduation-survey/powerpoint-runtime/report.json",
+      "visual_review": "release_evidence/scenes/graduation-survey/visual-review.json"
+    },
+    {
+      "case_id": "lab-paper-deep-reading",
+      "scene": "组会-文献精读",
+      "template_id": "T01",
+      "source_path": "测试文件.pdf",
+      "source_sha256": "ef3ee12098cce184dee58158d33676fc18fd2cf06fe3352b64fdedbdc26f526b",
+      "candidate_pptx": "release_evidence/scenes/lab-paper-deep-reading/candidate/working/final/complete_deck.pptx",
+      "build_report": "release_evidence/scenes/lab-paper-deep-reading/candidate/audit/complete_build_result.json",
+      "acceptance_report": "release_evidence/scenes/lab-paper-deep-reading/candidate/audit/product_acceptance.json",
+      "runtime_report": "release_evidence/scenes/lab-paper-deep-reading/powerpoint-runtime/report.json",
+      "visual_review": "release_evidence/scenes/lab-paper-deep-reading/visual-review.json"
+    },
+    {
+      "case_id": "lab-weekly-progress",
+      "scene": "组会-周报进展",
+      "template_id": "T01",
+      "source_path": "benchmarks/sources/academic-ppt-weekly-progress.md",
+      "source_sha256": "",
+      "candidate_pptx": "release_evidence/scenes/lab-weekly-progress/candidate/working/final/complete_deck.pptx",
+      "build_report": "release_evidence/scenes/lab-weekly-progress/candidate/audit/complete_build_result.json",
+      "acceptance_report": "release_evidence/scenes/lab-weekly-progress/candidate/audit/product_acceptance.json",
+      "runtime_report": "release_evidence/scenes/lab-weekly-progress/powerpoint-runtime/report.json",
+      "visual_review": "release_evidence/scenes/lab-weekly-progress/visual-review.json"
+    },
+    {
+      "case_id": "lab-research-progress",
+      "scene": "组会-课题进展",
+      "template_id": "T07",
+      "source_path": "基于知识图谱的云南植物知识问答系统的研究与构建_刘金平.pdf",
+      "source_sha256": "3f4da70d68493be9af19ca697b1c1145f56ea3e3ffdf4285a466c2b37bcc3f3f",
+      "candidate_pptx": "release_evidence/scenes/lab-research-progress/candidate/working/final/complete_deck.pptx",
+      "build_report": "release_evidence/scenes/lab-research-progress/candidate/audit/complete_build_result.json",
+      "acceptance_report": "release_evidence/scenes/lab-research-progress/candidate/audit/product_acceptance.json",
+      "runtime_report": "release_evidence/scenes/lab-research-progress/powerpoint-runtime/report.json",
+      "visual_review": "release_evidence/scenes/lab-research-progress/visual-review.json"
+    },
+    {
+      "case_id": "project-application-engineering",
+      "scene": "科研项目申报",
+      "template_id": "T04",
+      "source_path": "基于知识图谱的云南植物知识问答系统的研究与构建_刘金平.pdf",
+      "source_sha256": "3f4da70d68493be9af19ca697b1c1145f56ea3e3ffdf4285a466c2b37bcc3f3f",
+      "candidate_pptx": "release_evidence/scenes/project-application-engineering/candidate/working/final/complete_deck.pptx",
+      "build_report": "release_evidence/scenes/project-application-engineering/candidate/audit/complete_build_result.json",
+      "acceptance_report": "release_evidence/scenes/project-application-engineering/candidate/audit/product_acceptance.json",
+      "runtime_report": "release_evidence/scenes/project-application-engineering/powerpoint-runtime/report.json",
+      "visual_review": "release_evidence/scenes/project-application-engineering/visual-review.json"
+    },
+    {
+      "case_id": "project-competition-engineering",
+      "scene": "科研项目比赛",
+      "template_id": "T04",
+      "source_path": "基于知识图谱的云南植物知识问答系统的研究与构建_刘金平.pdf",
+      "source_sha256": "3f4da70d68493be9af19ca697b1c1145f56ea3e3ffdf4285a466c2b37bcc3f3f",
+      "candidate_pptx": "release_evidence/scenes/project-competition-engineering/candidate/working/final/complete_deck.pptx",
+      "build_report": "release_evidence/scenes/project-competition-engineering/candidate/audit/complete_build_result.json",
+      "acceptance_report": "release_evidence/scenes/project-competition-engineering/candidate/audit/product_acceptance.json",
+      "runtime_report": "release_evidence/scenes/project-competition-engineering/powerpoint-runtime/report.json",
+      "visual_review": "release_evidence/scenes/project-competition-engineering/visual-review.json"
+    },
+    {
+      "case_id": "project-closeout-engineering",
+      "scene": "项目中期与结题",
+      "template_id": "T08",
+      "source_path": "基于知识图谱的云南植物知识问答系统的研究与构建_刘金平.pdf",
+      "source_sha256": "3f4da70d68493be9af19ca697b1c1145f56ea3e3ffdf4285a466c2b37bcc3f3f",
+      "candidate_pptx": "release_evidence/scenes/project-closeout-engineering/candidate/working/final/complete_deck.pptx",
+      "build_report": "release_evidence/scenes/project-closeout-engineering/candidate/audit/complete_build_result.json",
+      "acceptance_report": "release_evidence/scenes/project-closeout-engineering/candidate/audit/product_acceptance.json",
+      "runtime_report": "release_evidence/scenes/project-closeout-engineering/powerpoint-runtime/report.json",
+      "visual_review": "release_evidence/scenes/project-closeout-engineering/visual-review.json"
+    },
+    {
+      "case_id": "conference-modeling-talk",
+      "scene": "学术会议报告",
+      "template_id": "T02",
+      "source_path": "测试文件.pdf",
+      "source_sha256": "ef3ee12098cce184dee58158d33676fc18fd2cf06fe3352b64fdedbdc26f526b",
+      "candidate_pptx": "release_evidence/scenes/conference-modeling-talk/candidate/working/final/complete_deck.pptx",
+      "build_report": "release_evidence/scenes/conference-modeling-talk/candidate/audit/complete_build_result.json",
+      "acceptance_report": "release_evidence/scenes/conference-modeling-talk/candidate/audit/product_acceptance.json",
+      "runtime_report": "release_evidence/scenes/conference-modeling-talk/powerpoint-runtime/report.json",
+      "visual_review": "release_evidence/scenes/conference-modeling-talk/visual-review.json"
+    }
+  ],
+  "template_regressions": [
+    {
+      "template_id": "T01",
+      "semantic_spec": "assets/template_specs/T01_green_research.semantic.json",
+      "candidate_pptx": "release_evidence/scenes/lab-paper-deep-reading/candidate/working/final/complete_deck.pptx",
+      "build_report": "release_evidence/scenes/lab-paper-deep-reading/candidate/audit/complete_build_result.json",
+      "object_qa_report": "release_evidence/scenes/lab-paper-deep-reading/candidate/audit/object_qa.json",
+      "composition_report": "release_evidence/scenes/lab-paper-deep-reading/candidate/audit/composition_quality.json",
+      "runtime_report": "release_evidence/scenes/lab-paper-deep-reading/powerpoint-runtime/report.json",
+      "visual_review": "release_evidence/scenes/lab-paper-deep-reading/visual-review.json"
+    },
+    {
+      "template_id": "T02",
+      "semantic_spec": "assets/template_specs/T02_blue_research.semantic.json",
+      "candidate_pptx": "release_evidence/scenes/conference-modeling-talk/candidate/working/final/complete_deck.pptx",
+      "build_report": "release_evidence/scenes/conference-modeling-talk/candidate/audit/complete_build_result.json",
+      "object_qa_report": "release_evidence/scenes/conference-modeling-talk/candidate/audit/object_qa.json",
+      "composition_report": "release_evidence/scenes/conference-modeling-talk/candidate/audit/composition_quality.json",
+      "runtime_report": "release_evidence/scenes/conference-modeling-talk/powerpoint-runtime/report.json",
+      "visual_review": "release_evidence/scenes/conference-modeling-talk/visual-review.json"
+    },
+    {
+      "template_id": "T03",
+      "semantic_spec": "assets/template_specs/T03_blue_defense.semantic.json",
+      "candidate_pptx": "release_evidence/scenes/graduation-survey/candidate/working/final/complete_deck.pptx",
+      "build_report": "release_evidence/scenes/graduation-survey/candidate/audit/complete_build_result.json",
+      "object_qa_report": "release_evidence/scenes/graduation-survey/candidate/audit/object_qa.json",
+      "composition_report": "release_evidence/scenes/graduation-survey/candidate/audit/composition_quality.json",
+      "runtime_report": "release_evidence/scenes/graduation-survey/powerpoint-runtime/report.json",
+      "visual_review": "release_evidence/scenes/graduation-survey/visual-review.json"
+    },
+    {
+      "template_id": "T04",
+      "semantic_spec": "assets/template_specs/T04_project_application.semantic.json",
+      "candidate_pptx": "release_evidence/scenes/project-application-engineering/candidate/working/final/complete_deck.pptx",
+      "build_report": "release_evidence/scenes/project-application-engineering/candidate/audit/complete_build_result.json",
+      "object_qa_report": "release_evidence/scenes/project-application-engineering/candidate/audit/object_qa.json",
+      "composition_report": "release_evidence/scenes/project-application-engineering/candidate/audit/composition_quality.json",
+      "runtime_report": "release_evidence/scenes/project-application-engineering/powerpoint-runtime/report.json",
+      "visual_review": "release_evidence/scenes/project-application-engineering/visual-review.json"
+    },
+    {
+      "template_id": "T05",
+      "semantic_spec": "assets/template_specs/T05_red_general.semantic.json",
+      "candidate_pptx": "release_evidence/scenes/proposal-defense-modeling/candidate/working/final/complete_deck.pptx",
+      "build_report": "release_evidence/scenes/proposal-defense-modeling/candidate/audit/complete_build_result.json",
+      "object_qa_report": "release_evidence/scenes/proposal-defense-modeling/candidate/audit/object_qa.json",
+      "composition_report": "release_evidence/scenes/proposal-defense-modeling/candidate/audit/composition_quality.json",
+      "runtime_report": "release_evidence/scenes/proposal-defense-modeling/powerpoint-runtime/report.json",
+      "visual_review": "release_evidence/scenes/proposal-defense-modeling/visual-review.json"
+    },
+    {
+      "template_id": "T06",
+      "semantic_spec": "assets/template_specs/T06_yunnan_purple.semantic.json",
+      "candidate_pptx": "release_evidence/scenes/midterm-laboratory/candidate/working/final/complete_deck.pptx",
+      "build_report": "release_evidence/scenes/midterm-laboratory/candidate/audit/complete_build_result.json",
+      "object_qa_report": "release_evidence/scenes/midterm-laboratory/candidate/audit/object_qa.json",
+      "composition_report": "release_evidence/scenes/midterm-laboratory/candidate/audit/composition_quality.json",
+      "runtime_report": "release_evidence/scenes/midterm-laboratory/powerpoint-runtime/report.json",
+      "visual_review": "release_evidence/scenes/midterm-laboratory/visual-review.json"
+    },
+    {
+      "template_id": "T07",
+      "semantic_spec": "assets/template_specs/T07_yunnan_red.semantic.json",
+      "candidate_pptx": "release_evidence/scenes/lab-research-progress/candidate/working/final/complete_deck.pptx",
+      "build_report": "release_evidence/scenes/lab-research-progress/candidate/audit/complete_build_result.json",
+      "object_qa_report": "release_evidence/scenes/lab-research-progress/candidate/audit/object_qa.json",
+      "composition_report": "release_evidence/scenes/lab-research-progress/candidate/audit/composition_quality.json",
+      "runtime_report": "release_evidence/scenes/lab-research-progress/powerpoint-runtime/report.json",
+      "visual_review": "release_evidence/scenes/lab-research-progress/visual-review.json"
+    },
+    {
+      "template_id": "T08",
+      "semantic_spec": "assets/template_specs/T08_yunnan_blue.semantic.json",
+      "candidate_pptx": "release_evidence/scenes/project-closeout-engineering/candidate/working/final/complete_deck.pptx",
+      "build_report": "release_evidence/scenes/project-closeout-engineering/candidate/audit/complete_build_result.json",
+      "object_qa_report": "release_evidence/scenes/project-closeout-engineering/candidate/audit/object_qa.json",
+      "composition_report": "release_evidence/scenes/project-closeout-engineering/candidate/audit/composition_quality.json",
+      "runtime_report": "release_evidence/scenes/project-closeout-engineering/powerpoint-runtime/report.json",
+      "visual_review": "release_evidence/scenes/project-closeout-engineering/visual-review.json"
+    }
+  ],
+  "verification": [
+    {"id": "full_test_suite", "report": "release_evidence/verification/full-tests.json"},
+    {"id": "skill_validation", "report": "release_evidence/verification/skill-validation.json"},
+    {"id": "clean_host_installation", "report": "release_evidence/verification/clean-host-installation.json"},
+    {"id": "release_documentation", "report": "release_evidence/verification/release-documentation.json"}
+  ],
+  "release_confirmation": "release_evidence/release-confirmation.json"
+}

@@ -4,11 +4,16 @@
   "requested_templates": [
     "T01",
     "T02",
-    "T03"
+    "T03",
+    "T04",
+    "T05",
+    "T06",
+    "T07",
+    "T08"
   ],
   "semantic_compile_passed": true,
-  "render_check_requested": true,
-  "render_check_passed": true,
+  "render_check_requested": false,
+  "render_check_passed": false,
   "templates": [
     {
       "template_id": "T01",
@@ -67,7 +72,7 @@
         "No render manifest supplied; empty media, replacement fonts, source provenance, and sample residue are checked only after binding."
       ],
       "powerpoint_visual_review": "passed",
-      "powerpoint_preview_count": 10,
+      "powerpoint_preview_count": 0,
       "powerpoint_error": null,
       "product_accepted": false
     },
@@ -128,7 +133,7 @@
         "No render manifest supplied; empty media, replacement fonts, source provenance, and sample residue are checked only after binding."
       ],
       "powerpoint_visual_review": "passed",
-      "powerpoint_preview_count": 9,
+      "powerpoint_preview_count": 0,
       "powerpoint_error": null,
       "product_accepted": false
     },
@@ -195,20 +200,229 @@
         "No render manifest supplied; empty media, replacement fonts, source provenance, and sample residue are checked only after binding."
       ],
       "powerpoint_visual_review": "passed",
-      "powerpoint_preview_count": 11,
+      "powerpoint_preview_count": 0,
+      "powerpoint_error": null,
+      "product_accepted": false
+    },
+    {
+      "template_id": "T04",
+      "standard_editable_pptx": "assets/powerpoint_templates/T04_project_application.pptx",
+      "semantic_specification": "assets/template_specs/T04_project_application.semantic.json",
+      "slide_count": 5,
+      "semantic_module_count": 10,
+      "child_slot_count": 27,
+      "media_archetypes": [
+        {
+          "page_id": "T04_P02",
+          "scope": "page",
+          "kind": "one_image",
+          "slot_count": 1
+        },
+        {
+          "page_id": "T04_P03",
+          "scope": "module",
+          "kind": "one_per_module",
+          "slot_count": 3
+        },
+        {
+          "page_id": "T04_P04",
+          "scope": "page",
+          "kind": "one_image",
+          "slot_count": 1
+        }
+      ],
+      "identity_signature": "37cb35edcc6a9d8f98e878134abe85b24e6592611d1b520a2df91ac911f747b7",
+      "structure_identity": {
+        "passed": false,
+        "source_fingerprint": "5dd2e8ba043f5a1e0a826900c29055e638c79032a3b747f4916a966d1919ec39",
+        "standard_fingerprint": "6331ff48bb119d47c069fc48e8ac101002bb6289c3cf99bb476c8d234a0bedee"
+      },
+      "semantic_compile_passed": true,
+      "object_qa_passed": true,
+      "object_qa_observations": [
+        "No render manifest supplied; empty media, replacement fonts, source provenance, and sample residue are checked only after binding."
+      ],
+      "powerpoint_visual_review": "not_run",
+      "powerpoint_preview_count": 0,
+      "powerpoint_error": null,
+      "product_accepted": false
+    },
+    {
+      "template_id": "T05",
+      "standard_editable_pptx": "assets/powerpoint_templates/T05_red_general.pptx",
+      "semantic_specification": "assets/template_specs/T05_red_general.semantic.json",
+      "slide_count": 5,
+      "semantic_module_count": 10,
+      "child_slot_count": 27,
+      "media_archetypes": [
+        {
+          "page_id": "T05_P02",
+          "scope": "page",
+          "kind": "one_image",
+          "slot_count": 1
+        },
+        {
+          "page_id": "T05_P03",
+          "scope": "module",
+          "kind": "one_per_module",
+          "slot_count": 3
+        },
+        {
+          "page_id": "T05_P04",
+          "scope": "page",
+          "kind": "one_image",
+          "slot_count": 1
+        }
+      ],
+      "identity_signature": "b80a27ab1b9168bb23d205eb496f081b51318ec6846dd573488137544786fd77",
+      "structure_identity": {
+        "passed": false,
+        "source_fingerprint": "6828d4177c6d167be58998d5e1f58f78d2e26c683a9e4795a7ffed8ad7c32877",
+        "standard_fingerprint": "6331ff48bb119d47c069fc48e8ac101002bb6289c3cf99bb476c8d234a0bedee"
+      },
+      "semantic_compile_passed": true,
+      "object_qa_passed": true,
+      "object_qa_observations": [
+        "No render manifest supplied; empty media, replacement fonts, source provenance, and sample residue are checked only after binding."
+      ],
+      "powerpoint_visual_review": "not_run",
+      "powerpoint_preview_count": 0,
+      "powerpoint_error": null,
+      "product_accepted": false
+    },
+    {
+      "template_id": "T06",
+      "standard_editable_pptx": "assets/powerpoint_templates/T06_yunnan_purple.pptx",
+      "semantic_specification": "assets/template_specs/T06_yunnan_purple.semantic.json",
+      "slide_count": 5,
+      "semantic_module_count": 10,
+      "child_slot_count": 27,
+      "media_archetypes": [
+        {
+          "page_id": "T06_P02",
+          "scope": "page",
+          "kind": "one_image",
+          "slot_count": 1
+        },
+        {
+          "page_id": "T06_P03",
+          "scope": "module",
+          "kind": "one_per_module",
+          "slot_count": 3
+        },
+        {
+          "page_id": "T06_P04",
+          "scope": "page",
+          "kind": "one_image",
+          "slot_count": 1
+        }
+      ],
+      "identity_signature": "2f27146a4948d63fd8cee896a92ff06dbdc1f402a3756376229c92da6e4d1c3b",
+      "structure_identity": {
+        "passed": false,
+        "source_fingerprint": "ff52ba4abf4aa74a360667433fbdeb49cc6e3e53a986ce8a0f0c28b402b80184",
+        "standard_fingerprint": "da4b63b1239e292f604139784a036eff021b17ec40c86a291fb3ce89b1f90529"
+      },
+      "semantic_compile_passed": true,
+      "object_qa_passed": true,
+      "object_qa_observations": [
+        "No render manifest supplied; empty media, replacement fonts, source provenance, and sample residue are checked only after binding."
+      ],
+      "powerpoint_visual_review": "not_run",
+      "powerpoint_preview_count": 0,
+      "powerpoint_error": null,
+      "product_accepted": false
+    },
+    {
+      "template_id": "T07",
+      "standard_editable_pptx": "assets/powerpoint_templates/T07_yunnan_red.pptx",
+      "semantic_specification": "assets/template_specs/T07_yunnan_red.semantic.json",
+      "slide_count": 5,
+      "semantic_module_count": 10,
+      "child_slot_count": 27,
+      "media_archetypes": [
+        {
+          "page_id": "T07_P02",
+          "scope": "page",
+          "kind": "one_image",
+          "slot_count": 1
+        },
+        {
+          "page_id": "T07_P03",
+          "scope": "module",
+          "kind": "one_per_module",
+          "slot_count": 3
+        },
+        {
+          "page_id": "T07_P04",
+          "scope": "page",
+          "kind": "one_image",
+          "slot_count": 1
+        }
+      ],
+      "identity_signature": "73af2bbf4ea0c1e33d77f7f334b1701890606dbef14e0d92e12b05124403fad5",
+      "structure_identity": {
+        "passed": false,
+        "source_fingerprint": "1993819384f62241d03c3e6ee3fd2145fe277a3fbc848d6e041d1aacb14a4294",
+        "standard_fingerprint": "da4b63b1239e292f604139784a036eff021b17ec40c86a291fb3ce89b1f90529"
+      },
+      "semantic_compile_passed": true,
+      "object_qa_passed": true,
+      "object_qa_observations": [
+        "No render manifest supplied; empty media, replacement fonts, source provenance, and sample residue are checked only after binding."
+      ],
+      "powerpoint_visual_review": "not_run",
+      "powerpoint_preview_count": 0,
+      "powerpoint_error": null,
+      "product_accepted": false
+    },
+    {
+      "template_id": "T08",
+      "standard_editable_pptx": "assets/powerpoint_templates/T08_yunnan_blue.pptx",
+      "semantic_specification": "assets/template_specs/T08_yunnan_blue.semantic.json",
+      "slide_count": 5,
+      "semantic_module_count": 10,
+      "child_slot_count": 27,
+      "media_archetypes": [
+        {
+          "page_id": "T08_P02",
+          "scope": "page",
+          "kind": "one_image",
+          "slot_count": 1
+        },
+        {
+          "page_id": "T08_P03",
+          "scope": "module",
+          "kind": "one_per_module",
+          "slot_count": 3
+        },
+        {
+          "page_id": "T08_P04",
+          "scope": "page",
+          "kind": "one_image",
+          "slot_count": 1
+        }
+      ],
+      "identity_signature": "a35469d03035fd21880005b13cc88acbba94660466e1e9adac9198700a08fcf5",
+      "structure_identity": {
+        "passed": false,
+        "source_fingerprint": "0597a91635d43be127ebfe7c45f18ede10876daf5a7912c4d1fc06950a277c99",
+        "standard_fingerprint": "da4b63b1239e292f604139784a036eff021b17ec40c86a291fb3ce89b1f90529"
+      },
+      "semantic_compile_passed": true,
+      "object_qa_passed": true,
+      "object_qa_observations": [
+        "No render manifest supplied; empty media, replacement fonts, source provenance, and sample residue are checked only after binding."
+      ],
+      "powerpoint_visual_review": "not_run",
+      "powerpoint_preview_count": 0,
       "powerpoint_error": null,
       "product_accepted": false
     }
   ],
   "failures": [],
-  "remaining_templates": [
-    "T04",
-    "T05",
-    "T06",
-    "T07",
-    "T08"
-  ],
-  "all_eight_templates_complete": false,
+  "remaining_templates": [],
+  "all_eight_templates_complete": true,
   "product_accepted": false,
   "release_note": "Semantic compilation is a prerequisite only; all eight templates and formal PowerPoint review remain mandatory."
 }

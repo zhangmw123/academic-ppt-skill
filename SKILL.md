@@ -450,6 +450,7 @@ bind real representative sources and pass the complete Skill entry point:
 ```powershell
 python "<skill-root>/scripts/run_scene_benchmarks.py"
 python "<skill-root>/scripts/run_scene_benchmarks.py" --formal --runtime powerpoint
+python "<skill-root>/scripts/audit_release_readiness.py"
 ```
 
 Do not fork per-scene application logic. Update

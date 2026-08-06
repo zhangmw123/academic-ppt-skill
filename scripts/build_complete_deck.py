@@ -34,7 +34,7 @@ from academic_ppt.scenes import SceneCatalog
 from academic_ppt.speaker import SpeakerScriptWriter
 from academic_ppt.storylines import StorylinePlanner
 from academic_ppt.templates import TemplateAdmissionGate, TemplateCapabilityGraph, TemplateCatalog
-from academic_ppt.visuals import VisualTask
+from academic_ppt.visuals import VisualTask, bind_rendered_visual_task
 
 
 def _representative_page_ids(plan) -> set[str]:
@@ -276,12 +276,10 @@ def _render_dynamic_candidate(
     ]
     _write_json(audit / "visual_tasks.json", {"visual_tasks": [task.__dict__ for task in tasks]})
     review_passed = ProductAcceptanceEvaluator._visual_review_passed(args.visual_review, len(plan.pages))
-    final_tasks = []
-    for task in tasks:
-        task = task.lock_semantics().mark_rendered(final_pptx).bind_to_slide()
-        if review_passed:
-            task = task.mark_render_inspected().accept()
-        final_tasks.append(task)
+    final_tasks = [
+        bind_rendered_visual_task(task, final_pptx, review_passed=review_passed)
+        for task in tasks
+    ]
     _write_json(audit / "final_visual_tasks.json", {"visual_tasks": [task.__dict__ for task in final_tasks]})
 
     semantic = ScientificSemanticGate().inspect(plan, graph)
@@ -739,12 +737,14 @@ def main() -> None:
         font_policy=font_policy,
     )
     final_pptx = adapter.render(final_layout, selected_template["path"], working / "final" / "complete_deck.pptx")
+    review_passed = ProductAcceptanceEvaluator._visual_review_passed(args.visual_review, len(plan.pages))
     final_tasks = []
     for task in tasks:
         images = content.image_content.get(task.page_id, [])
         output = images[0] if images else final_pptx
-        task = task.lock_semantics().mark_rendered(output).bind_to_slide().mark_render_inspected().accept()
-        final_tasks.append(task)
+        final_tasks.append(
+            bind_rendered_visual_task(task, output, review_passed=review_passed)
+        )
     _write_json(audit / "final_visual_tasks.json", {"visual_tasks": [task.__dict__ for task in final_tasks]})
 
     semantic = ScientificSemanticGate().inspect(plan, graph)
